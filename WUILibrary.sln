@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WUIClient", "WUIClient\WUIClient.csproj", "{F2FBA4EB-7364-4546-A89B-0E8E372837E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WUIServer", "WUIServer\WUIServer.csproj", "{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WUIShared", "WUIShared\WUIShared.shproj", "{7529D369-8762-4AA4-BD87-B3C21801BB0E}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		WUIShared\WUIShared.projitems*{7529d369-8762-4aa4-bd87-b3c21801bb0e}*SharedItemsImports = 13
+		WUIShared\WUIShared.projitems*{f2fba4eb-7364-4546-a89b-0e8e372837e0}*SharedItemsImports = 4
+		WUIShared\WUIShared.projitems*{f5d2c8d0-7032-4982-8c46-71fa5eb0b447}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2FBA4EB-7364-4546-A89B-0E8E372837E0}.Release|x86.Build.0 = Release|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5D2C8D0-7032-4982-8C46-71FA5EB0B447}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {14581A40-F8DF-4451-A51C-12E31F36E5FE}
+	EndGlobalSection
+EndGlobal

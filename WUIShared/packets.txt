@@ -1,0 +1,72 @@
+﻿#output C:\Users\waldohp\source\repos\WUILibrary\WUIShared\Packets.cs
+#namespace WUIShared.Packets
+#packetEnumName PacketTypes
+
+PlayerJoined
+	int PID
+	int UID
+	string username
+
+PlayerLeft
+	int PID
+
+SpawnGameObject
+	int ObjType
+	int UID
+	int parentUID
+
+ChangeGameObjectUID
+	int oldUID
+	int newUID
+
+FreeTempUID
+	int UID
+
+DestroyGameObject
+	int UID
+
+SetParentOfGameObject
+	int UID
+	int newParentUID
+
+TransformPositionSet
+	int UID
+	float x
+	float y
+	float z
+
+RawTextureRendererTextureSet
+	int UID
+	int assetUID
+	float r
+	float g
+	float b
+
+RawTextureRendererRotationSet
+	int UID
+	float rotation
+
+AssetSend
+	int assetUID
+	byte[] asset
+
+ByteArrayUserPacket
+	int UID
+	byte type
+	byte[p8388608] data
+
+FloatArrayUserPacket
+	int UID
+	byte type
+	float[p8] data
+
+IntArrayUserPacket
+	int UID
+	byte type
+	int[p8] data
+
+StringArrayUserPacket
+	int UID
+	byte type
+	string[p3] data
+
