@@ -137,10 +137,19 @@ namespace WUIClient {
             toBeAdded.Enqueue(child);
         }
 
-        public void RemoveChild(GameObject child) {
+        public void RemoveChild(GameObject gameObject, bool sendToOthers = true) {
             childrenChanged = true;
-            toBeRemoved.Enqueue(child);
-            child.Parent = null;
+            toBeRemoved.Enqueue(gameObject);
+            if (multiplayer && gameObject.Parent != null) {
+                Game1.networkManager.Remove(gameObject, sendToOthers);
+                foreach (var item in gameObject.children)
+                    item.Remove();
+            }
+            gameObject.Parent = null;
+        }
+
+        public void Remove(bool sendToOthers = true) {
+            Parent.RemoveChild(this, sendToOthers);
         }
 
         public T GetFirst<T>() where T : GameObject {

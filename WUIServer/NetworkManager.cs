@@ -26,12 +26,18 @@ namespace WUIServer {
             client.On<ByteArrayUserPacket>(Client_ByteArrayUserPacket);
             client.On<SpawnGameObject>(Client_SpawnGameObject);
             client.On<FreeTempUID>(Client_FreeTempUID);
-
+            client.On<DestroyGameObject>(Client_DestroyGameObject);
             client.OnStart += Client_OnStart;
         }
 
         private void Client_OnStart(ClientBase client) {
             world.SendTo(client);
+        }
+
+        private void Client_DestroyGameObject(ClientBase sender, DestroyGameObject packet) {
+            if (!gameObjects.ContainsKey(packet.UID)) return;
+            GameObject gameObject = gameObjects[packet.UID];
+            gameObject.Parent.RemoveChild(gameObject);
         }
 
         private void Client_FreeTempUID(ClientBase sender, FreeTempUID packet) {
@@ -45,7 +51,7 @@ namespace WUIServer {
             if (!clientObjectIdsToServerObjectIds.ContainsKey(sender))
                 clientObjectIdsToServerObjectIds.Add(sender, new Dictionary<int, int>());
             Dictionary<int, int> clientToServerIds = clientObjectIdsToServerObjectIds[sender];
-            
+
             GameObject gameObject = ObjectInstantiator.Instantiate((Objects)packet.ObjType);
             gameObject.UID = GenerateFreeId();
             clientToServerIds[packet.UID] = gameObject.UID;
@@ -75,8 +81,10 @@ namespace WUIServer {
             return freeId++;
         }
 
-        public void Remove(GameObject networkReplicator) {
-            gameObjects.Remove(networkReplicator.UID);
+        public void Remove(GameObject gameObject, bool sendToOthers) {
+            gameObjects.Remove(gameObject.UID);
+            if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0))
+                Program.broadcaster.Broadcast(new DestroyGameObject() { UID = gameObject.UID });
         }
     }
 }

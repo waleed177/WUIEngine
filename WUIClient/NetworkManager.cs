@@ -20,7 +20,12 @@ namespace WUIClient {
             Game1.client.On<WUIShared.Packets.ByteArrayUserPacket>(Client_ByteArrayUserPacket);
             Game1.client.On<WUIShared.Packets.SpawnGameObject>(Client_SpawnGameObject);
             Game1.client.On<WUIShared.Packets.ChangeGameObjectUID>(Client_ChangeGameObjectUID);
-            
+            Game1.client.On<DestroyGameObject>(Client_DestroyGameObject);
+        }
+
+        private void Client_DestroyGameObject(ClientBase sender, DestroyGameObject packet) {
+            GameObject gameObject = gameObjects[packet.UID];
+            gameObject.Parent.RemoveChild(gameObject, false);
         }
 
         private void Client_ChangeGameObjectUID(ClientBase sender, ChangeGameObjectUID packet) {
@@ -64,8 +69,10 @@ namespace WUIClient {
             });
         }
 
-        public void Remove(GameObject networkReplicator) {
-            gameObjects.Remove(networkReplicator.UID);
+        public void Remove(GameObject gameObject, bool sendToOthers) {
+            gameObjects.Remove(gameObject.UID);
+            if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0))
+                Game1.client.Send(new DestroyGameObject() { UID = gameObject.UID });
         }
     }
 }

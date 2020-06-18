@@ -107,6 +107,7 @@ namespace WUIServer {
                 if (multiplayer && !usedToBeMultiplayer)
                     Program.networkManager.Add(child);
                 if (multiplayer && !usedToBeMultiplayer) {
+                    //TODO fix problem if children have children.
                     foreach (var item in child.GetAllChildren()) {
                         if (!item.multiplayer) {
                             Program.networkManager.Add(item);
@@ -118,10 +119,19 @@ namespace WUIServer {
             toBeAdded.Enqueue(child);
         }
 
-        public void RemoveChild(GameObject child) {
+        public void RemoveChild(GameObject gameObject, bool sendToOthers = true) {
             childrenChanged = true;
-            toBeRemoved.Enqueue(child);
-            child.Parent = null;
+            toBeRemoved.Enqueue(gameObject);
+            if (multiplayer && gameObject.Parent != null) {
+                Program.networkManager.Remove(gameObject, sendToOthers);
+                foreach (var item in gameObject.children)
+                    item.Remove();
+            }
+            gameObject.Parent = null;
+        }
+
+        public void Remove(bool sendToOthers = true) {
+            Parent.RemoveChild(this, sendToOthers);
         }
 
         public T GetFirst<T>() where T : GameObject {
