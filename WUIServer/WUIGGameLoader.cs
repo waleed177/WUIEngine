@@ -44,6 +44,9 @@ namespace WUIServer {
                 case "clickable":
                     gameObject.AddChild(new MouseClickableComponent());
                     break;
+                case "boxCollider":
+                    gameObject.AddChild(new BoxCollider());
+                    break;
                 case "draggable":
                     if(gameObject.GetFirst<MouseClickableComponent>() == null)
                         gameObject.AddChild(new MouseClickableComponent());
@@ -55,23 +58,38 @@ namespace WUIServer {
         }
 
         private void Lang_SetPropertyBinder(string objectName, string propertyName, string propertyValue) {
-            Console.WriteLine(objectName + "$" + propertyName + "$" + propertyValue);
+            GameObject gameObject = gameObjects[objectName];
             switch (propertyName) {
                 case "texture": {
-                        RawTextureRenderer tex = gameObjects[objectName].GetFirst<RawTextureRenderer>();
+                        RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
                         if (tex == null)
-                            gameObjects[objectName].AddChild(tex = new RawTextureRenderer());
+                            gameObject.AddChild(tex = new RawTextureRenderer());
                         tex.texture = new Texture2D(File.ReadAllBytes(propertyValue));
                     }
                     break;
                 case "size": {
                         string[] sp = propertyValue.Split(' ');
-                        gameObjects[objectName].transform.Size = new Math.Vector2(int.Parse(sp[0]), int.Parse(sp[1]));
+                        gameObject.transform.Size = new Math.Vector2(int.Parse(sp[0]), int.Parse(sp[1]));
                     }
                     break;
                 case "position": {
                         string[] sp = propertyValue.Split(' ');
-                        gameObjects[objectName].transform.Position = new Math.Vector2(int.Parse(sp[0]), int.Parse(sp[1]));
+                        gameObject.transform.Position = new Math.Vector2(int.Parse(sp[0]), int.Parse(sp[1]));
+                    }
+                    break;
+                case "onCollisionStay": {
+                        Collider collider = gameObject.GetFirst<Collider>();
+                        if (collider == null)
+                            gameObject.AddChild(collider = new BoxCollider());
+
+                        string code = propertyValue;
+                        collider.ContinouslyCheckCollisions = true;
+                        collider.OnCollisionStay += Collider_OnCollisionStay;
+                        void Collider_OnCollisionStay(Collider sender, Collider other) {
+                            //temp
+                            if (code == "remove this")
+                                gameObject.Parent.RemoveChild(gameObject);
+                        }
                     }
                     break;
                 default:
