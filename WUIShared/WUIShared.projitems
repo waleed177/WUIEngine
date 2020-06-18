@@ -9,8 +9,11 @@
     <Import_RootNamespace>WUIShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGLanguage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGSyntaxParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)packets.txt" />

@@ -1,6 +1,7 @@
 ﻿using LowLevelNetworking.Server;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace WUIServer {
                 multiplayer = true
             };
             networkManager = new NetworkManager(world);
+            new WUIGGameLoader(world).Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\SyntaxTesting.txt"));
             Console.WriteLine("Server started!");
         }
     }

@@ -1,0 +1,10 @@
+Player:
+	draggable
+	texture C:\Users\waldohp\Pictures\Pepsi colors.png
+	size 50 50
+	position 100 100
+
+Block:
+	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
+	size 100 50
+	position 100 150

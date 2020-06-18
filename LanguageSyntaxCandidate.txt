@@ -1,0 +1,34 @@
+#parser general
+clearall
+#include general
+
+size-multiplier 32
+position-multiplier 32 -32
+
+Player:
+    player
+    player-spawnpoint-position 0 0
+    texture player.png
+    texture-color red
+    $coins 0
+    event $negativeCoins
+    $coins.onSet value allow unless if $coins < 0 do emit $negativeCoins
+
+DeadlyBlock:
+    size 1 1
+    onTouch Player player:
+        player respawn
+        player $coins--
+
+Coin:
+    onTouch Player player:
+        player $coins++
+        remove this
+
+Block:
+    collider
+
+Block 0 -3 to 3 -4
+DeadlyBlock 4 -3
+
+
