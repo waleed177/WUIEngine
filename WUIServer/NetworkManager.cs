@@ -28,6 +28,12 @@ namespace WUIServer {
             client.On<FreeTempUID>(Client_FreeTempUID);
             client.On<DestroyGameObject>(Client_DestroyGameObject);
             client.OnStart += Client_OnStart;
+            client.OnDisconnect += Client_OnDisconnect;
+        }
+
+        private void Client_OnDisconnect(ClientBase client) {
+            if (clientObjectIdsToServerObjectIds.ContainsKey(client))
+                clientObjectIdsToServerObjectIds.Remove(client);
         }
 
         private void Client_OnStart(ClientBase client) {
