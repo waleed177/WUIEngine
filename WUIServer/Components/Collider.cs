@@ -20,8 +20,10 @@ namespace WUIServer.Components {
                 foreach(GameObject child in Program.world.GetAllChildren()) {
                     Collider coll = child.GetFirst<Collider>();
                     if (coll == null || coll == this) continue;
-                    if (CollidesWith(coll))
+                    if (CollidesWith(coll)) {
                         OnCollisionStay?.Invoke(this, coll);
+                        if (Parent == null) return;
+                    }
                 }
             }
         }

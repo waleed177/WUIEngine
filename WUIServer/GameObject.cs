@@ -145,7 +145,7 @@ namespace WUIServer {
         }
 
         public IEnumerable<GameObject> GetAllChildren() {
-            return children.Union(toBeAdded);
+            return children.Union(toBeAdded).Except(toBeRemoved);
         }
 
         public void Send(byte type, byte[] data, int length) {
