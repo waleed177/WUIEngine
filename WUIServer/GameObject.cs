@@ -20,6 +20,7 @@ namespace WUIServer {
         public Transform transform { get; internal set; }
         public int UID { get; internal set; }
         public Objects ObjType { get; internal set; }
+        public string name;
 
         private bool childrenChanged = false;
 
@@ -187,11 +188,12 @@ namespace WUIServer {
             };
         }
 
+        //TODO: THREAD SAFETY.
         public virtual void SendTo(ClientBase client) {
             Packet packet = GetSpawnPacket();
             if (packet != null)
                 client.Send(packet);
-            foreach (var item in GetAllChildren())
+            foreach (var item in GetAllChildren().ToArray())
                 item.SendTo(client);
         }
     }
