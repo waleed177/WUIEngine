@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WUIServer.Components;
+using WUIShared;
 using WUIShared.Languages;
 
 namespace WUIServer {
     public class WUIGGameLoader {
         private WUIGLanguage lang;
         private Dictionary<string, GameObject> gameObjects;
+        private Dictionary<string, object> instanceVariables;
         private readonly GameObject world;
 
         public WUIGGameLoader(GameObject world) {
@@ -19,6 +21,7 @@ namespace WUIServer {
             lang.ComponentAddBinder += Lang_ComponentAddBinder;
             lang.SetPropertyBinder += Lang_SetPropertyBinder;
             gameObjects = new Dictionary<string, GameObject>();
+            instanceVariables = new Dictionary<string, object>();
             this.world = world;
         }
 
@@ -31,6 +34,7 @@ namespace WUIServer {
                 throw new Exception($"{objectName} already exists..");
             GameObject obj = new GameObject();
             gameObjects[objectName] = obj;
+            obj.name = objectName;
             world.AddChild(obj);
         }
 
@@ -48,9 +52,12 @@ namespace WUIServer {
                     gameObject.AddChild(new BoxCollider());
                     break;
                 case "draggable":
-                    if(gameObject.GetFirst<MouseClickableComponent>() == null)
+                    if (gameObject.GetFirst<MouseClickableComponent>() == null)
                         gameObject.AddChild(new MouseClickableComponent());
                     gameObject.AddChild(new DragComponent());
+                    break;
+                case "followMouse":
+                    gameObject.AddChild(new FollowMouse());
                     break;
                 default:
                     break;
@@ -59,6 +66,15 @@ namespace WUIServer {
 
         private void Lang_SetPropertyBinder(string objectName, string propertyName, string propertyValue) {
             GameObject gameObject = gameObjects[objectName];
+
+            if (propertyName.StartsWith("@")) {
+                string variableName = propertyName.Substring(1);
+                object val = propertyValue;
+                if (int.TryParse(propertyValue, out int intPropertyValue)) val = intPropertyValue;
+                instanceVariables[objectName + "@" + variableName] = val;
+                return;
+            }
+
             switch (propertyName) {
                 case "texture": {
                         RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
@@ -82,13 +98,44 @@ namespace WUIServer {
                         if (collider == null)
                             gameObject.AddChild(collider = new BoxCollider());
 
-                        string code = propertyValue;
+                        string objName = objectName;
+                        string[] lines = propertyValue.Split(',');
                         collider.ContinouslyCheckCollisions = true;
                         collider.OnCollisionStay += Collider_OnCollisionStay;
                         void Collider_OnCollisionStay(Collider sender, Collider other) {
-                            //temp
-                            if (code == "remove this")
-                                gameObject.Parent.RemoveChild(gameObject);
+                            for (int i = 0; i < lines.Length; i++) {
+                                string code = lines[i].Trim();
+                                int idOfFirstNonalpha = code.FindFirstNonAlphanumeric();
+
+                                if (code.StartsWith("remove this"))
+                                    sender.Parent.Remove();
+                                else if (code.StartsWith("remove other"))
+                                    other.Parent.Remove();
+                                else if (code[idOfFirstNonalpha] == '@') {
+                                    string refersToObject = code.Substring(0, idOfFirstNonalpha);
+                                    if (refersToObject == "this" || refersToObject == "")
+                                        refersToObject = objName;
+                                    else if (refersToObject == "other")
+                                        refersToObject = other.Parent.name;
+
+                                    int secondNonalpha = code.FindFirstNonAlphanumeric(idOfFirstNonalpha + 1);
+                                    string variableName = code.Substring(idOfFirstNonalpha + 1, secondNonalpha - idOfFirstNonalpha - 1);
+                                    string operation = code.Substring(secondNonalpha).Trim();
+                                    switch (operation) {
+                                        case "++":
+                                            if (instanceVariables.ContainsKey(refersToObject + "@" + variableName) && instanceVariables[refersToObject + "@" + variableName] is int num) {
+                                                instanceVariables[refersToObject + "@" + variableName] = num + 1;
+                                                Console.WriteLine(instanceVariables[refersToObject + "@" + variableName]);
+
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                }
+
+                            }
                         }
                     }
                     break;
