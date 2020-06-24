@@ -17,12 +17,49 @@ namespace WUIShared
             return res;
         }
 
-        public static int FindFirstNonAlphanumeric(this string str) {
-            for (int i = 0; i < str.Length; i++)
+        public static int FindFirstNonAlphanumeric(this string str, int startId = 0, int endId = -1) {
+            int end = endId >= 0 ? endId : str.Length;
+            for (int i = startId; i < end; i++)
                 if (!Char.IsLetterOrDigit(str[i]))
                     return i;
             return -1;
         }
 
+        public static bool CharsSatisfy(this string str, Func <char, bool> f) {
+            for (int i = 0; i < str.Length; i++)
+                if (!f(str[i]))
+                    return false;
+            return true;
+        }
+
+        public static List<string> SplitUsingFunction(this string str, Func<char, bool> splitter, Func<char, bool> lonelys) {
+            List<string> res = new List<string>();
+            string token = "";
+            bool splitterNow = splitter(str[0]);
+
+            //waw+wow
+            for(int i = 0; i < str.Length; i++) {
+                char c = str[i];
+                if(lonelys(c)) {
+                    if (token != "") {
+                        res.Add(token);
+                        token = "";
+                    }
+                    res.Add(c.ToString());
+                    continue;
+                }
+                if(splitterNow != splitter(c)) {
+                    res.Add(token);
+                    token = c.ToString();
+                    splitterNow = splitter(c);
+                } else {
+                    token += c;
+                }
+            }
+            if(token != "") {
+                res.Add(token);
+            }
+            return res;
+        }
     }
 }
