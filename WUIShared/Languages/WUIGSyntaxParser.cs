@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace WUIShared.Languages {
-
-    public enum TokenTypes {
-        ObjectName,
-        PropertyName,
-        PropertyValue,
-        InstantiateComponent,
-        EOF,
-        Unknown
-    }
-
     public class WUIGSyntaxParser {
+        public enum TokenTypes {
+            ObjectName,
+            PropertyName,
+            PropertyValue,
+            InstantiateComponent,
+            EOF,
+            Unknown
+        }
         private string code;
         private string[] lines;
         private string[] words;
@@ -65,7 +63,7 @@ namespace WUIShared.Languages {
             }
 
             string word = words[currentWord];
-
+            
             if (tabLevel == 0 && word.EndsWith(":")) {
                 tokenType = TokenTypes.ObjectName;
                 word = word.Remove(word.Length - 1);

@@ -62,6 +62,7 @@ namespace WUIServer {
             OnDestroyed();
         }
 
+        //Thread issue with the queues. something else is dequeuing them some how.
         public void Update(float deltaTime) {
             OnUpdate(deltaTime);
             if (childrenChanged) {

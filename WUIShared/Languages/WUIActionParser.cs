@@ -29,7 +29,7 @@ namespace WUIShared.Languages
         }
 
         private void ParseStatement(Program res) {
-            Console.WriteLine(token.type + " : " + token.value + " : " + tokenizer.TabIndex);
+            //Console.WriteLine(token.type + " : " + token.value + " : " + tokenizer.TabIndex);
 
             switch (token.type) {
                 case TokenTypes.Punctuation:
@@ -58,14 +58,19 @@ namespace WUIShared.Languages
                     }
                     break;
                 case TokenTypes.Identifier: {
-                        //Function
-                        FunctionCall functionCall = new FunctionCall() {
-                            functionName = (string)token.value
-                        };
+                        Token peek = tokenizer.PeekToken();
+                        if(peek.type == TokenTypes.Operator) {
+                            res.body.Add(ReadValue(token));
+                        }else {
+                            //Function
+                            FunctionCall functionCall = new FunctionCall() {
+                                functionName = (string)token.value
+                            };
 
-                        while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation && token.type != TokenTypes.EOF)
-                            functionCall.arguments.Add(ReadValue(token));
-                        res.body.Add(functionCall);
+                            while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation && token.type != TokenTypes.EOF)
+                                functionCall.arguments.Add(ReadValue(token));
+                            res.body.Add(functionCall);
+                        }
                     }
                     break;
                 case TokenTypes.Operator:
@@ -100,7 +105,12 @@ namespace WUIShared.Languages
 
             if(tokenizer.PeekToken().type == TokenTypes.Operator) {
                 Token op = tokenizer.NextToken();
-                res = new BinaryOperator() { operatorName = (string) op.value, left = res, right = ReadValue(tokenizer.NextToken()) };
+                string oper = (string)op.value;
+                if(oper == "++" || oper == "--") {
+                    res = new RightUnaryOperator() { operatorName = oper, left = res };
+                } else {
+                    res = new BinaryOperator() { operatorName = (string) op.value, left = res, right = ReadValue(tokenizer.NextToken()) };
+                }
             }
             return res;
         }

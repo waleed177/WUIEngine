@@ -4,6 +4,7 @@ Player:
 	texture C:\Users\waldohp\Pictures\Pepsi colors.png
 	size 50 50
 	position 100 100
+	@coins 0
 
 Block:
 	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
@@ -14,10 +15,15 @@ Coin:
 	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
 	size 50 50
 	position 200 250
-	onCollisionStay remove this
+	onCollisionStay other@coins++, remove this
 
 Coin2:
 	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
 	size 50 50
-	position 300 250
-	onCollisionStay remove this
+	position 260 250
+	onCollisionStay other@coins++, remove other
+
+CustomMouse:
+	texture C:\Users\waldohp\source\repos\WUILibrary\WUIClient\Icon.bmp
+	size 100 100
+	followMouse

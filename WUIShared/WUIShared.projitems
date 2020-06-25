@@ -9,6 +9,10 @@
     <Import_RootNamespace>WUIShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CharacterStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionLanguage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionTokenizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGLanguage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGSyntaxParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects.cs" />

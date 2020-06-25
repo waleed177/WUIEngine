@@ -27,6 +27,40 @@ namespace WUIServer {
 
         public void Evaluate(string code) {
             lang.Evaluate(code);
+
+            WUIActionLanguage w = new WUIActionLanguage();
+            w.LoadCode(
+@"
+print ""hello world"";
+wow@cats = ""heylooo"";
+test@test = 0;
+
+print ""hello"";
+if test@test print wow@cats;
+if 1 print ""lol"";
+
+test@test++ print test@test;
+test@test++ print test@test;
+test2@test = 2 * test@test + test@test ; // Wrong to be fixed later.
+test@test++ print test@test;
+test@test++ print test@test;
+
+print test2@test;
+
+//if wow@cats == 1: if test@test remove this@this; if lol@that remove that@this;
+");
+            w.Bind("print", args => {
+                Console.WriteLine(args[0].ToString());
+                return null;
+            });
+
+            w.Bind("wow", args => {
+                Console.WriteLine("WOW FUNC");
+                return null;
+            });
+
+            w.Compile()();
+            //
         }
 
         private void Lang_CreateObjectBinder(string objectName) {
@@ -102,40 +136,9 @@ namespace WUIServer {
                         string[] lines = propertyValue.Split(',');
                         collider.ContinouslyCheckCollisions = true;
                         collider.OnCollisionStay += Collider_OnCollisionStay;
+
                         void Collider_OnCollisionStay(Collider sender, Collider other) {
-                            for (int i = 0; i < lines.Length; i++) {
-                                string code = lines[i].Trim();
-                                int idOfFirstNonalpha = code.FindFirstNonAlphanumeric();
-
-                                if (code.StartsWith("remove this"))
-                                    sender.Parent.Remove();
-                                else if (code.StartsWith("remove other"))
-                                    other.Parent.Remove();
-                                else if (code[idOfFirstNonalpha] == '@') {
-                                    string refersToObject = code.Substring(0, idOfFirstNonalpha);
-                                    if (refersToObject == "this" || refersToObject == "")
-                                        refersToObject = objName;
-                                    else if (refersToObject == "other")
-                                        refersToObject = other.Parent.name;
-
-                                    int secondNonalpha = code.FindFirstNonAlphanumeric(idOfFirstNonalpha + 1);
-                                    string variableName = code.Substring(idOfFirstNonalpha + 1, secondNonalpha - idOfFirstNonalpha - 1);
-                                    string operation = code.Substring(secondNonalpha).Trim();
-                                    switch (operation) {
-                                        case "++":
-                                            if (instanceVariables.ContainsKey(refersToObject + "@" + variableName) && instanceVariables[refersToObject + "@" + variableName] is int num) {
-                                                instanceVariables[refersToObject + "@" + variableName] = num + 1;
-                                                Console.WriteLine(instanceVariables[refersToObject + "@" + variableName]);
-
-                                            }
-                                            break;
-                                        default:
-                                            break;
-                                    }
-
-                                }
-
-                            }
+                            
                         }
                     }
                     break;

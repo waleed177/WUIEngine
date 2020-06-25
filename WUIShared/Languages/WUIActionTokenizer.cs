@@ -51,7 +51,7 @@ namespace WUIShared.Languages {
                 peekChar = stream.Peek();
             }
 
-            while (peekChar == ' ' || peekChar == '\n' || peekChar == '\t') {
+            while (peekChar == ' ' || peekChar == '\n' || peekChar == '\r' || peekChar == '\t') {
                 if (peekChar == '\n') {
                     TabIndex = 0;
                     StartOfLine = true;
