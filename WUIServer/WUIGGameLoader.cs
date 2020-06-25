@@ -31,23 +31,7 @@ namespace WUIServer {
             WUIActionLanguage w = new WUIActionLanguage();
             w.LoadCode(
 @"
-print ""hello world"";
-wow@cats = ""heylooo"";
-test@test = 0;
-
-print ""hello"";
-if test@test print wow@cats;
-if 1 print ""lol"";
-
-test@test++ print test@test;
-test@test++ print test@test;
-test2@test = 2 * test@test + test@test ; // Wrong to be fixed later.
-test@test++ print test@test;
-test@test++ print test@test;
-
-print test2@test;
-
-//if wow@cats == 1: if test@test remove this@this; if lol@that remove that@this;
+if 3 == 1 + 1: print ""hello"";
 ");
             w.Bind("print", args => {
                 Console.WriteLine(args[0].ToString());
