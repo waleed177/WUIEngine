@@ -84,6 +84,9 @@ namespace WUIServer {
                 case "followMouse":
                     gameObject.AddChild(new FollowMouse());
                     break;
+                case "topDownPlayer":
+                    gameObject.AddChild(new PlayerController());
+                    break;
                 default:
                     break;
             }
@@ -118,6 +121,15 @@ namespace WUIServer {
                                     tex.texture = new Texture2D(File.ReadAllBytes(item + propertyValue));
                                     break;
                                 }
+                    }
+                    break;
+                case "player-speed": {
+                        PlayerController plr = gameObject.GetFirst<PlayerController>();
+                        if (plr == null)
+                            gameObject.AddChild(plr = new PlayerController());
+                        string[] sp = propertyValue.Split(' ');
+                        plr.HorizontalSpeed = int.Parse(sp[0]);
+                        plr.VerticalSpeed = int.Parse(sp[1]);
                     }
                     break;
                 case "size": {

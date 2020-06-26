@@ -13,6 +13,7 @@ namespace WUIShared.Objects
         DragComponent,
         ButtonComponent,
         TextRenderer,
-        ListBoxUIComponent
+        ListBoxUIComponent,
+        PlayerController
     }
 }

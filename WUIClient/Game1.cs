@@ -115,6 +115,7 @@ namespace WUIClient {
             client.AcceptPacketIfAvailable();
 
             WMouse.Update();
+            WKeyboard.Update();
             world.Update(deltaTime);
             canvas.Update(deltaTime);
 

@@ -1,11 +1,11 @@
 images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\Test1\Tiles\
 
 Player:
-	draggable
+	topDownPlayer
+	player-speed 300 300
 	boxCollider
 	texture boxCoin.png
 	size 25 25
 	position 100 100
-	followMouse
 	@coins 0
 

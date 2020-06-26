@@ -60,6 +60,7 @@
     <Compile Include="Components\DragComponent.cs" />
     <Compile Include="Components\FollowMouse.cs" />
     <Compile Include="Components\MouseClickableComponent.cs" />
+    <Compile Include="Components\PlayerController.cs" />
     <Compile Include="Components\RawTextureRenderer.cs" />
     <Compile Include="Components\TextRenderer.cs" />
     <Compile Include="Components\Transform.cs" />
