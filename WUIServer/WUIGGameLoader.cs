@@ -14,8 +14,10 @@ namespace WUIServer {
         private Dictionary<string, GameObject> gameObjects;
         private Dictionary<string, object> instanceVariables;
         private readonly GameObject world;
+        WUIActionLanguage ActionScript;
 
         public WUIGGameLoader(GameObject world) {
+            ActionScript = new WUIActionLanguage();
             lang = new WUIGLanguage();
             lang.CreateObjectBinder += Lang_CreateObjectBinder;
             lang.ComponentAddBinder += Lang_ComponentAddBinder;
@@ -23,28 +25,30 @@ namespace WUIServer {
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
             this.world = world;
-        }
 
-        public void Evaluate(string code) {
-            lang.Evaluate(code);
-
-            WUIActionLanguage w = new WUIActionLanguage();
-            w.LoadCode(
-@"
-if 3 == 1 + 1: print ""hello"";
-");
-            w.Bind("print", args => {
+            ActionScript.Bind("print", args => {
                 Console.WriteLine(args[0].ToString());
                 return null;
             });
 
-            w.Bind("wow", args => {
-                Console.WriteLine("WOW FUNC");
+            ActionScript.Bind("remove", args => {
+                ((GameObject)args[0]).Remove();
                 return null;
             });
 
-            w.Compile()();
-            //
+            ActionScript.Bind("teleport", args => {
+                ((GameObject)args[0]).transform.Position = new Math.Vector2((float)args[1], (float)args[2]);
+                return null;
+            });
+
+            ActionScript.Bind("move", args => {
+                ((GameObject)args[0]).transform.Position += new Math.Vector2((int)args[1], (int)args[2]);
+                return null;
+            });
+        }
+
+        public void Evaluate(string code) {
+            lang.Evaluate(code);
         }
 
         private void Lang_CreateObjectBinder(string objectName) {
@@ -53,6 +57,8 @@ if 3 == 1 + 1: print ""hello"";
             GameObject obj = new GameObject();
             gameObjects[objectName] = obj;
             obj.name = objectName;
+            ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
+            ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
             world.AddChild(obj);
         }
 
@@ -89,7 +95,7 @@ if 3 == 1 + 1: print ""hello"";
                 string variableName = propertyName.Substring(1);
                 object val = propertyValue;
                 if (int.TryParse(propertyValue, out int intPropertyValue)) val = intPropertyValue;
-                instanceVariables[objectName + "@" + variableName] = val;
+                ActionScript.SetVariable(new string[] { objectName, variableName }, val);
                 return;
             }
 
@@ -117,12 +123,17 @@ if 3 == 1 + 1: print ""hello"";
                             gameObject.AddChild(collider = new BoxCollider());
 
                         string objName = objectName;
-                        string[] lines = propertyValue.Split(',');
+                        ActionScript.LoadCode(propertyValue);
+                        Action func = ActionScript.Compile();
+
                         collider.ContinouslyCheckCollisions = true;
                         collider.OnCollisionStay += Collider_OnCollisionStay;
 
+
                         void Collider_OnCollisionStay(Collider sender, Collider other) {
-                            
+                            ActionScript.SetVariable(new string[] { "other" }, ActionScript.GetVariable(new string[] { other.Parent.name }));
+                            ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { sender.Parent.name }));
+                            func();
                         }
                     }
                     break;

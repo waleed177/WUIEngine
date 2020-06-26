@@ -96,7 +96,7 @@ namespace WUIShared.Languages
                     if(peek.type == TokenTypes.Operator && (string) peek.value == "@") {
                         tokenizer.NextToken();
                         string varName = (string) tokenizer.NextToken().value;
-                        res = new Variable() { name = token.value + "@" + varName };
+                        res = new Variable() { path = new string[] { (string) token.value, varName } };
                     } else throw new Exception("Identifier doesnt make sense");
                     break;
                 default:
@@ -128,7 +128,7 @@ namespace WUIShared.Languages
         }
 
         public class Variable : ParseObject {
-            public string name;
+            public string[] path;
         }
 
         public class Integer : ParseObject {

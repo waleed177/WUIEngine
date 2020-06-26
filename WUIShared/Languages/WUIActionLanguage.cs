@@ -9,6 +9,7 @@ namespace WUIShared.Languages {
         public delegate object FunctionDelegate(object[] args);
         private Dictionary<string, FunctionDelegate> bindingDictionary;
         private Dictionary<string, object> variables;
+        private Stack<Dictionary<string, object>> localVariables;
 
         Program parsedProgram;
 
@@ -16,6 +17,7 @@ namespace WUIShared.Languages {
             parser = new WUIActionParser();
             bindingDictionary = new Dictionary<string, FunctionDelegate>();
             variables = new Dictionary<string, object>();
+            localVariables = new Stack<Dictionary<string, object>>();
         }
 
         public void LoadCode(string code) {
@@ -39,7 +41,7 @@ namespace WUIShared.Languages {
                     if (binaryOperator.left is Variable leftVariable)
                         switch (binaryOperator.operatorName) {
                             case "=":
-                                res += () => variables[leftVariable.name] = ComputeValue(binaryOperator.right);
+                                res += () => SetVariable(leftVariable.path, ComputeValue(binaryOperator.right));
                                 break;
                             default:
                                 break;
@@ -48,10 +50,10 @@ namespace WUIShared.Languages {
                     if (rightUnaryOperator.left is Variable leftVariable)
                         switch (rightUnaryOperator.operatorName) {
                             case "++":
-                                res += () => variables[leftVariable.name] = (int)variables[leftVariable.name] + 1;
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) + 1);
                                 break;
                             case "--":
-                                res += () => variables[leftVariable.name] = (int)variables[leftVariable.name] - 1;
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) - 1);
                                 break;
                             default:
                                 break;
@@ -80,8 +82,8 @@ namespace WUIShared.Languages {
             if (item is Integer integer)
                 res = integer.value;
             else if (item is Variable variable)
-                res = variables[variable.name];
-            else if(item is BinaryOperator binaryOperator) {
+                res = GetVariable(variable.path);
+            else if (item is BinaryOperator binaryOperator) {
                 switch (binaryOperator.operatorName) {
                     case "+":
                         res = (int)ComputeValue(binaryOperator.left) + (int)ComputeValue(binaryOperator.right);
@@ -100,8 +102,7 @@ namespace WUIShared.Languages {
                         break;
                     default: throw new NotImplementedException("Not implemented " + binaryOperator.operatorName);
                 }
-            }
-            else if (item is WUIActionParser.String str)
+            } else if (item is WUIActionParser.String str)
                 res = str.value;
             else
                 throw new NotImplementedException("This item is not implemented!");
@@ -110,6 +111,32 @@ namespace WUIShared.Languages {
 
         public void Bind(string functionName, FunctionDelegate function) {
             bindingDictionary[functionName] = function;
+        }
+
+        public void SetVariable(string[] path, object value) {
+            SetVariable(variables, path, value);
+        }
+
+        private void SetVariable(Dictionary<string, object> variables, string[] path, object value) {
+            //Hardcoded 1,2 since these are the only ones supported as of right now.
+            switch (path.Length) {
+                case 1:
+                    variables[path[0]] = value;
+                    break;
+                case 2:
+                    ((Dictionary<string, object>)variables[path[0]])[path[1]] = value;
+                    break;
+                default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
+            }
+        }
+
+        public object GetVariable(string[] path) {
+            //Hardcoded 1,2 since these are the only ones supported as of right now.
+            switch (path.Length) {
+                case 1: return variables[path[0]];
+                case 2: return((Dictionary<string, object>)variables[path[0]])[path[1]];
+                default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
+            }
         }
     }
 }

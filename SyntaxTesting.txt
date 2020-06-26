@@ -15,13 +15,14 @@ Coin:
 	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
 	size 50 50
 	position 200 250
-	onCollisionStay other@coins++, remove this
+	@Touched 0
+	onCollisionStay if Coin@Touched==0: Coin@Touched=1 Player@coins++ print Player@coins
 
 Coin2:
 	texture C:\Users\waldohp\Pictures\Ethical_Decision_Making_rubric_handout-1.jpg
 	size 50 50
 	position 260 250
-	onCollisionStay other@coins++, remove other
+	onCollisionStay print "hello"; move this@object 10 0;
 
 CustomMouse:
 	texture C:\Users\waldohp\source\repos\WUILibrary\WUIClient\Icon.bmp

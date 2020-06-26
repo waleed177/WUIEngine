@@ -1,0 +1,9 @@
+Player:
+	draggable
+	boxCollider
+	texture C:\Users\waldohp\Pictures\Pepsi colors.png
+	size 50 50
+	position 100 100
+	mouseFollow
+	@coins 0
+
