@@ -63,11 +63,27 @@ namespace WUIShared.Languages {
             }
 
             string word = words[currentWord];
-            
+            while(word.Trim() == "") {
+                NextWord();
+                if(currentWord == -1) {
+                    tokenType = TokenTypes.EOF;
+                    return null;
+                }
+                word = words[currentWord];
+            }
+
             if (tabLevel == 0 && word.EndsWith(":")) {
                 tokenType = TokenTypes.ObjectName;
                 word = word.Remove(word.Length - 1);
                 CurrentObjectName = word;
+            }else if(tabLevel == 0) {
+                CurrentObjectName = null;
+                if (currentWord == 0) {
+                    tokenType = TokenTypes.PropertyName;
+                } else if (currentWord == 1) {
+                    tokenType = TokenTypes.PropertyValue;
+                    return ReadString(1);
+                }
             } else if (tabLevel == 1) {
                 if (words.Length == 1)
                     tokenType = TokenTypes.InstantiateComponent;
@@ -75,10 +91,7 @@ namespace WUIShared.Languages {
                     tokenType = TokenTypes.PropertyName;
                 } else if (currentWord == 1) {
                     tokenType = TokenTypes.PropertyValue;
-                    string res = "";
-                    for (int i = 1; i < words.Length; i++) res += (i == 1 ? "" : " ") + words[i];
-                    NextLine();
-                    return res;
+                    return ReadString(1);
                 }
             }
 
@@ -86,6 +99,11 @@ namespace WUIShared.Languages {
             return word;
         }
 
-
+        private string ReadString(int start) {
+            string res = "";
+            for (int i = start; i < words.Length; i++) res += (i == start ? "" : " ") + words[i];
+            NextLine();
+            return res;
+        }
     }
 }

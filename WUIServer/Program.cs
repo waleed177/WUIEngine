@@ -30,7 +30,7 @@ namespace WUIServer {
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
-            new WUIGGameLoader(world).Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\SyntaxTesting.txt"));
+            new WUIGGameLoader(world).Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
             Console.WriteLine("Server started!");
         }
 

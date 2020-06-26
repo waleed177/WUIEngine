@@ -13,6 +13,7 @@ namespace WUIServer {
         private WUIGLanguage lang;
         private Dictionary<string, GameObject> gameObjects;
         private Dictionary<string, object> instanceVariables;
+        private List<string> imagesDirectory = new List<string>();
         private readonly GameObject world;
         WUIActionLanguage ActionScript;
 
@@ -89,6 +90,12 @@ namespace WUIServer {
         }
 
         private void Lang_SetPropertyBinder(string objectName, string propertyName, string propertyValue) {
+            if(objectName == null) {
+                if(propertyName == "images") {
+                    imagesDirectory.Add(propertyValue);
+                }
+                return;
+            }
             GameObject gameObject = gameObjects[objectName];
 
             if (propertyName.StartsWith("@")) {
@@ -104,7 +111,13 @@ namespace WUIServer {
                         RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
                         if (tex == null)
                             gameObject.AddChild(tex = new RawTextureRenderer());
-                        tex.texture = new Texture2D(File.ReadAllBytes(propertyValue));
+                        if(File.Exists(propertyValue))
+                            tex.texture = new Texture2D(File.ReadAllBytes(propertyValue));
+                        else foreach (var item in imagesDirectory)
+                                if (File.Exists(item + propertyValue)) {
+                                    tex.texture = new Texture2D(File.ReadAllBytes(item + propertyValue));
+                                    break;
+                                }
                     }
                     break;
                 case "size": {

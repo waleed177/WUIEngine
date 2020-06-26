@@ -1,9 +1,11 @@
+images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\Test1\Tiles\
+
 Player:
 	draggable
 	boxCollider
-	texture C:\Users\waldohp\Pictures\Pepsi colors.png
-	size 50 50
+	texture boxCoin.png
+	size 25 25
 	position 100 100
-	mouseFollow
+	followMouse
 	@coins 0
 
