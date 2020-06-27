@@ -28,12 +28,12 @@ namespace WUIServer.Components {
 
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
-            Send(client, 0, texture.bytes, texture.bytes.Length);
+            if (texture != null && texture.bytes != null) Send(client, 0, texture.bytes, texture.bytes.Length);
         }
 
         public override void OnAdded() {
             base.OnAdded();
-            Send(0, texture.bytes, texture.bytes.Length);
+            if(texture != null && texture.bytes != null) Send(0, texture.bytes, texture.bytes.Length);
         }
     }
 }
