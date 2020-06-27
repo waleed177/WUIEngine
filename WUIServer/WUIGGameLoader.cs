@@ -13,6 +13,8 @@ namespace WUIServer {
         private WUIGLanguage lang;
         private Dictionary<string, GameObject> gameObjects;
         private Dictionary<string, object> instanceVariables;
+        private Dictionary<string, Action> instantiateInstructions;
+
         private List<string> imagesDirectory = new List<string>();
         private readonly GameObject world;
         WUIActionLanguage ActionScript;
@@ -25,6 +27,7 @@ namespace WUIServer {
             lang.SetPropertyBinder += Lang_SetPropertyBinder;
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
+            instantiateInstructions = new Dictionary<string, Action>();
             this.world = world;
 
             ActionScript.Bind("print", args => {
@@ -46,6 +49,14 @@ namespace WUIServer {
                 ((GameObject)args[0]).transform.Position += new Math.Vector2((int)args[1], (int)args[2]);
                 return null;
             });
+
+            ActionScript.Bind("instantiate", args => {
+                instantiateInstructions[args[0].ToString()]();
+                GameObject gameObject = gameObjects["$$TEMP$$"];
+                if(args.Length == 3)
+                    gameObject.transform.Position = new Math.Vector2(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()));
+                return gameObject;
+            });
         }
 
         public void Evaluate(string code) {
@@ -53,7 +64,7 @@ namespace WUIServer {
         }
 
         private void Lang_CreateObjectBinder(string objectName) {
-            if (gameObjects.ContainsKey(objectName))
+            if (objectName != "$$TEMP$$" && gameObjects.ContainsKey(objectName))
                 throw new Exception($"{objectName} already exists..");
             GameObject obj = new GameObject();
             gameObjects[objectName] = obj;
@@ -61,6 +72,8 @@ namespace WUIServer {
             ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
             ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
             world.AddChild(obj);
+            if(objectName != "$$TEMP$$")
+                instantiateInstructions[objectName] = () => Lang_CreateObjectBinder("$$TEMP$$");
         }
 
         private void Lang_ComponentAddBinder(string objectName, string componentName) {
@@ -90,6 +103,9 @@ namespace WUIServer {
                 default:
                     break;
             }
+
+            if (objectName != "$$TEMP$$")
+                instantiateInstructions[objectName] += () => Lang_ComponentAddBinder("$$TEMP$$", componentName);
         }
 
         private void Lang_SetPropertyBinder(string objectName, string propertyName, string propertyValue) {
@@ -165,6 +181,9 @@ namespace WUIServer {
                 default:
                     break;
             }
+
+            if (objectName != "$$TEMP$$")
+                instantiateInstructions[objectName] += () => Lang_SetPropertyBinder("$$TEMP$$", propertyName, propertyValue);
         }
     }
 }

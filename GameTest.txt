@@ -9,3 +9,10 @@ Player:
 	position 100 100
 	@coins 0
 
+Test:
+	boxCollider
+	size 50 50
+	position 300 300
+	texture box.png
+	onCollisionStay print "test"; instantiate "Test" 100 50; remove this@object; print "done";
+
