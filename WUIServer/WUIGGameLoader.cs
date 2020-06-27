@@ -194,7 +194,7 @@ namespace WUIServer {
                                 gameObject.AddChild(collider = new BoxCollider());
 
                             string objName = objectName;
-                            ActionScript.LoadCode(propertyValue);
+                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
                             Action func = ActionScript.Compile();
 
                             collider.ContinouslyCheckCollisions = true;
@@ -209,7 +209,7 @@ namespace WUIServer {
                         }
                         break;
                     case "onUpdate": {
-                            ActionScript.LoadCode(propertyValue);
+                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
                             Action func = ActionScript.Compile();
                             gameObject.OnUpdateEvent += Update;
 

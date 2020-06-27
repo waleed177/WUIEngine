@@ -5,15 +5,22 @@ state:
 	@playersRequired 2
 	@players 0
 	@started 0
+	@finished 0
 	onUpdate 
 		if this@players == this@playersRequired:
-			if this@started == 0:
+			if this@finished == 0 if this@started == 0:
 				this@started = 1;
-				this@timeleft = 250;
+				this@timeleft = 40;
 				print "started!";
 		
-		this@timeleft--;
-		print this@timeleft;
+		if this@started:
+			this@timeleft--;
+			
+			if this@timeleft < 1:
+				this@started = 0;
+				this@finished = 1;
+				print "Game is over!";
+				print state@players;
 
 
 
@@ -26,20 +33,29 @@ Player:
 	position 100 100
 	@coins 0
 	@counted 0
+	@id 0
 	onUpdate
-		if this@counted == 0: this@counted = 1; state@players++;
+		if this@counted == 0:
+			this@counted = 1; 
+			state@players++;
+			this@id = state@players - 1;
+			if this@id == 0:
+				state@player0 = this@object;
+			if this@id == 1:
+				state@player1 = this@object;
+			
 
-Test:
+Monster:
 	boxCollider
 	size 50 50
-	position 300 300
+	position -100 -100
 	texture box.png
-	@dir 10
-	@touched 0
+	@dirX 0
+	@dirY 0
 	onUpdate
-		move this@object this@dir 0;
-		if getX this@object; > 500 this@dir = 0 - 10;
-		if getX this@object; < 100 this@dir = 10;
-	onCollisionStay 
-		if this@touched == 0: this@touched = 1; instantiate "Test" getX this@object; getY this@object; - 100
-
+		move this@object this@dirX this@dirY;
+		if state@started:
+			this@dirX = getX state@player0; - getX this@object;
+			this@dirY = getY state@player0; - getY this@object;
+			this@dirX = this@dirX / 10;
+			this@dirY = this@dirY / 10;
