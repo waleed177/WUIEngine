@@ -1,61 +1,98 @@
-images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\Test1\Tiles\
+images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\SpaceInvaders\
+
 
 state:
-	@timeleft 0
-	@playersRequired 2
 	@players 0
-	@started 0
-	@finished 0
-	onUpdate 
-		if this@players == this@playersRequired:
-			if this@finished == 0 if this@started == 0:
-				this@started = 1;
-				this@timeleft = 40;
-				print "started!";
+	@number 15
+alienSpawner:
+	onLoad
+		remove PlayerBullet@object;
+		remove EnemyBullet@object;
+		instantiate "Alien" 200 100;
+		instantiate "Alien" 300 100;
+		instantiate "Alien" 400 100;
 		
-		if this@started:
-			this@timeleft--;
-			
-			if this@timeleft < 1:
-				this@started = 0;
-				this@finished = 1;
-				print "Game is over!";
-				print state@players;
-
-
-
 Player:
+	boxCollider
 	topDownPlayer
+	texture player.png
+	size 64 64
+	position 403 373
 	player-speed 300 300
-	boxCollider
-	texture boxCoin.png
-	size 25 25
-	position 100 100
-	@coins 0
-	@counted 0
-	@id 0
+	@type 0
+	onLoad
+		this@id = state@players;
+		state@players++;
+		if this@id == 0 teleport this@object 403-128 373;
+		if this@id == 1 teleport this@object 403+128 373;
 	onUpdate
-		if this@counted == 0:
-			this@counted = 1; 
-			state@players++;
-			this@id = state@players - 1;
-			if this@id == 0:
-				state@player0 = this@object;
-			if this@id == 1:
-				state@player1 = this@object;
-			
+		if getY this@object; < 360:
+			teleport this@object getX this@object; 373;
+			instantiate "PlayerBullet" getX this@object; getY this@object; -75;
 
-Monster:
+Alien:
 	boxCollider
-	size 50 50
-	position -100 -100
-	texture box.png
-	@dirX 0
-	@dirY 0
+	texture alien.png
+	size 64 64
+	position 100 100
+	@type 1
+	@state 0
+	@timeleft 20
+	@timeforBullet 5
+	onLoad
+		this@timeforBullet = state@number;
+		state@number = state@number + 5;
 	onUpdate
-		move this@object this@dirX this@dirY;
-		if state@started:
-			this@dirX = getX state@player0; - getX this@object;
-			this@dirY = getY state@player0; - getY this@object;
-			this@dirX = this@dirX / 10;
-			this@dirY = this@dirY / 10;
+		if this@state == 0:
+			move this@object 10 0;
+			this@timeleft--;
+			if this@timeleft < 1:
+				this@state = 1;
+				this@timeleft = 20;
+		
+		if this@state == 1: 
+			move this@object 0-10 0;
+			this@timeleft--;
+			if this@timeleft < 1:
+				this@state = 0;
+				this@timeleft = 20;
+		
+		this@timeforBullet--;
+		if this@timeforBullet < 0:
+			instantiate "EnemyBullet" getX this@object; getY this@object; +75;
+			this@timeforBullet = state@number;
+			state@number = state@number + 5;
+			if state@number > 25:
+				state@number = 5;
+
+PlayerBullet:
+	boxCollider
+	texture bullet.png
+	size 16 16
+	@type 2
+	@life 20
+	onUpdate 
+		move this@object 0 0-10
+		this@life--;
+		if this@life < 0:
+			remove this@object;
+	onCollisionStay
+		if other@type == 1:
+			remove other@object;
+
+EnemyBullet:
+	boxCollider
+	texture bullet.png
+	size 16 16
+	@type 3
+	@life 20
+	onUpdate 
+		move this@object 0 10
+		this@life--;
+		if this@life < 0:
+			remove this@object;
+	onCollisionStay
+		if other@type == 0:
+			remove other@object;
+	
+
