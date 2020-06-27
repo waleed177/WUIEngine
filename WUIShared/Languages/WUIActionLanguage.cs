@@ -83,7 +83,9 @@ namespace WUIShared.Languages {
                 res = integer.value;
             else if (item is Variable variable)
                 res = GetVariable(variable.path);
-            else if (item is BinaryOperator binaryOperator) {
+            else if (item is FunctionCall functionCall) {
+                res = bindingDictionary[functionCall.functionName](ComputeArguments(functionCall.arguments));
+            } else if (item is BinaryOperator binaryOperator) {
                 switch (binaryOperator.operatorName) {
                     case "+":
                         res = (int)ComputeValue(binaryOperator.left) + (int)ComputeValue(binaryOperator.right);
