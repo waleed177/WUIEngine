@@ -14,6 +14,7 @@ namespace WUIServer {
         public static PacketBroadcaster broadcaster;
         public static GameObject world;
         internal static NetworkManager networkManager;
+        public static WUIGGameLoader gameWorldFile;
 
         private static Timer timer;
 
@@ -30,7 +31,8 @@ namespace WUIServer {
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
-            new WUIGGameLoader(world).Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
+            gameWorldFile = new WUIGGameLoader(world);
+            gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
             Console.WriteLine("Server started!");
         }
 

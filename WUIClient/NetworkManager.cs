@@ -21,6 +21,11 @@ namespace WUIClient {
             Game1.client.On<WUIShared.Packets.SpawnGameObject>(Client_SpawnGameObject);
             Game1.client.On<WUIShared.Packets.ChangeGameObjectUID>(Client_ChangeGameObjectUID);
             Game1.client.On<DestroyGameObject>(Client_DestroyGameObject);
+            Game1.client.On<OwnershipPacket>(Client_OwnershipPacket);
+        }
+
+        private void Client_OwnershipPacket(ClientBase sender, OwnershipPacket packet) {
+            gameObjects[packet.UID].ClientOwned = packet.Owned;
         }
 
         private void Client_DestroyGameObject(ClientBase sender, DestroyGameObject packet) {

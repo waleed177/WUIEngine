@@ -37,6 +37,8 @@ namespace WUIClient {
 
         public delegate void NetworkReadyDelegate(GameObject sender);
         public event NetworkReadyDelegate OnNetworkReady;
+        //Ownership
+        public bool ClientOwned { get; set; }
 
         public GameObject() : this(Objects.Empty, true) { }
 

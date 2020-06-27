@@ -10,7 +10,7 @@ namespace WUIClient.Components {
     public class PlayerController : GameObject {
         public float HorizontalSpeed { get; private set; } = 32;
         public float VerticalSpeed { get; private set; } = 32;
-
+        
         public PlayerController() : base(Objects.PlayerController, false) {
             On(0, OnRecieveSpeeds);
         }
@@ -22,14 +22,16 @@ namespace WUIClient.Components {
 
         public override void OnUpdate(float deltaTime) {
             base.OnUpdate(deltaTime);
-            if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.D))
-                transform.Position += new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
-            if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.A))
-                transform.Position -= new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
-            if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.W))
-                transform.Position -= new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
-            if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S))
-                transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
+            if (Parent.ClientOwned) {
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.D))
+                    transform.Position += new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.A))
+                    transform.Position -= new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.W))
+                    transform.Position -= new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S))
+                    transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
+            }
         }
     }
 }

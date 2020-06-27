@@ -38,6 +38,8 @@ namespace WUIServer {
 
         private void Client_OnStart(ClientBase client) {
             world.SendTo(client);
+            GameObject plr = Program.gameWorldFile.InstantiatePlayer();
+            client.Send(new OwnershipPacket() { UID = plr.UID, Owned = true });
         }
 
         private void Client_DestroyGameObject(ClientBase sender, DestroyGameObject packet) {

@@ -29,6 +29,10 @@ SetParentOfGameObject
 	int UID
 	int newParentUID
 
+OwnershipPacket
+	int UID
+	bool Owned
+
 TransformPositionSet
 	int UID
 	float x
@@ -69,4 +73,3 @@ StringArrayUserPacket
 	int UID
 	byte type
 	string[p3] data
-

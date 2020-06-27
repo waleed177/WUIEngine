@@ -14,6 +14,7 @@ namespace WUIShared.Packets {
         FreeTempUID,
         DestroyGameObject,
         SetParentOfGameObject,
+        OwnershipPacket,
         TransformPositionSet,
         RawTextureRendererTextureSet,
         RawTextureRendererRotationSet,
@@ -321,6 +322,44 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"int UID = {UID}\nint newParentUID = {newParentUID}\n";
+    }
+
+    public class OwnershipPacket : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.OwnershipPacket;
+        public override int Size { get => +4 + 1; }
+
+        public override int RawSerializeSize => Size + 5;
+        public int UID;
+        public bool Owned;
+
+        public OwnershipPacket() {
+        }
+        public OwnershipPacket(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(Size >> 0);
+                arr[start++] = (byte)(Size >> 8);
+                arr[start++] = (byte)(Size >> 16);
+                arr[start++] = (byte)(Size >> 24);
+            }
+            unchecked {
+                arr[start++] = (byte)(UID >> 0);
+                arr[start++] = (byte)(UID >> 8);
+                arr[start++] = (byte)(UID >> 16);
+                arr[start++] = (byte)(UID >> 24);
+            }
+            arr[start++] = (byte)(Owned ? 1 : 0);
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            Owned = arr[start++] == 1;
+            return start;
+        }
+        public override string ToString() => $"int UID = {UID}\nbool Owned = {Owned}\n";
     }
 
     public class TransformPositionSet : Packet {

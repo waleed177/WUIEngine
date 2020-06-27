@@ -12,6 +12,15 @@ namespace WUIServer.Components {
             
         }
 
+
+        public override void OnAdded() {
+            base.OnAdded();
+            byte[] data = new byte[8];
+            BinaryConversions.BinConversion.GetBytes(data, 0, HorizontalSpeed);
+            BinaryConversions.BinConversion.GetBytes(data, 4, VerticalSpeed);
+            Send(0, data, data.Length);
+        }
+
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
             byte[] data = new byte[8];
