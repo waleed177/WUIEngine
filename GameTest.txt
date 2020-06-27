@@ -14,5 +14,5 @@ Test:
 	size 50 50
 	position 300 300
 	texture box.png
-	onCollisionStay print "test"; instantiate "Test" 100 50; remove this@object; print "done";
-
+	@dir 10
+	onUpdate move this@object this@dir 0; if getX this@object; > 500 this@dir = 0 - 10; if getX this@object; < 100 this@dir = 10;

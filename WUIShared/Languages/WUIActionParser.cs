@@ -8,7 +8,6 @@ namespace WUIShared.Languages
     public class WUIActionParser
     {
         WUIActionTokenizer tokenizer;
-        Token token = new Token();
 
         public WUIActionParser() {
             tokenizer = new WUIActionTokenizer();
@@ -21,14 +20,15 @@ namespace WUIShared.Languages
         public Program ParseCode() {
             Program res = new Program();
 
+            Token token;
             while ((token = tokenizer.NextToken()).type != TokenTypes.EOF) {
-                ParseStatement(res);
+                ParseStatement(token, res);
             }
 
             return res;
         }
 
-        private void ParseStatement(Program res) {
+        private void ParseStatement(Token token, Program res) {
             //Console.WriteLine(token.type + " : " + token.value + " : " + tokenizer.TabIndex);
 
             switch (token.type) {
@@ -48,10 +48,10 @@ namespace WUIShared.Languages
                             tokenizer.NextToken(); //Dump the colon.
 
                             while (!((token = tokenizer.NextToken()).type == TokenTypes.Punctuation && (char) token.value == '\n') && token.type != TokenTypes.EOF)
-                                ParseStatement(ifStatement.TrueBody);
+                                ParseStatement(token, ifStatement.TrueBody);
                         } else {
                             token = tokenizer.NextToken();
-                            ParseStatement(ifStatement.TrueBody);
+                            ParseStatement(token, ifStatement.TrueBody);
                         }
 
                         res.body.Add(ifStatement);
@@ -63,12 +63,7 @@ namespace WUIShared.Languages
                             res.body.Add(ReadValue(token));
                         }else {
                             //Function
-                            FunctionCall functionCall = new FunctionCall() {
-                                functionName = (string)token.value
-                            };
-
-                            while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation && token.type != TokenTypes.EOF)
-                                functionCall.arguments.Add(ReadValue(token));
+                            FunctionCall functionCall = ReadFunction(token);
                             res.body.Add(functionCall);
                         }
                     }
@@ -82,6 +77,16 @@ namespace WUIShared.Languages
             }
         }
 
+        private FunctionCall ReadFunction(Token token) {
+            FunctionCall functionCall = new FunctionCall() {
+                functionName = (string)token.value
+            };
+
+            while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation && token.type != TokenTypes.EOF)
+                functionCall.arguments.Add(ReadValue(token));
+            return functionCall;
+        }
+
         private ParseObject ReadValue(Token token) {
             ParseObject res = null;
             switch (token.type) {
@@ -93,11 +98,11 @@ namespace WUIShared.Languages
                     break;
                 case TokenTypes.Identifier:
                     Token peek = tokenizer.PeekToken();
-                    if(peek.type == TokenTypes.Operator && (string) peek.value == "@") {
+                    if (peek.type == TokenTypes.Operator && (string)peek.value == "@") {
                         tokenizer.NextToken();
-                        string varName = (string) tokenizer.NextToken().value;
-                        res = new Variable() { path = new string[] { (string) token.value, varName } };
-                    } else throw new Exception("Identifier doesnt make sense");
+                        string varName = (string)tokenizer.NextToken().value;
+                        res = new Variable() { path = new string[] { (string)token.value, varName } };
+                    } else res = ReadFunction(token); //token is the function name
                     break;
                 default:
                     break;

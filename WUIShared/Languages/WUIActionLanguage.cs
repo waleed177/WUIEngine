@@ -99,8 +99,23 @@ namespace WUIShared.Languages {
                     case "/":
                         res = (int)ComputeValue(binaryOperator.left) / (int)ComputeValue(binaryOperator.right);
                         break;
+                    case "%":
+                        res = (int)ComputeValue(binaryOperator.left) % (int)ComputeValue(binaryOperator.right);
+                        break;
                     case "==":
                         res = ((int)ComputeValue(binaryOperator.left) == (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        break;
+                    case ">":
+                        res = ((int)ComputeValue(binaryOperator.left) > (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        break;
+                    case "<":
+                        res = ((int)ComputeValue(binaryOperator.left) < (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        break;
+                    case ">=":
+                        res = ((int)ComputeValue(binaryOperator.left) >= (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        break;
+                    case "<=":
+                        res = ((int)ComputeValue(binaryOperator.left) <= (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
                         break;
                     default: throw new NotImplementedException("Not implemented " + binaryOperator.operatorName);
                 }
