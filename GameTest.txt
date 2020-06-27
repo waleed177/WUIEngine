@@ -15,4 +15,6 @@ Test:
 	position 300 300
 	texture box.png
 	@dir 10
+	@touched 0
 	onUpdate move this@object this@dir 0; if getX this@object; > 500 this@dir = 0 - 10; if getX this@object; < 100 this@dir = 10;
+	onCollisionStay if this@touched == 0: this@touched = 1; instantiate "Test"  getX this@object;  getY this@object; - 100

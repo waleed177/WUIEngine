@@ -17,6 +17,7 @@ namespace WUIServer {
 
         private List<string> imagesDirectory = new List<string>();
         private readonly GameObject world;
+        private int tempObjectId = 0;
         WUIActionLanguage ActionScript;
 
         public WUIGGameLoader(GameObject world) {
@@ -60,8 +61,9 @@ namespace WUIServer {
 
             ActionScript.Bind("instantiate", args => {
                 instantiateInstructions[args[0].ToString()]();
-                GameObject gameObject = gameObjects["$$TEMP$$"];
-                if(args.Length == 3)
+                GameObject gameObject = gameObjects["$$TEMP$$" + tempObjectId];
+                tempObjectId++;
+                if (args.Length == 3)
                     gameObject.transform.Position = new Math.Vector2(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()));
                 return gameObject;
             });
@@ -72,7 +74,7 @@ namespace WUIServer {
         }
 
         private void Lang_CreateObjectBinder(string objectName) {
-            if (objectName != "$$TEMP$$" && gameObjects.ContainsKey(objectName))
+            if (objectName != "$$TEMP$$" + tempObjectId && gameObjects.ContainsKey(objectName))
                 throw new Exception($"{objectName} already exists..");
             GameObject obj = new GameObject();
             gameObjects[objectName] = obj;
@@ -80,8 +82,8 @@ namespace WUIServer {
             ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
             ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
             world.AddChild(obj);
-            if(objectName != "$$TEMP$$")
-                instantiateInstructions[objectName] = () => Lang_CreateObjectBinder("$$TEMP$$");
+            if(objectName != "$$TEMP$$" + tempObjectId)
+                instantiateInstructions[objectName] = () => Lang_CreateObjectBinder("$$TEMP$$" + tempObjectId);
         }
 
         private void Lang_ComponentAddBinder(string objectName, string componentName) {
@@ -112,8 +114,8 @@ namespace WUIServer {
                     break;
             }
 
-            if (objectName != "$$TEMP$$")
-                instantiateInstructions[objectName] += () => Lang_ComponentAddBinder("$$TEMP$$", componentName);
+            if (objectName != "$$TEMP$$" + tempObjectId)
+                instantiateInstructions[objectName] += () => Lang_ComponentAddBinder("$$TEMP$$" + tempObjectId, componentName);
         }
 
         private void Lang_SetPropertyBinder(string objectName, string propertyName, string propertyValue) {
@@ -130,10 +132,7 @@ namespace WUIServer {
                 object val = propertyValue;
                 if (int.TryParse(propertyValue, out int intPropertyValue)) val = intPropertyValue;
                 ActionScript.SetVariable(new string[] { objectName, variableName }, val);
-                return;
-            }
-
-            switch (propertyName) {
+            } else switch (propertyName) {
                 case "texture": {
                         RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
                         if (tex == null)
@@ -201,8 +200,8 @@ namespace WUIServer {
                     break;
             }
 
-            if (objectName != "$$TEMP$$")
-                instantiateInstructions[objectName] += () => Lang_SetPropertyBinder("$$TEMP$$", propertyName, propertyValue);
+            if (objectName != "$$TEMP$$" + tempObjectId)
+                instantiateInstructions[objectName] += () => Lang_SetPropertyBinder("$$TEMP$$" + tempObjectId, propertyName, propertyValue);
         }
     }
 }
