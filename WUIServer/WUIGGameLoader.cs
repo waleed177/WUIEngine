@@ -43,7 +43,7 @@ namespace WUIServer {
             });
 
             ActionScript.Bind("teleport", args => {
-                ((GameObject)args[0]).transform.Position = new Math.Vector2((float)args[1], (float)args[2]);
+                ((GameObject)args[0]).transform.Position = new Math.Vector2((int)args[1], (int)args[2]);
                 return null;
             });
 
