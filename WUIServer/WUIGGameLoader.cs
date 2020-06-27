@@ -50,6 +50,14 @@ namespace WUIServer {
                 return null;
             });
 
+            ActionScript.Bind("getX", args => {
+                return (int) ((GameObject)args[0]).transform.Position.X;
+            });
+
+            ActionScript.Bind("getY", args => {
+                return (int) ((GameObject)args[0]).transform.Position.Y;
+            });
+
             ActionScript.Bind("instantiate", args => {
                 instantiateInstructions[args[0].ToString()]();
                 GameObject gameObject = gameObjects["$$TEMP$$"];
@@ -174,6 +182,17 @@ namespace WUIServer {
                         void Collider_OnCollisionStay(Collider sender, Collider other) {
                             ActionScript.SetVariable(new string[] { "other" }, ActionScript.GetVariable(new string[] { other.Parent.name }));
                             ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { sender.Parent.name }));
+                            func();
+                        }
+                    }
+                    break;
+                case "onUpdate": {
+                        ActionScript.LoadCode(propertyValue);
+                        Action func = ActionScript.Compile();
+                        gameObject.OnUpdateEvent += Update;
+
+                        void Update() {
+                            ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
                             func();
                         }
                     }

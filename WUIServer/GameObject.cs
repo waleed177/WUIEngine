@@ -20,6 +20,8 @@ namespace WUIServer {
         public Transform transform { get; internal set; }
         public int UID { get; internal set; }
         public Objects ObjType { get; internal set; }
+        public event Action OnUpdateEvent;
+
         public string name;
 
         private bool childrenChanged = false;
@@ -88,8 +90,11 @@ namespace WUIServer {
                 }
             }
 
-            lock (childModification) foreach (var child in children)
+            lock (childModification) {
+                foreach (var child in children)
                     child.Update(deltaTime);
+                OnUpdateEvent?.Invoke();
+            }
         }
 
         public virtual void OnUpdate(float deltaTime) {
