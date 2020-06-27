@@ -85,7 +85,7 @@ namespace WUIShared.Languages {
                     return ReadString(1);
                 }
             } else if (tabLevel == 1) {
-                if (words.Length == 1)
+                if (words.Length == 1 && PeekTabLevel() == 1)
                     tokenType = TokenTypes.InstantiateComponent;
                 else if (currentWord == 0) {
                     tokenType = TokenTypes.PropertyName;
@@ -93,10 +93,20 @@ namespace WUIShared.Languages {
                     tokenType = TokenTypes.PropertyValue;
                     return ReadString(1);
                 }
+            } else if(tabLevel >= 2) {
+                tokenType = TokenTypes.PropertyValue;
+                string lines = "\t".Repeat(tabLevel-2) + ReadString(0);
+                while (tabLevel >= 2)
+                    lines += "\n" + "\t".Repeat(tabLevel-2) + ReadString(0);
+                return lines;
             }
 
             if (!peek) NextWord();
             return word;
+        }
+
+        private int PeekTabLevel() {
+            return currentLine + 1 < lines.Length ? lines[currentLine + 1].CountBegin("\t") : tabLevel;
         }
 
         private string ReadString(int start) {

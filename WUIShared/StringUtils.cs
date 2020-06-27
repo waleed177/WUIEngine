@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WUIShared
-{
+namespace WUIShared {
     public static class StringUtils {
 
         public static int CountBegin(this string str, string begin) {
@@ -25,7 +24,7 @@ namespace WUIShared
             return -1;
         }
 
-        public static bool CharsSatisfy(this string str, Func <char, bool> f) {
+        public static bool CharsSatisfy(this string str, Func<char, bool> f) {
             for (int i = 0; i < str.Length; i++)
                 if (!f(str[i]))
                     return false;
@@ -38,9 +37,9 @@ namespace WUIShared
             bool splitterNow = splitter(str[0]);
 
             //waw+wow
-            for(int i = 0; i < str.Length; i++) {
+            for (int i = 0; i < str.Length; i++) {
                 char c = str[i];
-                if(lonelys(c)) {
+                if (lonelys(c)) {
                     if (token != "") {
                         res.Add(token);
                         token = "";
@@ -48,7 +47,7 @@ namespace WUIShared
                     res.Add(c.ToString());
                     continue;
                 }
-                if(splitterNow != splitter(c)) {
+                if (splitterNow != splitter(c)) {
                     res.Add(token);
                     token = c.ToString();
                     splitterNow = splitter(c);
@@ -56,9 +55,16 @@ namespace WUIShared
                     token += c;
                 }
             }
-            if(token != "") {
+            if (token != "") {
                 res.Add(token);
             }
+            return res;
+        }
+
+        public static string Repeat(this string str, int num) {
+            string res = "";
+            for (int i = 0; i < num; i++)
+                res += str;
             return res;
         }
     }
