@@ -17,6 +17,7 @@ namespace WUIServer.Components {
         public RawTextureRenderer() : base(Objects.RawTextureRenderer, false) {
             texture = new Texture2D(null);
             On(0, RecievedTexture);
+            
         }
 
         private void RecievedTexture(ClientBase sender, byte[] bytes, int length) {
@@ -28,6 +29,11 @@ namespace WUIServer.Components {
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
             Send(client, 0, texture.bytes, texture.bytes.Length);
+        }
+
+        public override void OnAdded() {
+            base.OnAdded();
+            Send(0, texture.bytes, texture.bytes.Length);
         }
     }
 }
