@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using static WUIShared.Languages.WUIActionTokenizer;
 
-namespace WUIShared.Languages
-{
-    public class WUIActionParser
-    {
+namespace WUIShared.Languages {
+    public class WUIActionParser {
         WUIActionTokenizer tokenizer;
 
         public WUIActionParser() {
@@ -44,11 +42,17 @@ namespace WUIShared.Languages
                         ifStatement.condition = ReadValue(tokenizer.NextToken());
                         ifStatement.TrueBody = new Program();
                         Token possiblyColon = tokenizer.PeekToken();
-                        if(possiblyColon.type == TokenTypes.Punctuation && (char) possiblyColon.value == ':') {
+                        if (possiblyColon.type == TokenTypes.Punctuation && (char)possiblyColon.value == ':') {
+                            int refTabIndex = tokenizer.TabIndex;
                             tokenizer.NextToken(); //Dump the colon.
-
-                            while (!((token = tokenizer.NextToken()).type == TokenTypes.Punctuation && (char) token.value == '\n') && token.type != TokenTypes.EOF)
-                                ParseStatement(token, ifStatement.TrueBody);
+                            Token multilineCheckToken = tokenizer.PeekToken();
+                            if (multilineCheckToken.type == TokenTypes.Punctuation && (char)multilineCheckToken.value == '\n') {
+                                //Its a multiline if.
+                                tokenizer.NextToken(); //dump the new line.
+                                while(tokenizer.TabIndex > refTabIndex && (token = tokenizer.NextToken()).type != TokenTypes.EOF)
+                                    ParseStatement(token, ifStatement.TrueBody);
+                            } else while (!((token = tokenizer.NextToken()).type == TokenTypes.Punctuation && (char)token.value == '\n') && token.type != TokenTypes.EOF)
+                                    ParseStatement(token, ifStatement.TrueBody);
                         } else {
                             token = tokenizer.NextToken();
                             ParseStatement(token, ifStatement.TrueBody);
@@ -59,9 +63,9 @@ namespace WUIShared.Languages
                     break;
                 case TokenTypes.Identifier: {
                         Token peek = tokenizer.PeekToken();
-                        if(peek.type == TokenTypes.Operator) {
+                        if (peek.type == TokenTypes.Operator) {
                             res.body.Add(ReadValue(token));
-                        }else {
+                        } else {
                             //Function
                             FunctionCall functionCall = ReadFunction(token);
                             res.body.Add(functionCall);
@@ -91,10 +95,10 @@ namespace WUIShared.Languages
             ParseObject res = null;
             switch (token.type) {
                 case TokenTypes.Number:
-                    res = new Integer() { value = (int) token.value };
+                    res = new Integer() { value = (int)token.value };
                     break;
                 case TokenTypes.String:
-                    res = new String() { value = (string) token.value };
+                    res = new String() { value = (string)token.value };
                     break;
                 case TokenTypes.Identifier:
                     Token peek = tokenizer.PeekToken();
@@ -108,13 +112,13 @@ namespace WUIShared.Languages
                     break;
             }
 
-            if(tokenizer.PeekToken().type == TokenTypes.Operator) {
+            if (tokenizer.PeekToken().type == TokenTypes.Operator) {
                 Token op = tokenizer.NextToken();
                 string oper = (string)op.value;
-                if(oper == "++" || oper == "--") {
+                if (oper == "++" || oper == "--") {
                     res = new RightUnaryOperator() { operatorName = oper, left = res };
                 } else {
-                    res = new BinaryOperator() { operatorName = (string) op.value, left = res, right = ReadValue(tokenizer.NextToken()) };
+                    res = new BinaryOperator() { operatorName = (string)op.value, left = res, right = ReadValue(tokenizer.NextToken()) };
                 }
             }
             return res;

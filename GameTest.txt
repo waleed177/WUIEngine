@@ -1,5 +1,22 @@
 images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\Test1\Tiles\
 
+state:
+	@timeleft 0
+	@playersRequired 2
+	@players 0
+	@started 0
+	onUpdate 
+		if this@players == this@playersRequired:
+			if this@started == 0:
+				this@started = 1;
+				this@timeleft = 250;
+				print "started!";
+		
+		this@timeleft--;
+		print this@timeleft;
+
+
+
 Player:
 	topDownPlayer
 	player-speed 300 300
@@ -8,6 +25,9 @@ Player:
 	size 25 25
 	position 100 100
 	@coins 0
+	@counted 0
+	onUpdate
+		if this@counted == 0: this@counted = 1; state@players++;
 
 Test:
 	boxCollider
@@ -16,5 +36,10 @@ Test:
 	texture box.png
 	@dir 10
 	@touched 0
-	onUpdate move this@object this@dir 0; if getX this@object; > 500 this@dir = 0 - 10; if getX this@object; < 100 this@dir = 10;
-	onCollisionStay if this@touched == 0: this@touched = 1; instantiate "Test"  getX this@object;  getY this@object; - 100
+	onUpdate
+		move this@object this@dir 0;
+		if getX this@object; > 500 this@dir = 0 - 10;
+		if getX this@object; < 100 this@dir = 10;
+	onCollisionStay 
+		if this@touched == 0: this@touched = 1; instantiate "Test" getX this@object; getY this@object; - 100
+
