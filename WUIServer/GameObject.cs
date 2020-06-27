@@ -30,6 +30,9 @@ namespace WUIServer {
         private Dictionary<byte, RecievedBytesDelegate> networkBytePacketHandlers;
         private static WUIShared.Packets.ByteArrayUserPacket byteArrayUserPacket = new WUIShared.Packets.ByteArrayUserPacket() { data = new byte[8388608] };
 
+        //Threading locks
+        private object childModification = 1;
+
         public GameObject() : this(Objects.Empty, true) { }
 
         public GameObject(Objects type, bool hasTransform) {
@@ -66,25 +69,27 @@ namespace WUIServer {
         public void Update(float deltaTime) {
             OnUpdate(deltaTime);
             if (childrenChanged) {
-                while (toBeRemoved.Count > 0) {
-                    GameObject obj = toBeRemoved.Dequeue();
-                    children.Remove(obj);
-                    invokationQueue.Enqueue(obj.Destroyed);
-                    invokationQueue.Enqueue(() => { OnChildRemoved?.Invoke(this, obj); });
+                lock (childModification) {
+                    while (toBeRemoved.Count > 0) {
+                        GameObject obj = toBeRemoved.Dequeue();
+                        children.Remove(obj);
+                        invokationQueue.Enqueue(obj.Destroyed);
+                        invokationQueue.Enqueue(() => { OnChildRemoved?.Invoke(this, obj); });
+                    }
+                    while (toBeAdded.Count > 0) {
+                        GameObject obj = toBeAdded.Dequeue();
+                        children.Add(obj);
+                        invokationQueue.Enqueue(obj.Added);
+                        invokationQueue.Enqueue(() => { OnChildAdded?.Invoke(this, obj); });
+                    }
+                    while (invokationQueue.Count > 0)
+                        invokationQueue.Dequeue()();
+                    childrenChanged = false;
                 }
-                while (toBeAdded.Count > 0) {
-                    GameObject obj = toBeAdded.Dequeue();
-                    children.Add(obj);
-                    invokationQueue.Enqueue(obj.Added);
-                    invokationQueue.Enqueue(() => { OnChildAdded?.Invoke(this, obj); });
-                }
-                while (invokationQueue.Count > 0)
-                    invokationQueue.Dequeue()();
-                childrenChanged = false;
             }
 
-            foreach (var child in children)
-                child.Update(deltaTime);
+            lock (childModification) foreach (var child in children)
+                    child.Update(deltaTime);
         }
 
         public virtual void OnUpdate(float deltaTime) {
@@ -101,35 +106,39 @@ namespace WUIServer {
 
 
         public void AddChild(GameObject child, bool sendToOthers = true) {
-            childrenChanged = true;
-            child.Parent = this;
-            bool usedToBeMultiplayer = child.multiplayer;
-            child.multiplayer = multiplayer;
-            if (sendToOthers) {
-                if (multiplayer && !usedToBeMultiplayer)
-                    Program.networkManager.Add(child);
-                if (multiplayer && !usedToBeMultiplayer) {
-                    //TODO fix problem if children have children.
-                    foreach (var item in child.GetAllChildren()) {
-                        if (!item.multiplayer) {
-                            Program.networkManager.Add(item);
-                            item.multiplayer = true;
+            lock (childModification) {
+                childrenChanged = true;
+                child.Parent = this;
+                bool usedToBeMultiplayer = child.multiplayer;
+                child.multiplayer = multiplayer;
+                if (sendToOthers) {
+                    if (multiplayer && !usedToBeMultiplayer)
+                        Program.networkManager.Add(child);
+                    if (multiplayer && !usedToBeMultiplayer) {
+                        //TODO fix problem if children have children.
+                        foreach (var item in child.GetAllChildren()) {
+                            if (!item.multiplayer) {
+                                Program.networkManager.Add(item);
+                                item.multiplayer = true;
+                            }
                         }
                     }
                 }
+                toBeAdded.Enqueue(child);
             }
-            toBeAdded.Enqueue(child);
         }
 
         public void RemoveChild(GameObject gameObject, bool sendToOthers = true) {
-            childrenChanged = true;
-            toBeRemoved.Enqueue(gameObject);
-            if (multiplayer && gameObject.Parent != null) {
-                Program.networkManager.Remove(gameObject, sendToOthers);
-                foreach (var item in gameObject.children)
-                    item.Remove();
+            lock (childModification) {
+                childrenChanged = true;
+                toBeRemoved.Enqueue(gameObject);
+                if (multiplayer && gameObject.Parent != null) {
+                    Program.networkManager.Remove(gameObject, sendToOthers);
+                    foreach (var item in gameObject.children)
+                        item.Remove();
+                }
+                gameObject.Parent = null;
             }
-            gameObject.Parent = null;
         }
 
         public void Remove(bool sendToOthers = true) {
@@ -191,12 +200,16 @@ namespace WUIServer {
 
         //TODO: THREAD SAFETY.
         public virtual void SendTo(ClientBase client) {
-            Packet packet = GetSpawnPacket();
-            if (packet != null)
-                client.Send(packet);
-            foreach (var item in GetAllChildren().ToArray())
-                item.SendTo(client);
+            lock (childModification) {
+                Packet packet = GetSpawnPacket();
+                if (packet != null)
+                    client.Send(packet);
+                foreach (var item in GetAllChildren().ToArray())
+                    item.SendTo(client);
+            }
         }
+
+
     }
 
 }
