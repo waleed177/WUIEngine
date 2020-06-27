@@ -20,7 +20,9 @@ namespace WUIServer {
         public Transform transform { get; internal set; }
         public int UID { get; internal set; }
         public Objects ObjType { get; internal set; }
-        public event Action OnUpdateEvent;
+
+        public event Action<GameObject> OnUpdateEvent;
+        public event Action<GameObject> OnAddedEvent;
 
         public string name;
 
@@ -61,6 +63,7 @@ namespace WUIServer {
             if (transform == null && Parent != null)
                 transform = Parent.transform;
             OnAdded();
+            OnAddedEvent?.Invoke(this);
         }
 
         private void Destroyed() {
@@ -93,7 +96,7 @@ namespace WUIServer {
             lock (childModification) {
                 foreach (var child in children)
                     child.Update(deltaTime);
-                OnUpdateEvent?.Invoke();
+                OnUpdateEvent?.Invoke(this);
             }
         }
 

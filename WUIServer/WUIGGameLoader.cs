@@ -213,7 +213,18 @@ namespace WUIServer {
                             Action func = ActionScript.Compile();
                             gameObject.OnUpdateEvent += Update;
 
-                            void Update() {
+                            void Update(GameObject sender) {
+                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                func();
+                            }
+                        }
+                        break;
+                    case "onLoad": {
+                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                            Action func = ActionScript.Compile();
+                            gameObject.OnAddedEvent += OnAdded;
+
+                            void OnAdded(GameObject sender) {
                                 ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
                                 func();
                             }
