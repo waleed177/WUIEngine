@@ -147,11 +147,12 @@ namespace WUIShared.Languages {
             }
         }
 
+        //TODO: Investigate random errors here.
         public object GetVariable(string[] path) {
             //Hardcoded 1,2 since these are the only ones supported as of right now.
             switch (path.Length) {
                 case 1: return variables[path[0]];
-                case 2: return((Dictionary<string, object>)variables[path[0]])[path[1]];
+                case 2: return ((Dictionary<string, object>)variables[path[0]])[path[1]];
                 default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
             }
         }

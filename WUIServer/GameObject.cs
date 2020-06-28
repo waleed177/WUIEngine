@@ -33,6 +33,7 @@ namespace WUIServer {
         public delegate void RecievedBytesDelegate(ClientBase sender, byte[] bytes, int length);
         private Dictionary<byte, RecievedBytesDelegate> networkBytePacketHandlers;
         private static WUIShared.Packets.ByteArrayUserPacket byteArrayUserPacket = new WUIShared.Packets.ByteArrayUserPacket() { data = new byte[8388608] };
+        public ClientBase Owner { set; get; }
 
         //Threading locks
         private object childModification = 1;
@@ -149,6 +150,7 @@ namespace WUIServer {
             }
         }
 
+        //Parent is null at random? TODO: FIX
         public void Remove(bool sendToOthers = true) {
             Parent.RemoveChild(this, sendToOthers);
         }
@@ -173,6 +175,14 @@ namespace WUIServer {
             byteArrayUserPacket.type = type;
             byteArrayUserPacket.dataLength = length;
             Program.broadcaster.Broadcast(byteArrayUserPacket);
+        }
+
+        public void Send(byte type, byte[] data, int length, ClientBase except) {
+            byteArrayUserPacket.data = data;
+            byteArrayUserPacket.UID = UID;
+            byteArrayUserPacket.type = type;
+            byteArrayUserPacket.dataLength = length;
+            Program.broadcaster.Broadcast(byteArrayUserPacket, except);
         }
 
         public void Send(ClientBase client, byte type, byte[] data, int length) {

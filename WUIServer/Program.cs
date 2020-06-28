@@ -30,18 +30,19 @@ namespace WUIServer {
             networkManager = new NetworkManager(world);
             assetManager = new ServerAssetManager();
 
-            timer = new Timer(1000 / 5);
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-
             gameWorldFile = new WUIGGameLoader(world);
             gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
             Console.WriteLine("Server started!");
+
+            timer = new Timer(1000 / 20);
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+
         }
 
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e) {
-            //TODO: Properly calculate the 0.2f (The elapsed time)
-            world.Update(0.2f);
+            //TODO: Properly calculate the elapsed time
+            world.Update(0.05f);
         }
     }
 }

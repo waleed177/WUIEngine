@@ -61,7 +61,7 @@ namespace WUIServer.Components {
             BinConversion.GetFloat(bytes, 12, out float h);
             Position = new Vector2(x, y);
             Size = new Vector2(w, h);
-            Send(0, bytes, 16);
+            Send(0, bytes, 16, sender);
 
             DirtyPosition = false;
             DirtySize = false;
