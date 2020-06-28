@@ -10,8 +10,8 @@ namespace WUIServer {
             OnStart += ClientHandler_OnStart;
             OnDisconnect += ClientHandler_OnDisconnect;
 
+            Program.assetManager.Handle(this);
             Program.networkManager.HandleClient(this);
-
             On<WUIShared.Packets.SpawnGameObject>(Client_SpawnGameObjectRequest);
             On<WUIShared.Packets.ByteArrayUserPacket>(Client_ByteArrayUserPacket);
         }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace WUIServer {
     public class Texture2D {
+        public string name;
         public byte[] bytes;
 
         public Texture2D(byte[] texture) {

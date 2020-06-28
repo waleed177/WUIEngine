@@ -160,11 +160,19 @@ namespace WUIServer {
                             RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
                             if (tex == null)
                                 gameObject.AddChild(tex = new RawTextureRenderer());
-                            if (File.Exists(propertyValue))
+                            if (File.Exists(propertyValue)) {
+                                //TODO: MOVE THIS CODE ELSEWHERE
                                 tex.texture = new Texture2D(File.ReadAllBytes(propertyValue));
+                                tex.texture.name = Path.GetFileName(propertyValue);
+                                Program.assetManager.AddAsset(tex.texture.name, tex.texture.bytes);
+
+                            }
                             else foreach (var item in imagesDirectory)
                                     if (File.Exists(item + propertyValue)) {
+                                        //TODO: MOVE THIS CODE ELSEWHERE
                                         tex.texture = new Texture2D(File.ReadAllBytes(item + propertyValue));
+                                        tex.texture.name = Path.GetFileName(item + propertyValue);
+                                        Program.assetManager.AddAsset(tex.texture.name, tex.texture.bytes);
                                         break;
                                     }
                         }

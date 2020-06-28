@@ -24,6 +24,7 @@ namespace WUIClient {
         public Camera camera;
 
         public static NetworkManager networkManager;
+        public static ClientAssetManager assetManager;
 
         public Game1() {
             instance = this;
@@ -44,6 +45,7 @@ namespace WUIClient {
 
             client = new ClientBase("127.0.0.1", 3333, 8388608); //8MB Of buffer so images can be sent.
             networkManager = new NetworkManager(world);
+            assetManager = new ClientAssetManager(client);
         }
 
         protected override void Initialize() {

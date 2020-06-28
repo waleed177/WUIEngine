@@ -40,8 +40,7 @@ TransformPositionSet
 	float z
 
 RawTextureRendererTextureSet
-	int UID
-	int assetUID
+	string assetName
 	float r
 	float g
 	float b
@@ -51,7 +50,7 @@ RawTextureRendererRotationSet
 	float rotation
 
 AssetSend
-	int assetUID
+	string assetName
 	byte[] asset
 
 ByteArrayUserPacket

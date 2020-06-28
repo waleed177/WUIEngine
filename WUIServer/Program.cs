@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using WUIShared;
 using WUIShared.Objects;
 
 namespace WUIServer {
@@ -15,6 +16,7 @@ namespace WUIServer {
         public static GameObject world;
         internal static NetworkManager networkManager;
         public static WUIGGameLoader gameWorldFile;
+        public static ServerAssetManager assetManager;
 
         private static Timer timer;
 
@@ -26,6 +28,7 @@ namespace WUIServer {
                 multiplayer = true
             };
             networkManager = new NetworkManager(world);
+            assetManager = new ServerAssetManager();
 
             timer = new Timer(1000 / 5);
             timer.Elapsed += Timer_Elapsed;

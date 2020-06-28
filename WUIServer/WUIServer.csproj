@@ -71,6 +71,7 @@
     <Compile Include="ObjectInstantiator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerAssetManager.cs" />
     <Compile Include="Texture2D.cs" />
     <Compile Include="WUIGGameLoader.cs" />
   </ItemGroup>

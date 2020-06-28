@@ -414,11 +414,10 @@ namespace WUIShared.Packets {
 
     public class RawTextureRendererTextureSet : Packet {
         public override int PacketType { get; } = (int)PacketTypes.RawTextureRendererTextureSet;
-        public override int Size { get => +4 + 4 + 4 + 4 + 4; }
+        public override int Size { get => +4 + assetName.Length + 4 + 4 + 4; }
 
         public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public int assetUID;
+        public string assetName;
         public float r;
         public float g;
         public float b;
@@ -437,17 +436,13 @@ namespace WUIShared.Packets {
                 arr[start++] = (byte)(Size >> 24);
             }
             unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
+                arr[start++] = (byte)(assetName.Length >> 0);
+                arr[start++] = (byte)(assetName.Length >> 8);
+                arr[start++] = (byte)(assetName.Length >> 16);
+                arr[start++] = (byte)(assetName.Length >> 24);
             }
-            unchecked {
-                arr[start++] = (byte)(assetUID >> 0);
-                arr[start++] = (byte)(assetUID >> 8);
-                arr[start++] = (byte)(assetUID >> 16);
-                arr[start++] = (byte)(assetUID >> 24);
-            }
+            Encoding.ASCII.GetBytes(assetName, 0, assetName.Length, arr, start);
+            start += assetName.Length;
             BinConversion.GetBytes(arr, start, r);
             start += 4;
             BinConversion.GetBytes(arr, start, g);
@@ -457,8 +452,11 @@ namespace WUIShared.Packets {
             return start;
         }
         public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            assetUID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                assetName = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
             BinConversion.GetFloat(arr, start, out r);
             start += 4;
             BinConversion.GetFloat(arr, start, out g);
@@ -467,7 +465,7 @@ namespace WUIShared.Packets {
             start += 4;
             return start;
         }
-        public override string ToString() => $"int UID = {UID}\nint assetUID = {assetUID}\nfloat r = {r}\nfloat g = {g}\nfloat b = {b}\n";
+        public override string ToString() => $"string assetName = {assetName}\nfloat r = {r}\nfloat g = {g}\nfloat b = {b}\n";
     }
 
     public class RawTextureRendererRotationSet : Packet {
@@ -512,10 +510,10 @@ namespace WUIShared.Packets {
 
     public class AssetSend : Packet {
         public override int PacketType { get; } = (int)PacketTypes.AssetSend;
-        public override int Size { get => +4 + 4 + asset.Length * +1; }
+        public override int Size { get => +4 + assetName.Length + 4 + asset.Length * +1; }
 
         public override int RawSerializeSize => Size + 5;
-        public int assetUID;
+        public string assetName;
         public byte[] asset;
 
         public AssetSend() {
@@ -532,11 +530,13 @@ namespace WUIShared.Packets {
                 arr[start++] = (byte)(Size >> 24);
             }
             unchecked {
-                arr[start++] = (byte)(assetUID >> 0);
-                arr[start++] = (byte)(assetUID >> 8);
-                arr[start++] = (byte)(assetUID >> 16);
-                arr[start++] = (byte)(assetUID >> 24);
+                arr[start++] = (byte)(assetName.Length >> 0);
+                arr[start++] = (byte)(assetName.Length >> 8);
+                arr[start++] = (byte)(assetName.Length >> 16);
+                arr[start++] = (byte)(assetName.Length >> 24);
             }
+            Encoding.ASCII.GetBytes(assetName, 0, assetName.Length, arr, start);
+            start += assetName.Length;
             unchecked {
                 arr[start++] = (byte)(asset.Length >> 0);
                 arr[start++] = (byte)(asset.Length >> 8);
@@ -547,16 +547,21 @@ namespace WUIShared.Packets {
             return start;
         }
         public override int DeserializeFrom(byte[] arr, int start = 0) {
-            assetUID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                assetName = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
             {
                 int length = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                asset = new byte[length];
                 for (int i = 0; i < asset.Length; i++) {
                     asset[i] = arr[start++];
                 }
             }
             return start;
         }
-        public override string ToString() => $"int assetUID = {assetUID}\nbyte[] asset = {asset}\n";
+        public override string ToString() => $"string assetName = {assetName}\nbyte[] asset = {asset}\n";
     }
 
     public class ByteArrayUserPacket : Packet {

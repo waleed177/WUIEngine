@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIClient.Components {
     class RawTextureRenderer : GameObject {
@@ -21,8 +22,9 @@ namespace WUIClient.Components {
         }
 
         private void RecievedTexture(GameObject sender, byte[] bytes, int length) {
-             using (MemoryStream memoryStream = new MemoryStream(bytes))
-                texture = Texture2D.FromStream(Game1.instance.GraphicsDevice, memoryStream);
+            RawTextureRendererTextureSet packet = new RawTextureRendererTextureSet(bytes, 5); //skip the packet type and size TODO: make this the same as the lowlevelnetworklibrary, automated.
+            Console.WriteLine("ASSET " + packet.assetName);
+            texture = Game1.assetManager.GetAsset<Texture2D>(packet.assetName);
         }
 
         public override void OnRender(SpriteBatch batch, float deltaTime) {
@@ -32,7 +34,7 @@ namespace WUIClient.Components {
         }
 
         public void SendTexture(byte[] texture) {
-            Send(0, texture, texture.Length);
+            //Send(0, texture, texture.Length);
         }
 
     }
