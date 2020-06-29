@@ -114,7 +114,7 @@ namespace WUIClient {
 
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            client.AcceptPacketIfAvailable();
+            client.AcceptPacketsWhileAvailable();
 
             WMouse.Update();
             WKeyboard.Update();

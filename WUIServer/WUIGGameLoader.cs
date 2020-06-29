@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WUIServer.Components;
 using WUIShared;
@@ -73,12 +74,13 @@ namespace WUIServer {
         }
 
         public GameObject Instantiate(string name) {
+            GameObject gameObject;
             lock (instantiateInstructions) {
                 instantiateInstructions[name]();
-                GameObject gameObject = gameObjects["$$TEMP$$" + tempObjectId];
+                gameObject = gameObjects["$$TEMP$$" + tempObjectId];
                 tempObjectId++;
-                return gameObject;
             }
+            return gameObject;
         }
 
         public void Evaluate(string code) {
@@ -166,8 +168,7 @@ namespace WUIServer {
                                 tex.texture.name = Path.GetFileName(propertyValue);
                                 Program.assetManager.AddAsset(tex.texture.name, tex.texture.bytes);
 
-                            }
-                            else foreach (var item in imagesDirectory)
+                            } else foreach (var item in imagesDirectory)
                                     if (File.Exists(item + propertyValue)) {
                                         //TODO: MOVE THIS CODE ELSEWHERE
                                         tex.texture = new Texture2D(File.ReadAllBytes(item + propertyValue));

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using WUIServer.Components;
 using WUIShared.Objects;
 
@@ -94,11 +95,12 @@ namespace WUIServer {
                 }
             }
 
-            lock (childModification) {
+            //This lock was (possibily) causing deadlocks so i removed it, ill keep it commented for now though.
+            //lock (childModification) {
                 foreach (var child in children)
                     child.Update(deltaTime);
                 OnUpdateEvent?.Invoke(this);
-            }
+            //}
         }
 
         public virtual void OnUpdate(float deltaTime) {

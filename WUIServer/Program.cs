@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using WUIShared;
 using WUIShared.Objects;
 
@@ -18,7 +18,7 @@ namespace WUIServer {
         public static WUIGGameLoader gameWorldFile;
         public static ServerAssetManager assetManager;
 
-        private static Timer timer;
+        private static Thread timerThread;
 
         static void Main(string[] args) {
             server = new Server<ClientHandler>("127.0.0.1", 3333, 8388608);
@@ -34,15 +34,15 @@ namespace WUIServer {
             gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
             Console.WriteLine("Server started!");
 
-            timer = new Timer(1000 / 20);
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-
+            timerThread = new Thread(Timer_Thread);
+            timerThread.Start();
         }
 
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e) {
-            //TODO: Properly calculate the elapsed time
-            world.Update(0.05f);
+        private static void Timer_Thread() {
+            while (true) {
+                Thread.Sleep(1000/20);
+                world.Update(1000 / 20);
+            }
         }
     }
 }
