@@ -24,6 +24,7 @@ namespace WUIServer {
 
         public event Action<GameObject> OnUpdateEvent;
         public event Action<GameObject> OnAddedEvent;
+        public event Action<GameObject> OnDestroyedEvent;
 
         public string name;
 
@@ -70,6 +71,7 @@ namespace WUIServer {
 
         private void Destroyed() {
             OnDestroyed();
+            OnDestroyedEvent?.Invoke(this);
         }
 
         //Thread issue with the queues. something else is dequeuing them some how.

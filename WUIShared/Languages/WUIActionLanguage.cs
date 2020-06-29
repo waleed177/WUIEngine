@@ -134,6 +134,18 @@ namespace WUIShared.Languages {
             SetVariable(variables, path, value);
         }
 
+        public void RemoveVariable(string[] path) {
+            switch (path.Length) {
+                case 1:
+                    variables.Remove(path[0]);
+                    break;
+                case 2:
+                    ((Dictionary<string, object>)variables[path[0]]).Remove(path[1]);
+                    break;
+                default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
+            }
+        }
+
         private void SetVariable(Dictionary<string, object> variables, string[] path, object value) {
             //Hardcoded 1,2 since these are the only ones supported as of right now.
             switch (path.Length) {

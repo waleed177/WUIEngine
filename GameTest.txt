@@ -94,5 +94,4 @@ EnemyBullet:
 		this@life--;
 		if this@life < 0:
 			remove this@object;
-	
 

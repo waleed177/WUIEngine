@@ -100,6 +100,14 @@ namespace WUIServer {
             ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
             ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
             world.AddChild(obj);
+
+            string _objectName = objectName;
+            obj.OnDestroyedEvent += obj_OnDestroyedEvent;
+
+            void obj_OnDestroyedEvent(GameObject sender) {
+                ActionScript.RemoveVariable(new string[] { _objectName });
+                gameObjects.Remove(_objectName);
+            }
         }
 
         private void Lang_ComponentAddBinder(string objectName, string componentName) {
