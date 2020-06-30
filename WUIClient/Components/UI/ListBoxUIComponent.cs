@@ -9,7 +9,7 @@ using WUIShared.Objects;
 
 namespace WUIClient.Components.UI {
     public class ListBoxUIComponent : GameObject {
-        public bool screenPosition = false;
+        public bool screenPosition = true;
         private List<TextRenderer> items;
         public Texture2D texture;
         public int itemsPerPage = 10;
