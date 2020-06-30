@@ -79,5 +79,9 @@ namespace WUIClient {
             if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0))
                 Game1.client.Send(new DestroyGameObject() { UID = gameObject.UID });
         }
+
+        public GameObject Get(int uid) {
+            return gameObjects[uid];
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace WUIClient.Components {
         public PlayerController() : base(Objects.PlayerController, false) {
             On<PlayerSpeedSet>(PlayerSpeedSet);
         }
-
+        
         private void PlayerSpeedSet(ClientBase sender, PlayerSpeedSet packet) {
             HorizontalSpeed = packet.speedX;
             VerticalSpeed = packet.speedY;
@@ -26,8 +26,12 @@ namespace WUIClient.Components {
 
         public override void OnAdded() {
             base.OnAdded();
+            //TODO: THERE IS A CHANGE EVERYTHING HERE WONT WORK, SO INVESTIGATE THE OWNERSHIP PACKET AND STUFF.
+            //TODO: POSSIBLY MAKE A ONEXISTORFIND<Component> Function, or a WaitForChild function.
             collider = Parent.GetFirst<BoxCollider>();
             collider.InitializeClientSidedCollision();
+            if(Parent.ClientOwned)
+                Game1.localPlayer = this;
         }
 
         public override void OnUpdate(float deltaTime) {

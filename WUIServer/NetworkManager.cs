@@ -96,7 +96,7 @@ namespace WUIServer {
                 Program.broadcaster.Broadcast(new DestroyGameObject() { UID = gameObject.UID });
         }
 
-        public GameObject GetGameObject(int uid) {
+        public GameObject Get(int uid) {
             return gameObjects[uid];
         }
     }

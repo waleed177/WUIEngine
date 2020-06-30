@@ -64,6 +64,11 @@ PlayerSpeedSet
 MovingObjectClientCollision
 	int[p25] uids
 
+CameraSetFollow
+	bool followLocalPlayer
+	bool followEnabled
+	int followUID
+
 #serializeSize true
 
 ByteArrayUserPacket

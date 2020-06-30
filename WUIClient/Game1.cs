@@ -26,6 +26,7 @@ namespace WUIClient {
 
         public static NetworkManager networkManager;
         public static ClientAssetManager assetManager;
+        public static PlayerController localPlayer;
 
         public Game1() {
             instance = this;

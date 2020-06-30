@@ -1,14 +1,8 @@
 images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\SpaceInvaders\
 
-state:
-	@lastPlayer 0
-	@ok 0
-
 Camera:
-	camera
-	onUpdate
-		if state@ok: teleport this@object getX state@lastPlayer;-100 getY state@lastPlayer;-100;
-	
+	camera-follow localPlayer
+
 Player:
 	boxCollider
 	topDownPlayer
@@ -17,7 +11,6 @@ Player:
 	position 403 373
 	player-speed 300 300
 	@type 0
-	onLoad state@lastPlayer = this@object; state@ok = 1;
 
 Wall:
 	boxCollider

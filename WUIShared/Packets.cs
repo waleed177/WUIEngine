@@ -22,6 +22,7 @@ namespace WUIShared.Packets {
         RawTextureRendererRotationSet,
         PlayerSpeedSet,
         MovingObjectClientCollision,
+        CameraSetFollow,
         ByteArrayUserPacket,
     }
 
@@ -628,6 +629,41 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"int[p25] uids = {uids}\n";
+    }
+
+    public class CameraSetFollow : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.CameraSetFollow;
+        public override int Size { get => +1 + 1 + 4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public bool followLocalPlayer;
+        public bool followEnabled;
+        public int followUID;
+
+        public CameraSetFollow() {
+        }
+        public CameraSetFollow(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            arr[start++] = (byte)(followLocalPlayer ? 1 : 0);
+            arr[start++] = (byte)(followEnabled ? 1 : 0);
+            unchecked {
+                arr[start++] = (byte)(followUID >> 0);
+                arr[start++] = (byte)(followUID >> 8);
+                arr[start++] = (byte)(followUID >> 16);
+                arr[start++] = (byte)(followUID >> 24);
+            }
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            followLocalPlayer = arr[start++] == 1;
+            followEnabled = arr[start++] == 1;
+            followUID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            return start;
+        }
+        public override string ToString() => $"bool followLocalPlayer = {followLocalPlayer}\nbool followEnabled = {followEnabled}\nint followUID = {followUID}\n";
     }
 
     public class ByteArrayUserPacket : Packet {

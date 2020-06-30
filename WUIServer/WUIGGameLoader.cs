@@ -208,6 +208,15 @@ namespace WUIServer {
                             gameObject.transform.Position = new Math.Vector2(int.Parse(sp[0]), int.Parse(sp[1]));
                         }
                         break;
+                    case "camera-follow": {
+                            CameraComponent camera = gameObject.GetFirst<CameraComponent>();
+                            if (camera == null)
+                                gameObject.AddChild(camera = new CameraComponent());
+                            string[] sp = propertyValue.Split(' ');
+                            if (sp[0] == "localPlayer")
+                                camera.FollowLocalPlayer = true;
+                        }
+                        break;
                     case "onCollisionStay": {
                             Collider collider = gameObject.GetFirst<Collider>();
                             if (collider == null)

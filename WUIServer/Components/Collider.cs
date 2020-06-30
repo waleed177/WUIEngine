@@ -56,7 +56,7 @@ namespace WUIServer.Components {
 
         private void OnMovingObjectClientCollision(ClientBase sender, MovingObjectClientCollision packet) {
             for(int i = 0; i < packet.uidsLength; i++) {
-                Collider collider = ((Collider)Program.networkManager.GetGameObject(packet.uids[i]));
+                Collider collider = ((Collider)Program.networkManager.Get(packet.uids[i]));
                 collider.OnCollisionStay?.Invoke(collider, this);
                 OnCollisionStay?.Invoke(this, collider);
             }

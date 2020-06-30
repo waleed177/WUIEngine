@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace WUIClient {
     public class Camera {
 
-        public float X;
-        public float Y;
+        public float X = 0;
+        public float Y = 0;
         private Game game;
         public Matrix transformMatrix;
 
