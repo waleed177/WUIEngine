@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LowLevelNetworking.Shared;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -18,12 +19,10 @@ namespace WUIClient.Components {
         public Vector2 pivot = Vector2.Zero;
 
         public RawTextureRenderer() : base(Objects.RawTextureRenderer, false) {
-            On(0, RecievedTexture);
+            On<RawTextureRendererTextureSet>(Object_RawTextureRendererTextureSet);
         }
 
-        private void RecievedTexture(GameObject sender, byte[] bytes, int length) {
-            RawTextureRendererTextureSet packet = new RawTextureRendererTextureSet(bytes, 5); //skip the packet type and size TODO: make this the same as the lowlevelnetworklibrary, automated.
-            Console.WriteLine("ASSET " + packet.assetName);
+        private void Object_RawTextureRendererTextureSet(ClientBase sender, RawTextureRendererTextureSet packet) {
             texture = Game1.assetManager.GetAsset<Texture2D>(packet.assetName);
         }
 

@@ -1,4 +1,5 @@
-﻿using LowLevelNetworking.Shared;
+﻿using LowLevelNetworking.Packets;
+using LowLevelNetworking.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +33,9 @@ namespace WUIServer {
 
         //Multiplayer stuff
         public bool multiplayer = false;
-        public delegate void RecievedBytesDelegate(ClientBase sender, byte[] bytes, int length);
-        private Dictionary<byte, RecievedBytesDelegate> networkBytePacketHandlers;
         private static WUIShared.Packets.ByteArrayUserPacket byteArrayUserPacket = new WUIShared.Packets.ByteArrayUserPacket() { data = new byte[8388608] };
         public ClientBase Owner { set; get; }
+        private PacketHandler<ClientBase> packetHandler;
 
         //Threading locks
         private object childModification = 1;
@@ -53,7 +53,7 @@ namespace WUIServer {
             }
 
             ObjType = type;
-            networkBytePacketHandlers = new Dictionary<byte, RecievedBytesDelegate>();
+            packetHandler = new PacketHandler<ClientBase>();
             OnChildAdded += GameObject_OnChildAdded;
         }
 
@@ -173,40 +173,39 @@ namespace WUIServer {
             return children.Union(toBeAdded).Except(toBeRemoved);
         }
 
-        public void Send(byte type, byte[] data, int length) {
-            byteArrayUserPacket.data = data;
-            byteArrayUserPacket.UID = UID;
-            byteArrayUserPacket.type = type;
-            byteArrayUserPacket.dataLength = length;
-            Program.broadcaster.Broadcast(byteArrayUserPacket);
+        public void Send(Packet packet) {
+            lock (byteArrayUserPacket) {
+                packet.SerializeTo(byteArrayUserPacket.data);
+                byteArrayUserPacket.dataLength = packet.RawSerializeSize;
+                byteArrayUserPacket.UID = UID;
+                Program.broadcaster.Broadcast(byteArrayUserPacket);
+            }
         }
 
-        public void Send(byte type, byte[] data, int length, ClientBase except) {
-            byteArrayUserPacket.data = data;
-            byteArrayUserPacket.UID = UID;
-            byteArrayUserPacket.type = type;
-            byteArrayUserPacket.dataLength = length;
-            Program.broadcaster.Broadcast(byteArrayUserPacket, except);
+        public void Send(Packet packet, ClientBase except) {
+            lock (byteArrayUserPacket) {
+                packet.SerializeTo(byteArrayUserPacket.data);
+                byteArrayUserPacket.dataLength = packet.RawSerializeSize;
+                byteArrayUserPacket.UID = UID;
+                Program.broadcaster.Broadcast(byteArrayUserPacket, except);
+            }
         }
 
-        public void Send(ClientBase client, byte type, byte[] data, int length) {
-            byteArrayUserPacket.data = data;
-            byteArrayUserPacket.UID = UID;
-            byteArrayUserPacket.type = type;
-            byteArrayUserPacket.dataLength = length;
-            client.Send(byteArrayUserPacket);
+        public void Send(ClientBase client, Packet packet) {
+            lock (byteArrayUserPacket) {
+                packet.SerializeTo(byteArrayUserPacket.data);
+                byteArrayUserPacket.dataLength = packet.RawSerializeSize;
+                byteArrayUserPacket.UID = UID;
+                client.Send(byteArrayUserPacket);
+            }
         }
 
-        public void On(byte type, RecievedBytesDelegate recievedBytesHandler) {
-            if (networkBytePacketHandlers.ContainsKey(type))
-                networkBytePacketHandlers[type] += recievedBytesHandler;
-            else
-                networkBytePacketHandlers.Add(type, recievedBytesHandler);
+        public void On<PacketType>(PacketHandler<ClientBase>.HandlePacket<PacketType> handlePacket) where PacketType : Packet, new() {
+            packetHandler.On(handlePacket);
         }
 
-        internal void Emit(ClientBase sender, byte type, byte[] data, int length) {
-            if (networkBytePacketHandlers.ContainsKey(type))
-                networkBytePacketHandlers[type]?.Invoke(sender, data, length);
+        internal void Emit(ClientBase sender, byte[] data) {
+            packetHandler.Emit(sender, data[0], data, 1);
         }
 
 

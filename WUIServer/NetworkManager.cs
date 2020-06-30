@@ -76,7 +76,7 @@ namespace WUIServer {
 
         private void Client_ByteArrayUserPacket(ClientBase sender, WUIShared.Packets.ByteArrayUserPacket packet) {
             if (gameObjects.ContainsKey(packet.UID))
-                gameObjects[packet.UID].Emit(sender, packet.type, packet.data, packet.dataLength);
+                gameObjects[packet.UID].Emit(sender, packet.data);
         }
 
         public void Add(GameObject gameObject) {

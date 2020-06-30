@@ -15,14 +15,13 @@ namespace WUIShared.Packets {
         DestroyGameObject,
         SetParentOfGameObject,
         OwnershipPacket,
+        AssetSend,
         TransformPositionSet,
+        TransformSizeSet,
         RawTextureRendererTextureSet,
         RawTextureRendererRotationSet,
-        AssetSend,
+        PlayerSpeedSet,
         ByteArrayUserPacket,
-        FloatArrayUserPacket,
-        IntArrayUserPacket,
-        StringArrayUserPacket,
     }
 
     public class PlayerJoined : Packet {
@@ -362,152 +361,6 @@ namespace WUIShared.Packets {
         public override string ToString() => $"int UID = {UID}\nbool Owned = {Owned}\n";
     }
 
-    public class TransformPositionSet : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.TransformPositionSet;
-        public override int Size { get => +4 + 4 + 4 + 4; }
-
-        public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public float x;
-        public float y;
-        public float z;
-
-        public TransformPositionSet() {
-        }
-        public TransformPositionSet(byte[] arr, int start = 0) {
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
-            }
-            BinConversion.GetBytes(arr, start, x);
-            start += 4;
-            BinConversion.GetBytes(arr, start, y);
-            start += 4;
-            BinConversion.GetBytes(arr, start, z);
-            start += 4;
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            BinConversion.GetFloat(arr, start, out x);
-            start += 4;
-            BinConversion.GetFloat(arr, start, out y);
-            start += 4;
-            BinConversion.GetFloat(arr, start, out z);
-            start += 4;
-            return start;
-        }
-        public override string ToString() => $"int UID = {UID}\nfloat x = {x}\nfloat y = {y}\nfloat z = {z}\n";
-    }
-
-    public class RawTextureRendererTextureSet : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.RawTextureRendererTextureSet;
-        public override int Size { get => +4 + assetName.Length + 4 + 4 + 4; }
-
-        public override int RawSerializeSize => Size + 5;
-        public string assetName;
-        public float r;
-        public float g;
-        public float b;
-
-        public RawTextureRendererTextureSet() {
-        }
-        public RawTextureRendererTextureSet(byte[] arr, int start = 0) {
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(assetName.Length >> 0);
-                arr[start++] = (byte)(assetName.Length >> 8);
-                arr[start++] = (byte)(assetName.Length >> 16);
-                arr[start++] = (byte)(assetName.Length >> 24);
-            }
-            Encoding.ASCII.GetBytes(assetName, 0, assetName.Length, arr, start);
-            start += assetName.Length;
-            BinConversion.GetBytes(arr, start, r);
-            start += 4;
-            BinConversion.GetBytes(arr, start, g);
-            start += 4;
-            BinConversion.GetBytes(arr, start, b);
-            start += 4;
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            {
-                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-                assetName = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
-                start += strlen;
-            }
-            BinConversion.GetFloat(arr, start, out r);
-            start += 4;
-            BinConversion.GetFloat(arr, start, out g);
-            start += 4;
-            BinConversion.GetFloat(arr, start, out b);
-            start += 4;
-            return start;
-        }
-        public override string ToString() => $"string assetName = {assetName}\nfloat r = {r}\nfloat g = {g}\nfloat b = {b}\n";
-    }
-
-    public class RawTextureRendererRotationSet : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.RawTextureRendererRotationSet;
-        public override int Size { get => +4 + 4; }
-
-        public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public float rotation;
-
-        public RawTextureRendererRotationSet() {
-        }
-        public RawTextureRendererRotationSet(byte[] arr, int start = 0) {
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
-            }
-            BinConversion.GetBytes(arr, start, rotation);
-            start += 4;
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            BinConversion.GetFloat(arr, start, out rotation);
-            start += 4;
-            return start;
-        }
-        public override string ToString() => $"int UID = {UID}\nfloat rotation = {rotation}\n";
-    }
-
     public class AssetSend : Packet {
         public override int PacketType { get; } = (int)PacketTypes.AssetSend;
         public override int Size { get => +4 + assetName.Length + 4 + asset.Length * +1; }
@@ -564,13 +417,181 @@ namespace WUIShared.Packets {
         public override string ToString() => $"string assetName = {assetName}\nbyte[] asset = {asset}\n";
     }
 
+    public class TransformPositionSet : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.TransformPositionSet;
+        public override int Size { get => +4 + 4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public float x;
+        public float y;
+
+        public TransformPositionSet() {
+        }
+        public TransformPositionSet(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            BinConversion.GetBytes(arr, start, x);
+            start += 4;
+            BinConversion.GetBytes(arr, start, y);
+            start += 4;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            BinConversion.GetFloat(arr, start, out x);
+            start += 4;
+            BinConversion.GetFloat(arr, start, out y);
+            start += 4;
+            return start;
+        }
+        public override string ToString() => $"float x = {x}\nfloat y = {y}\n";
+    }
+
+    public class TransformSizeSet : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.TransformSizeSet;
+        public override int Size { get => +4 + 4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public float x;
+        public float y;
+
+        public TransformSizeSet() {
+        }
+        public TransformSizeSet(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            BinConversion.GetBytes(arr, start, x);
+            start += 4;
+            BinConversion.GetBytes(arr, start, y);
+            start += 4;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            BinConversion.GetFloat(arr, start, out x);
+            start += 4;
+            BinConversion.GetFloat(arr, start, out y);
+            start += 4;
+            return start;
+        }
+        public override string ToString() => $"float x = {x}\nfloat y = {y}\n";
+    }
+
+    public class RawTextureRendererTextureSet : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.RawTextureRendererTextureSet;
+        public override int Size { get => +4 + assetName.Length + 4 + 4 + 4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public string assetName;
+        public float r;
+        public float g;
+        public float b;
+
+        public RawTextureRendererTextureSet() {
+        }
+        public RawTextureRendererTextureSet(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(assetName.Length >> 0);
+                arr[start++] = (byte)(assetName.Length >> 8);
+                arr[start++] = (byte)(assetName.Length >> 16);
+                arr[start++] = (byte)(assetName.Length >> 24);
+            }
+            Encoding.ASCII.GetBytes(assetName, 0, assetName.Length, arr, start);
+            start += assetName.Length;
+            BinConversion.GetBytes(arr, start, r);
+            start += 4;
+            BinConversion.GetBytes(arr, start, g);
+            start += 4;
+            BinConversion.GetBytes(arr, start, b);
+            start += 4;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                assetName = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
+            BinConversion.GetFloat(arr, start, out r);
+            start += 4;
+            BinConversion.GetFloat(arr, start, out g);
+            start += 4;
+            BinConversion.GetFloat(arr, start, out b);
+            start += 4;
+            return start;
+        }
+        public override string ToString() => $"string assetName = {assetName}\nfloat r = {r}\nfloat g = {g}\nfloat b = {b}\n";
+    }
+
+    public class RawTextureRendererRotationSet : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.RawTextureRendererRotationSet;
+        public override int Size { get => +4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public float rotation;
+
+        public RawTextureRendererRotationSet() {
+        }
+        public RawTextureRendererRotationSet(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            BinConversion.GetBytes(arr, start, rotation);
+            start += 4;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            BinConversion.GetFloat(arr, start, out rotation);
+            start += 4;
+            return start;
+        }
+        public override string ToString() => $"float rotation = {rotation}\n";
+    }
+
+    public class PlayerSpeedSet : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.PlayerSpeedSet;
+        public override int Size { get => +4 + 4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public float speedX;
+        public float speedY;
+
+        public PlayerSpeedSet() {
+        }
+        public PlayerSpeedSet(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            BinConversion.GetBytes(arr, start, speedX);
+            start += 4;
+            BinConversion.GetBytes(arr, start, speedY);
+            start += 4;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            BinConversion.GetFloat(arr, start, out speedX);
+            start += 4;
+            BinConversion.GetFloat(arr, start, out speedY);
+            start += 4;
+            return start;
+        }
+        public override string ToString() => $"float speedX = {speedX}\nfloat speedY = {speedY}\n";
+    }
+
     public class ByteArrayUserPacket : Packet {
         public override int PacketType { get; } = (int)PacketTypes.ByteArrayUserPacket;
-        public override int Size { get => +4 + 1 + 4 + dataLength * +1; }
+        public override int Size { get => +4 + 4 + dataLength * +1; }
 
         public override int RawSerializeSize => Size + 5;
         public int UID;
-        public byte type;
         public byte[] data;
         public int dataLength;
 
@@ -595,7 +616,7 @@ namespace WUIShared.Packets {
                 arr[start++] = (byte)(UID >> 16);
                 arr[start++] = (byte)(UID >> 24);
             }
-            arr[start++] = type; unchecked {
+            unchecked {
                 arr[start++] = (byte)(dataLength >> 0);
                 arr[start++] = (byte)(dataLength >> 8);
                 arr[start++] = (byte)(dataLength >> 16);
@@ -606,194 +627,13 @@ namespace WUIShared.Packets {
         }
         public override int DeserializeFrom(byte[] arr, int start = 0) {
             UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            type = arr[start++];
             dataLength = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
             for (int i = 0; i < dataLength; i++) {
                 data[i] = arr[start++];
             }
             return start;
         }
-        public override string ToString() => $"int UID = {UID}\nbyte type = {type}\nbyte[p8388608] data = {data}\n";
-    }
-
-    public class FloatArrayUserPacket : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.FloatArrayUserPacket;
-        public override int Size { get => +4 + 1 + 4 + dataLength * +4; }
-
-        public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public byte type;
-        public float[] data;
-        public int dataLength;
-
-        public FloatArrayUserPacket() {
-            data = new float[8];
-        }
-        public FloatArrayUserPacket(byte[] arr, int start = 0) {
-            data = new float[8];
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
-            }
-            arr[start++] = type; unchecked {
-                arr[start++] = (byte)(dataLength >> 0);
-                arr[start++] = (byte)(dataLength >> 8);
-                arr[start++] = (byte)(dataLength >> 16);
-                arr[start++] = (byte)(dataLength >> 24);
-            }
-            for (int i = 0; i < dataLength; i++) {
-                BinConversion.GetBytes(arr, start, data[i]);
-                start += 4;
-            }
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            type = arr[start++];
-            dataLength = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            for (int i = 0; i < dataLength; i++) {
-                BinConversion.GetFloat(arr, start, out data[i]);
-                start += 4;
-            }
-            return start;
-        }
-        public override string ToString() => $"int UID = {UID}\nbyte type = {type}\nfloat[p8] data = {data}\n";
-    }
-
-    public class IntArrayUserPacket : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.IntArrayUserPacket;
-        public override int Size { get => +4 + 1 + 4 + dataLength * +4; }
-
-        public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public byte type;
-        public int[] data;
-        public int dataLength;
-
-        public IntArrayUserPacket() {
-            data = new int[8];
-        }
-        public IntArrayUserPacket(byte[] arr, int start = 0) {
-            data = new int[8];
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
-            }
-            arr[start++] = type; unchecked {
-                arr[start++] = (byte)(dataLength >> 0);
-                arr[start++] = (byte)(dataLength >> 8);
-                arr[start++] = (byte)(dataLength >> 16);
-                arr[start++] = (byte)(dataLength >> 24);
-            }
-            for (int i = 0; i < dataLength; i++) {
-                unchecked {
-                    arr[start++] = (byte)(data[i] >> 0);
-                    arr[start++] = (byte)(data[i] >> 8);
-                    arr[start++] = (byte)(data[i] >> 16);
-                    arr[start++] = (byte)(data[i] >> 24);
-                }
-            }
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            type = arr[start++];
-            dataLength = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            for (int i = 0; i < dataLength; i++) {
-                data[i] = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            }
-            return start;
-        }
-        public override string ToString() => $"int UID = {UID}\nbyte type = {type}\nint[p8] data = {data}\n";
-    }
-
-    public class StringArrayUserPacket : Packet {
-        public override int PacketType { get; } = (int)PacketTypes.StringArrayUserPacket;
-        public override int Size { get => +4 + 1 + 4 + data.Sum((x) => x != null ? (4 + x.Length) : 0); }
-
-        public override int RawSerializeSize => Size + 5;
-        public int UID;
-        public byte type;
-        public string[] data;
-        public int dataLength;
-
-        public StringArrayUserPacket() {
-            data = new string[3];
-        }
-        public StringArrayUserPacket(byte[] arr, int start = 0) {
-            data = new string[3];
-            DeserializeFrom(arr, start);
-        }
-        public override int SerializeTo(byte[] arr, int start = 0) {
-            arr[start++] = (byte)PacketType;
-            unchecked {
-                arr[start++] = (byte)(Size >> 0);
-                arr[start++] = (byte)(Size >> 8);
-                arr[start++] = (byte)(Size >> 16);
-                arr[start++] = (byte)(Size >> 24);
-            }
-            unchecked {
-                arr[start++] = (byte)(UID >> 0);
-                arr[start++] = (byte)(UID >> 8);
-                arr[start++] = (byte)(UID >> 16);
-                arr[start++] = (byte)(UID >> 24);
-            }
-            arr[start++] = type; unchecked {
-                arr[start++] = (byte)(dataLength >> 0);
-                arr[start++] = (byte)(dataLength >> 8);
-                arr[start++] = (byte)(dataLength >> 16);
-                arr[start++] = (byte)(dataLength >> 24);
-            }
-            for (int i = 0; i < dataLength; i++) {
-                unchecked {
-                    arr[start++] = (byte)(data[i].Length >> 0);
-                    arr[start++] = (byte)(data[i].Length >> 8);
-                    arr[start++] = (byte)(data[i].Length >> 16);
-                    arr[start++] = (byte)(data[i].Length >> 24);
-                }
-                Encoding.ASCII.GetBytes(data[i], 0, data[i].Length, arr, start);
-                start += data[i].Length;
-            }
-            return start;
-        }
-        public override int DeserializeFrom(byte[] arr, int start = 0) {
-            UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            type = arr[start++];
-            dataLength = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-            for (int i = 0; i < dataLength; i++) {
-                {
-                    int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
-                    data[i] = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
-                    start += strlen;
-                }
-            }
-            return start;
-        }
-        public override string ToString() => $"int UID = {UID}\nbyte type = {type}\nstring[p3] data = {data}\n";
+        public override string ToString() => $"int UID = {UID}\nbyte[p8388608] data = {data}\n";
     }
 
 

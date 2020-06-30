@@ -3,6 +3,7 @@ using LowLevelNetworking.Shared;
 using System;
 using WUIServer.Math;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIServer.Components {
     public class Transform : GameObject {
@@ -16,6 +17,8 @@ namespace WUIServer.Components {
                 backingField_Position = value;
                 backingField_bounds.x = value.X;
                 backingField_bounds.y = value.Y;
+                positionPacket.x = value.X;
+                positionPacket.y = value.Y;
                 DirtyPosition = true;
             }
         }
@@ -28,6 +31,8 @@ namespace WUIServer.Components {
                 backingField_Size = value;
                 backingField_bounds.width = value.X;
                 backingField_bounds.height = value.Y;
+                sizePacket.x = value.X;
+                sizePacket.y = value.Y;
                 DirtySize = true;
             }
         }
@@ -47,24 +52,27 @@ namespace WUIServer.Components {
         private float networkPeriod = 0.1f;
         private float networkUpdateTimeLeft = 0;
 
-        byte[] networkBuffer;
+        private TransformPositionSet positionPacket;
+        private TransformSizeSet sizePacket;
+
 
         public Transform() : base(Objects.Transform, false) {
-            networkBuffer = new byte[16];
-            On(0, NetworkTransformUpdate);
+            positionPacket = new TransformPositionSet();
+            sizePacket = new TransformSizeSet();
+            On<TransformPositionSet>(TransformPositionSet);
+            On<TransformSizeSet>(TransformSizeSet);
         }
 
-        private void NetworkTransformUpdate(ClientBase sender, byte[] bytes, int length) {
-            BinConversion.GetFloat(bytes, 0, out float x);
-            BinConversion.GetFloat(bytes, 4, out float y);
-            BinConversion.GetFloat(bytes, 8, out float w);
-            BinConversion.GetFloat(bytes, 12, out float h);
-            Position = new Vector2(x, y);
-            Size = new Vector2(w, h);
-            Send(0, bytes, 16, sender);
-
-            DirtyPosition = false;
+        private void TransformSizeSet(ClientBase sender, TransformSizeSet packet) {
+            Size = new Vector2(packet.x, packet.y);
+            Send(packet);
             DirtySize = false;
+        }
+
+        private void TransformPositionSet(ClientBase sender, WUIShared.Packets.TransformPositionSet transformPositionSet) {
+            Position = new Vector2(transformPositionSet.x, transformPositionSet.y);
+            Send(transformPositionSet);
+            DirtyPosition = false;
         }
 
         public override void OnUpdate(float deltaTime) {
@@ -73,30 +81,22 @@ namespace WUIServer.Components {
                 networkUpdateTimeLeft -= deltaTime;
                 if (networkUpdateTimeLeft <= 0) {
                     networkUpdateTimeLeft = networkPeriod;
-                    if (DirtyPosition || DirtySize)
-                        ForceSendPosSiz();
+                    if (DirtyPosition) {
+                        Send(positionPacket);
+                        DirtyPosition = false;
+                    }
+                    if (DirtySize) {
+                        Send(sizePacket);
+                        DirtySize = false;
+                    }
                 }
             }
         }
 
-        private void ForceSendPosSiz() {
-            SerializePosSize();
-            Send(0, networkBuffer, 16);
-            DirtyPosition = false;
-            DirtySize = false;
-        }
-
-        private void SerializePosSize() {
-            BinConversion.GetBytes(networkBuffer, 0, Position.X);
-            BinConversion.GetBytes(networkBuffer, 4, Position.Y);
-            BinConversion.GetBytes(networkBuffer, 8, Size.X);
-            BinConversion.GetBytes(networkBuffer, 12, Size.Y);
-        }
-
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
-            SerializePosSize();
-            Send(client, 0, networkBuffer, networkBuffer.Length);
+            Send(client, positionPacket);
+            Send(client, sizePacket);
         }
     }
 }

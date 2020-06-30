@@ -1,10 +1,12 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using LowLevelNetworking.Shared;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIClient.Components {
     public class PlayerController : GameObject {
@@ -12,12 +14,12 @@ namespace WUIClient.Components {
         public float VerticalSpeed { get; private set; } = 32;
         
         public PlayerController() : base(Objects.PlayerController, false) {
-            On(0, OnRecieveSpeeds);
+            On<PlayerSpeedSet>(PlayerSpeedSet);
         }
 
-        private void OnRecieveSpeeds(GameObject sender, byte[] bytes, int length) {
-            BinaryConversions.BinConversion.GetFloat(bytes, 0, out float temp); HorizontalSpeed = temp;
-            BinaryConversions.BinConversion.GetFloat(bytes, 0, out float temp2); VerticalSpeed = temp2;
+        private void PlayerSpeedSet(ClientBase sender, PlayerSpeedSet packet) {
+            HorizontalSpeed = packet.speedX;
+            VerticalSpeed = packet.speedY;
         }
 
         public override void OnUpdate(float deltaTime) {

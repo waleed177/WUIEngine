@@ -15,18 +15,14 @@ namespace WUIServer.Components {
         public float rotation;
         public Vector2 pivot;
 
-        private byte[] texturePacket;
-
         public RawTextureRenderer() : base(Objects.RawTextureRenderer, false) {
             texture = new Texture2D(null);
-            On(0, RecievedTexture);
-            
+            On<RawTextureRendererTextureSet>(RecievedTexture);
         }
 
-        private void RecievedTexture(ClientBase sender, byte[] bytes, int length) {
+        private void RecievedTexture(ClientBase sender, RawTextureRendererTextureSet rawTextureRendererTextureSet) {
             //TODO: IMPLEMENT RECIEVED TEXTURE
             Console.WriteLine("RecievedTexture not implemented");
-            
         }
 
         private Packet GetTexturePacket() {
@@ -38,27 +34,17 @@ namespace WUIServer.Components {
             };
         }
 
-        private void SerializeTexturePacket() {
-            Packet packet = GetTexturePacket();
-            texturePacket = new byte[packet.RawSerializeSize];
-            packet.SerializeTo(texturePacket);
-        }
-
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
 
-            if (texture != null && texture.bytes != null) {
-                if(texturePacket == null) SerializeTexturePacket();
-                Send(client, 0, texturePacket, texturePacket.Length);
-            }
-   
+            if (texture != null && texture.bytes != null)
+                Send(client, GetTexturePacket());
         }
 
         public override void OnAdded() {
             base.OnAdded();
             if (texture != null && texture.bytes != null) {
-                SerializeTexturePacket();
-                Send(0, texturePacket, texturePacket.Length);
+                Send(GetTexturePacket());
             }
         }
     }

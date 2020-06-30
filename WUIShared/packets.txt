@@ -33,11 +33,20 @@ OwnershipPacket
 	int UID
 	bool Owned
 
+AssetSend
+	string assetName
+	byte[] asset
+
+
+#serializeSize false
+
 TransformPositionSet
-	int UID
 	float x
 	float y
-	float z
+
+TransformSizeSet
+	float x
+	float y
 
 RawTextureRendererTextureSet
 	string assetName
@@ -46,29 +55,14 @@ RawTextureRendererTextureSet
 	float b
 
 RawTextureRendererRotationSet
-	int UID
 	float rotation
 
-AssetSend
-	string assetName
-	byte[] asset
+PlayerSpeedSet
+	float speedX
+	float speedY
+
+#serializeSize true
 
 ByteArrayUserPacket
 	int UID
-	byte type
 	byte[p8388608] data
-
-FloatArrayUserPacket
-	int UID
-	byte type
-	float[p8] data
-
-IntArrayUserPacket
-	int UID
-	byte type
-	int[p8] data
-
-StringArrayUserPacket
-	int UID
-	byte type
-	string[p3] data

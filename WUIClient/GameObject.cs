@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LowLevelNetworking.Packets;
+using LowLevelNetworking.Shared;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -28,9 +30,8 @@ namespace WUIClient {
 
         //Multiplayer stuff
         public bool multiplayer = false;
-        public delegate void RecievedBytesDelegate(GameObject sender, byte[] bytes, int length);
-        private Dictionary<byte, RecievedBytesDelegate> networkBytePacketHandlers;
         private static WUIShared.Packets.ByteArrayUserPacket byteArrayUserPacket = new WUIShared.Packets.ByteArrayUserPacket() { data = new byte[8388608] };
+        private PacketHandler<ClientBase> packetHandler;
 
         public delegate void RecievedNetworkUIDDelegate(GameObject sender, int UID);
         public event RecievedNetworkUIDDelegate OnRecieveNetworkUID;
@@ -53,7 +54,7 @@ namespace WUIClient {
             }
 
             ObjType = type;
-            networkBytePacketHandlers = new Dictionary<byte, RecievedBytesDelegate>();
+            packetHandler = new PacketHandler<ClientBase>();
             OnChildAdded += GameObject_OnChildAdded;
         }
 
@@ -168,24 +169,21 @@ namespace WUIClient {
            return children.Union(toBeAdded);
         }
 
-        public void Send(byte type, byte[] data, int length) {
-            byteArrayUserPacket.data = data;
-            byteArrayUserPacket.UID = UID;
-            byteArrayUserPacket.type = type;
-            byteArrayUserPacket.dataLength = length;
-            Game1.client.Send(byteArrayUserPacket);
+        public void Send(Packet packet) {
+            lock (byteArrayUserPacket) {
+                packet.SerializeTo(byteArrayUserPacket.data);
+                byteArrayUserPacket.dataLength = packet.RawSerializeSize;
+                byteArrayUserPacket.UID = UID;
+                Game1.client.Send(byteArrayUserPacket);
+            }
         }
 
-        public void On(byte type, RecievedBytesDelegate recievedBytesHandler) {
-            if (networkBytePacketHandlers.ContainsKey(type))
-                networkBytePacketHandlers[type] += recievedBytesHandler;
-            else
-                networkBytePacketHandlers.Add(type, recievedBytesHandler);
+        public void On<PacketType>(PacketHandler<ClientBase>.HandlePacket<PacketType> handlePacket) where PacketType : Packet, new() {
+            packetHandler.On(handlePacket);
         }
 
-        internal void Emit(byte type, byte[] data, int length) {
-            if (networkBytePacketHandlers.ContainsKey(type))
-                networkBytePacketHandlers[type]?.Invoke(this, data, length);
+        internal void Emit(ClientBase sender, byte[] data) {
+            packetHandler.Emit(sender, data[0], data, 1);
         }
 
         public void SetPermanentNetworkUID(int UID) {
