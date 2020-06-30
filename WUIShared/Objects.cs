@@ -15,6 +15,7 @@ namespace WUIShared.Objects
         TextRenderer,
         ListBoxUIComponent,
         PlayerController,
-        BoxCollider
+        BoxCollider,
+        Camera
     }
 }

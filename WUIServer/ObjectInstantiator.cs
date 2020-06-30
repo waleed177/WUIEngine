@@ -17,7 +17,8 @@ namespace WUIServer {
                 [Objects.RawTextureRenderer] = GeneralFactory<RawTextureRenderer>,
                 [Objects.Transform] = GeneralFactory<Transform>,
                 [Objects.PlayerController] = GeneralFactory<PlayerController>,
-                [Objects.BoxCollider] = GeneralFactory<BoxCollider>
+                [Objects.BoxCollider] = GeneralFactory<BoxCollider>,
+                [Objects.Camera] = GeneralFactory<CameraComponent>,
             };
         }
 

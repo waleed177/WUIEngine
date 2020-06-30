@@ -138,6 +138,9 @@ namespace WUIServer {
                 case "topDownPlayer":
                     gameObject.AddChild(new PlayerController());
                     break;
+                case "camera":
+                    gameObject.AddChild(new CameraComponent());
+                    break;
                 default:
                     break;
             }

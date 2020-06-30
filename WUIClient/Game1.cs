@@ -16,6 +16,7 @@ namespace WUIClient {
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        private SpriteBatch spriteBatchUI;
         public Texture2D UIRect;
         public SpriteFont arial;
 
@@ -38,7 +39,7 @@ namespace WUIClient {
                 multiplayer = false
             };
 
-            IsMouseVisible = false;
+            IsMouseVisible = true;
             camera = new Camera();
             WMouse.camera = camera;
 
@@ -55,6 +56,7 @@ namespace WUIClient {
 
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatchUI = new SpriteBatch(GraphicsDevice);
             UIRect = Content.Load<Texture2D>("UI");
             arial = Content.Load<SpriteFont>("arial");
 
@@ -73,12 +75,6 @@ namespace WUIClient {
             canvas.AddChild(filePanel);
             filePanel.OpenDirectory(@"C:\Users\waldohp\Desktop\Files\GameEngine WUI test folder");
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
-
-            GameObject mouse = new GameObject();
-            mouse.AddChild(new FollowMouse(false));
-            mouse.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.Red });
-            mouse.transform.Size = new Vector2(4, 4);
-            canvas.AddChild(mouse);
         }
 
         private void FilePanel_OnItemDrop(FilePanel sender, string fileName) {
@@ -126,12 +122,16 @@ namespace WUIClient {
 
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            float deltaTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            spriteBatch.Begin();
+            camera.Update(this);
+            spriteBatch.Begin(transformMatrix: camera.transformMatrix);
             world.Render(spriteBatch, deltaTime);
-            canvas.Render(spriteBatch, deltaTime);
             spriteBatch.End();
+
+            spriteBatchUI.Begin();
+            canvas.Render(spriteBatchUI, deltaTime);      
+            spriteBatchUI.End();
 
             base.Draw(gameTime);
         }

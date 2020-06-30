@@ -56,6 +56,7 @@
     <Compile Include="Color.cs" />
     <Compile Include="Components\BoxCollider.cs" />
     <Compile Include="Components\ButtonComponent.cs" />
+    <Compile Include="Components\CameraComponent.cs" />
     <Compile Include="Components\Collider.cs" />
     <Compile Include="Components\DragComponent.cs" />
     <Compile Include="Components\FollowMouse.cs" />
