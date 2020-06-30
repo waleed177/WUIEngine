@@ -21,6 +21,7 @@ namespace WUIShared.Packets {
         RawTextureRendererTextureSet,
         RawTextureRendererRotationSet,
         PlayerSpeedSet,
+        MovingObjectClientCollision,
         ByteArrayUserPacket,
     }
 
@@ -584,6 +585,49 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"float speedX = {speedX}\nfloat speedY = {speedY}\n";
+    }
+
+    public class MovingObjectClientCollision : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.MovingObjectClientCollision;
+        public override int Size { get => +4 + uidsLength * +4; }
+
+        public override int RawSerializeSize => Size + 1;
+        public int[] uids;
+        public int uidsLength;
+
+        public MovingObjectClientCollision() {
+            uids = new int[25];
+        }
+        public MovingObjectClientCollision(byte[] arr, int start = 0) {
+            uids = new int[25];
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(uidsLength >> 0);
+                arr[start++] = (byte)(uidsLength >> 8);
+                arr[start++] = (byte)(uidsLength >> 16);
+                arr[start++] = (byte)(uidsLength >> 24);
+            }
+            for (int i = 0; i < uidsLength; i++) {
+                unchecked {
+                    arr[start++] = (byte)(uids[i] >> 0);
+                    arr[start++] = (byte)(uids[i] >> 8);
+                    arr[start++] = (byte)(uids[i] >> 16);
+                    arr[start++] = (byte)(uids[i] >> 24);
+                }
+            }
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            uidsLength = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            for (int i = 0; i < uidsLength; i++) {
+                uids[i] = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            }
+            return start;
+        }
+        public override string ToString() => $"int[p25] uids = {uids}\n";
     }
 
     public class ByteArrayUserPacket : Packet {

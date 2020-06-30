@@ -7,10 +7,13 @@ Player:
 	size 64 64
 	position 403 373
 	player-speed 300 300
+	@type 0
 
 Wall:
 	boxCollider
 	texture alien.png
 	size 300 32
 	position 0 400
+	@type 1
+	onCollisionStay print other@type
 

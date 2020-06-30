@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIClient.Components {
     public abstract class Collider : GameObject {
@@ -15,6 +16,9 @@ namespace WUIClient.Components {
         public Collider(Objects type) : base(type, false) { }
 
         public abstract bool CollidesWith(Collider other);
+
+        private MovingObjectClientCollision objectClientCollision;
+        private Collider[] collisions;
 
         public override void OnUpdate(float deltaTime) {
             base.OnUpdate(deltaTime);
@@ -48,6 +52,20 @@ namespace WUIClient.Components {
                 if (CollidesWith(coll)) return true;
             }
             return false;
+        }
+
+        public void InitializeClientSidedCollision() {
+            objectClientCollision = new MovingObjectClientCollision();
+            collisions = new Collider[25];
+        }
+
+        //TODO: Obsolete this for security reasons.
+        public void SendCurrentCollisions() {
+            int amt = GetCollisions(collisions);
+            for (int i = 0; i < amt; i++)
+                objectClientCollision.uids[i] = collisions[i].UID;
+            objectClientCollision.uidsLength = amt;
+            Send(objectClientCollision);
         }
     }
 }

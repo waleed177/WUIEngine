@@ -1,7 +1,9 @@
 ﻿
+using System;
 using LowLevelNetworking.Shared;
 using WUIServer;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIServer.Components {
     public class PlayerController : GameObject {
@@ -16,7 +18,6 @@ namespace WUIServer.Components {
         public override void OnAdded() {
             base.OnAdded();
             Send(SpeedPacket());
-
         }
 
         private WUIShared.Packets.PlayerSpeedSet SpeedPacket() {

@@ -95,5 +95,9 @@ namespace WUIServer {
             if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0))
                 Program.broadcaster.Broadcast(new DestroyGameObject() { UID = gameObject.UID });
         }
+
+        public GameObject GetGameObject(int uid) {
+            return gameObjects[uid];
+        }
     }
 }

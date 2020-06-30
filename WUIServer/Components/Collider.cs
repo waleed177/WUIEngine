@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LowLevelNetworking.Shared;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIServer.Components {
     public abstract class Collider : GameObject {
@@ -12,7 +14,9 @@ namespace WUIServer.Components {
 
         public bool ContinouslyCheckCollisions { get; set; } = false;
 
-        public Collider(Objects type) : base(type, false) { }
+        public Collider(Objects type) : base(type, false) {
+            On<MovingObjectClientCollision>(OnMovingObjectClientCollision);
+        }
 
         public abstract bool CollidesWith(Collider other);
 
@@ -49,5 +53,14 @@ namespace WUIServer.Components {
             }
             return false;
         }
+
+        private void OnMovingObjectClientCollision(ClientBase sender, MovingObjectClientCollision packet) {
+            for(int i = 0; i < packet.uidsLength; i++) {
+                Collider collider = ((Collider)Program.networkManager.GetGameObject(packet.uids[i]));
+                collider.OnCollisionStay?.Invoke(collider, this);
+                OnCollisionStay?.Invoke(this, collider);
+            }
+        }
+
     }
 }

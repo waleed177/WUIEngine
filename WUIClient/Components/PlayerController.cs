@@ -27,6 +27,7 @@ namespace WUIClient.Components {
         public override void OnAdded() {
             base.OnAdded();
             collider = Parent.GetFirst<BoxCollider>();
+            collider.InitializeClientSidedCollision();
         }
 
         public override void OnUpdate(float deltaTime) {
@@ -42,6 +43,7 @@ namespace WUIClient.Components {
                 if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S))
                     transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
                 if(collider != null && collider.IsColliding()) {
+                    collider.SendCurrentCollisions();
                     transform.Position = prevPosition;
                 }
             }
