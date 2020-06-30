@@ -16,7 +16,8 @@ namespace WUIServer {
                 [Objects.MouseClickableComponent] = GeneralFactory<MouseClickableComponent>,
                 [Objects.RawTextureRenderer] = GeneralFactory<RawTextureRenderer>,
                 [Objects.Transform] = GeneralFactory<Transform>,
-                [Objects.PlayerController] = GeneralFactory<PlayerController>
+                [Objects.PlayerController] = GeneralFactory<PlayerController>,
+                [Objects.BoxCollider] = GeneralFactory<BoxCollider>
             };
         }
 

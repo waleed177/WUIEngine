@@ -19,7 +19,7 @@ namespace WUIClient {
         public Texture2D UIRect;
         public SpriteFont arial;
 
-        GameObject world;
+        public GameObject world;
         private GameObject canvas;
         public Camera camera;
 

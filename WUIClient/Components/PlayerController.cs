@@ -1,4 +1,5 @@
 ﻿using LowLevelNetworking.Shared;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,8 @@ namespace WUIClient.Components {
     public class PlayerController : GameObject {
         public float HorizontalSpeed { get; private set; } = 32;
         public float VerticalSpeed { get; private set; } = 32;
-        
+        private Collider collider;
+
         public PlayerController() : base(Objects.PlayerController, false) {
             On<PlayerSpeedSet>(PlayerSpeedSet);
         }
@@ -22,9 +24,15 @@ namespace WUIClient.Components {
             VerticalSpeed = packet.speedY;
         }
 
+        public override void OnAdded() {
+            base.OnAdded();
+            collider = Parent.GetFirst<BoxCollider>();
+        }
+
         public override void OnUpdate(float deltaTime) {
             base.OnUpdate(deltaTime);
             if (Parent.ClientOwned) {
+                Vector2 prevPosition = transform.Position;
                 if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.D))
                     transform.Position += new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
                 if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.A))
@@ -33,7 +41,11 @@ namespace WUIClient.Components {
                     transform.Position -= new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
                 if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S))
                     transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
+                if(collider != null && collider.IsColliding()) {
+                    transform.Position = prevPosition;
+                }
             }
         }
+
     }
 }

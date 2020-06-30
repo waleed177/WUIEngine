@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WUIShared.Objects;
 
-namespace WUIServer.Components {
+namespace WUIClient.Components {
     public class BoxCollider : Collider {
 
-        public BoxCollider() : base(Objects.BoxCollider) {
+        public BoxCollider() : base (WUIShared.Objects.Objects.BoxCollider) {
 
         }
 
