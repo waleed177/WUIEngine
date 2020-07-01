@@ -91,17 +91,19 @@ namespace WUIServer {
                         invokationQueue.Enqueue(obj.Added);
                         invokationQueue.Enqueue(() => { OnChildAdded?.Invoke(this, obj); });
                     }
-                    while (invokationQueue.Count > 0)
-                        invokationQueue.Dequeue()();
                     childrenChanged = false;
                 }
             }
 
+            lock (childModification)
+                while (invokationQueue.Count > 0)
+                    invokationQueue.Dequeue()();
+
             //This lock was (possibily) causing deadlocks so i removed it, ill keep it commented for now though.
             //lock (childModification) {
-                foreach (var child in children)
-                    child.Update(deltaTime);
-                OnUpdateEvent?.Invoke(this);
+            foreach (var child in children)
+                child.Update(deltaTime);
+            OnUpdateEvent?.Invoke(this);
             //}
         }
 
@@ -230,7 +232,11 @@ namespace WUIServer {
             }
         }
 
-
+        public void Invoke(Action action) {
+            lock (childModification) {
+                invokationQueue.Enqueue(action);
+            }
+        }
     }
 
 }

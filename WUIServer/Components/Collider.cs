@@ -55,10 +55,14 @@ namespace WUIServer.Components {
         }
 
         private void OnMovingObjectClientCollision(ClientBase sender, MovingObjectClientCollision packet) {
-            for(int i = 0; i < packet.uidsLength; i++) {
+            for (int i = 0; i < packet.uidsLength; i++) {
                 Collider collider = ((Collider)Program.networkManager.Get(packet.uids[i]));
-                collider.OnCollisionStay?.Invoke(collider, this);
-                OnCollisionStay?.Invoke(this, collider);
+                //TODO CHECK IF ITS BETTER TO BATCH CALL INSTEAD OF INVOKE MANY TIMES.
+                Invoke(InvokeCollision);
+                void InvokeCollision() {
+                    collider.OnCollisionStay?.Invoke(collider, this);
+                    OnCollisionStay?.Invoke(this, collider);
+                }
             }
         }
 
