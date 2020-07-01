@@ -21,8 +21,8 @@ namespace WUIServer.Components {
         }
 
         private void RecievedTexture(ClientBase sender, RawTextureRendererTextureSet rawTextureRendererTextureSet) {
-            //TODO: IMPLEMENT RECIEVED TEXTURE
-            Console.WriteLine("RecievedTexture not implemented");
+            texture.name = rawTextureRendererTextureSet.assetName;
+            Send(GetTexturePacket());
         }
 
         private Packet GetTexturePacket() {
@@ -37,13 +37,13 @@ namespace WUIServer.Components {
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
 
-            if (texture != null && texture.bytes != null)
+            if (texture != null)
                 Send(client, GetTexturePacket());
         }
 
         public override void OnAdded() {
             base.OnAdded();
-            if (texture != null && texture.bytes != null) {
+            if (texture != null) {
                 Send(GetTexturePacket());
             }
         }

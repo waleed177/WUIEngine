@@ -32,9 +32,10 @@ namespace WUIClient.Components {
                 batch.Draw(texture, transform.IntBounds, null, color, rotation, pivot, SpriteEffects.None, 0);
         }
 
-        public void SendTexture(byte[] texture) {
-            //Send(0, texture, texture.Length);
+        public void SetTexture(string fileName) {
+            Send(new RawTextureRendererTextureSet() {
+                assetName = fileName
+            });
         }
-
     }
 }

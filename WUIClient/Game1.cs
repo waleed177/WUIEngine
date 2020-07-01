@@ -79,9 +79,18 @@ namespace WUIClient {
         }
 
         private void FilePanel_OnItemDrop(FilePanel sender, string fileName) {
-            FileStream fileStream = new FileStream(fileName, FileMode.Open);
-            Texture2D spriteAtlas = Texture2D.FromStream(GraphicsDevice, fileStream);
-            
+            Texture2D spriteAtlas = assetManager.GetAsset<Texture2D>(Path.GetFileName(fileName));
+            FileStream fileStream = null;
+            if (spriteAtlas == null) {
+                fileStream = new FileStream(fileName, FileMode.Open);
+                spriteAtlas = Texture2D.FromStream(GraphicsDevice, fileStream);
+                byte[] texture = new byte[fileStream.Length];
+                fileStream.Position = 0;
+                fileStream.Read(texture, 0, texture.Length);
+                fileStream.Dispose();
+                assetManager.SetAsset(Path.GetFileName(fileName), texture);
+            }
+
             GameObject obj = new GameObject();
             obj.transform.Position = WMouse.WorldPosition;
             obj.transform.Size = new Vector2(64, 32);
@@ -91,11 +100,7 @@ namespace WUIClient {
             world.AddChild(obj);
             obj.GetFirst<RawTextureRenderer>().OnNetworkReady += Obj_OnNetworkReady;
             void Obj_OnNetworkReady(GameObject sender2) {
-                byte[] texture = new byte[fileStream.Length];
-                fileStream.Position = 0;
-                fileStream.Read(texture, 0, texture.Length);
-                obj.GetFirst<RawTextureRenderer>().SendTexture(texture);
-                fileStream.Dispose();
+                obj.GetFirst<RawTextureRenderer>().SetTexture(Path.GetFileName(fileName));
             }
         }
 

@@ -26,7 +26,9 @@ namespace WUIClient {
         }
 
         public T GetAsset<T>(string name) {
-            return (T) assets[name]; //TEXTURE NOT FOUND SOMETIMES.
+            if (assets.ContainsKey(name))
+                return (T)assets[name]; //TEXTURE NOT FOUND SOMETIMES.
+            else return default;
         }
     }
 }

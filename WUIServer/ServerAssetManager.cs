@@ -39,7 +39,7 @@ namespace WUIServer {
         //TODO: ADD SECURITY MEASURES TO SERVER RECEIVING ASSETS.
         private void OnAssetSend(ClientBase sender, AssetSend packet) {
             Console.WriteLine("Recieved asset " + packet.assetName + " from client.");
-            assets[packet.assetName] = packet.asset;
+            AddAsset(packet.assetName, packet.asset);
         }
 
     }
