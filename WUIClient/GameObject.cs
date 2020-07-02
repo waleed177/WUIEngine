@@ -152,7 +152,7 @@ namespace WUIClient {
         }
 
         public void Remove(bool sendToOthers = true) {
-            Parent.RemoveChild(this, sendToOthers);
+            Parent?.RemoveChild(this, sendToOthers);
         }
 
         public T GetFirst<T>() where T : GameObject {

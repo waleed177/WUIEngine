@@ -31,8 +31,10 @@ namespace WUIClient.Tools {
                 }
             }
 
-            if (WMouse.RightMouseClick())
+            if (WMouse.RightMouseClick()) {
                 selected = null;
+                gizmo.Remove();
+            }
 
             if(selected != null) {
                 selected.transform.Position = gizmo.transform.Position - selected.transform.Size/2;
@@ -40,6 +42,7 @@ namespace WUIClient.Tools {
         }
 
         protected override void OnDeselect() {
+            selected = null;
             gizmo.Remove();
         }
     }

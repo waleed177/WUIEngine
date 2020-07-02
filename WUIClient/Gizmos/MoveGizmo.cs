@@ -14,12 +14,7 @@ namespace WUIClient.Gizmos {
         private GameObject GizmoUp { get; }
         private GameObject GizmoDown { get; }
 
-        private MouseClickableComponent[] mouseClickables;
-        private Vector2[] originalPositions;
-
         public MoveGizmo() {
-            mouseClickables = new MouseClickableComponent[4];
-            originalPositions = new Vector2[4];
             GizmoRight = MakeGizmo(0, 16, 0, Axis.X);
             GizmoLeft = MakeGizmo(1, -16, 0, Axis.X);
             GizmoUp = MakeGizmo(2, 0, -16, Axis.Y);
@@ -29,9 +24,9 @@ namespace WUIClient.Gizmos {
         private GameObject MakeGizmo(int i, float x, float y, Axis axis) {
             GameObject res = new GameObject();
             res.transform.Size = new Microsoft.Xna.Framework.Vector2(8, 8);
-            originalPositions[i] = res.transform.Position = new Vector2(x, y);
+            res.transform.Position = new Vector2(x, y);
             res.AddChild(new RawTextureRenderer() { texture = Game1.instance.UIRect, color = Color.White });
-            res.AddChild(mouseClickables[i] = new MouseClickableComponent());
+            res.AddChild(new MouseClickableComponent());
             res.AddChild(new DragComponent() { dragTransform = transform, axis = axis});
             AddChild(res);
             return res;
