@@ -58,6 +58,7 @@
     <Compile Include="Components\PlayerController.cs" />
     <Compile Include="Gizmos\Gizmo.cs" />
     <Compile Include="Gizmos\MoveGizmo.cs" />
+    <Compile Include="Gizmos\ScaleGizmo.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Components\TextRenderer.cs" />
     <Compile Include="Components\Transform.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Components\RawTextureRenderer.cs" />
     <Compile Include="RectangleF.cs" />
     <Compile Include="Tools\MoveTool.cs" />
+    <Compile Include="Tools\ScaleTool.cs" />
     <Compile Include="Tools\Tool.cs" />
     <Compile Include="WMouse.cs" />
     <Compile Include="WKeyboard.cs" />

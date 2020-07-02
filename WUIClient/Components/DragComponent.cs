@@ -23,11 +23,13 @@ namespace WUIClient.Components {
         private MouseClickable<GameObject> mouseClickable;
 
         public DragComponent() : base(Objects.DragComponent, false) {
-            dragTransform = transform;
+            
         }
 
         public override void OnAdded() {
             base.OnAdded();
+            if(dragTransform == null)
+                dragTransform = transform;
             mouseClickable = Parent.GetFirst<MouseClickableComponent>().mouseClickable;
             mouseClickable.OnMouseLeftClickDown += MouseClickable_OnMouseLeftClick;
             mouseClickable.OnMouseLeftClickUp += MouseClickable_OnMouseLeftClickUp;

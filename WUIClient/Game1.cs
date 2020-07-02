@@ -31,6 +31,7 @@ namespace WUIClient {
 
         private Tools.Tool currentTool = null;
         private Tools.MoveTool moveTool;
+        private Tools.ScaleTool scaleTool;
 
         public Game1() {
             instance = this;
@@ -69,6 +70,9 @@ namespace WUIClient {
             UIRect = Content.Load<Texture2D>("UI");
             arial = Content.Load<SpriteFont>("arial");
 
+            moveTool = new Tools.MoveTool();
+            scaleTool = new Tools.ScaleTool();
+
             GameObject btn = new GameObject();
             btn.transform.Position = new Vector2(140, 0);
             btn.transform.Size = new Vector2(100, 32);
@@ -76,8 +80,18 @@ namespace WUIClient {
             btn.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.White });
             btn.AddChild(new TextRenderer("MoveTool", Color.Black));
             btn.AddChild(new ButtonComponent());
-            btn.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += MoveToolSelect;
+            btn.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += (sender) => ToolSelect(moveTool);
             canvas.AddChild(btn);
+
+            GameObject btn2 = new GameObject();
+            btn2.transform.Position = new Vector2(240, 0);
+            btn2.transform.Size = new Vector2(100, 32);
+            btn2.AddChild(new MouseClickableComponent(true));
+            btn2.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.White });
+            btn2.AddChild(new TextRenderer("ScaleTool", Color.Black));
+            btn2.AddChild(new ButtonComponent());
+            btn2.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += (sender) => ToolSelect(scaleTool);
+            canvas.AddChild(btn2);
 
             FilePanel filePanel = new FilePanel();
             filePanel.transform.Position = new Vector2(0, 0);
@@ -86,20 +100,19 @@ namespace WUIClient {
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
 
 
-            moveTool = new Tools.MoveTool();
         }
 
-        private void MoveToolSelect(GameObject sender) {
+        private void ToolSelect(Tools.Tool tool) {
             if (currentTool != null) {
                 currentTool.Deselect();
-                if (currentTool != moveTool) {
-                    currentTool = moveTool;
+                if (currentTool != tool) {
+                    currentTool = tool;
                     currentTool.Select();
                 } else
                     currentTool = null;
 
             } else {
-                currentTool = moveTool;
+                currentTool = tool;
                 currentTool.Select();
             }
         }

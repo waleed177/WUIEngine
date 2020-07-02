@@ -16,6 +16,12 @@ namespace WUIClient {
             this.height = height;
         }
 
+        public float Right => x + width;
+        public float Left => x;
+        public float Top => y;
+        public float Bottom => y + height;
+        public Vector2 Center => new Vector2(x + width / 2, y + height / 2);
+
         public bool Contains(Vector2 point) {
             return x < point.X && point.X < x + width && y < point.Y && point.Y < y + height;
         }
