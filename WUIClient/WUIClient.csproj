@@ -56,6 +56,8 @@
     <Compile Include="Components\FollowMouse.cs" />
     <Compile Include="Components\MouseClickableComponent.cs" />
     <Compile Include="Components\PlayerController.cs" />
+    <Compile Include="Gizmos\Gizmo.cs" />
+    <Compile Include="Gizmos\MoveGizmo.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Components\TextRenderer.cs" />
     <Compile Include="Components\Transform.cs" />
@@ -70,6 +72,8 @@
     <Compile Include="GameObject.cs" />
     <Compile Include="Components\RawTextureRenderer.cs" />
     <Compile Include="RectangleF.cs" />
+    <Compile Include="Tools\MoveTool.cs" />
+    <Compile Include="Tools\Tool.cs" />
     <Compile Include="WMouse.cs" />
     <Compile Include="WKeyboard.cs" />
   </ItemGroup>

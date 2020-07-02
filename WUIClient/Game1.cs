@@ -21,12 +21,16 @@ namespace WUIClient {
         public SpriteFont arial;
 
         public GameObject world;
+        public static  GameObject gizmoWorld;
         private GameObject canvas;
         public Camera camera;
 
         public static NetworkManager networkManager;
         public static ClientAssetManager assetManager;
         public static PlayerController localPlayer;
+
+        private Tools.Tool currentTool = null;
+        private Tools.MoveTool moveTool;
 
         public Game1() {
             instance = this;
@@ -37,6 +41,10 @@ namespace WUIClient {
             };
 
             canvas = new GameObject(Objects.Empty, false) {
+                multiplayer = false
+            };
+
+            gizmoWorld = new GameObject(Objects.Empty, false) {
                 multiplayer = false
             };
 
@@ -61,21 +69,39 @@ namespace WUIClient {
             UIRect = Content.Load<Texture2D>("UI");
             arial = Content.Load<SpriteFont>("arial");
 
-            //GameObject btn = new GameObject();
-            //btn.transform.Position = new Vector2(32, 32);
-            //btn.transform.Size = new Vector2(64, 32);
-            //btn.AddChild(new MouseClickableComponent(false));
-            //btn.AddChild(new DragComponent());
-            //btn.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.White });
-            //btn.AddChild(new TextRenderer("Wow", Color.White));
-            //btn.AddChild(new ButtonComponent());
-            //world.AddChild(btn);
+            GameObject btn = new GameObject();
+            btn.transform.Position = new Vector2(140, 0);
+            btn.transform.Size = new Vector2(100, 32);
+            btn.AddChild(new MouseClickableComponent(true));
+            btn.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.White });
+            btn.AddChild(new TextRenderer("MoveTool", Color.Black));
+            btn.AddChild(new ButtonComponent());
+            btn.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += MoveToolSelect;
+            canvas.AddChild(btn);
 
             FilePanel filePanel = new FilePanel();
             filePanel.transform.Position = new Vector2(0, 0);
             canvas.AddChild(filePanel);
             filePanel.OpenDirectory(@"C:\Users\waldohp\Desktop\Files\GameEngine WUI test folder");
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
+
+
+            moveTool = new Tools.MoveTool();
+        }
+
+        private void MoveToolSelect(GameObject sender) {
+            if (currentTool != null) {
+                currentTool.Deselect();
+                if (currentTool != moveTool) {
+                    currentTool = moveTool;
+                    currentTool.Select();
+                } else
+                    currentTool = null;
+
+            } else {
+                currentTool = moveTool;
+                currentTool.Select();
+            }
         }
 
         private void FilePanel_OnItemDrop(FilePanel sender, string fileName) {
@@ -104,7 +130,7 @@ namespace WUIClient {
             }
         }
 
-        
+
 
         protected override void UnloadContent() {
             client.Stop();
@@ -118,8 +144,11 @@ namespace WUIClient {
 
             client.AcceptPacketsWhileAvailable();
 
+            if (currentTool != null)
+                currentTool.Update();
             WMouse.Update();
             WKeyboard.Update();
+            gizmoWorld.Update(deltaTime);
             world.Update(deltaTime);
             canvas.Update(deltaTime);
 
@@ -133,10 +162,11 @@ namespace WUIClient {
             camera.Update(this);
             spriteBatch.Begin(transformMatrix: camera.transformMatrix);
             world.Render(spriteBatch, deltaTime);
+            gizmoWorld.Render(spriteBatch, deltaTime);
             spriteBatch.End();
 
             spriteBatchUI.Begin();
-            canvas.Render(spriteBatchUI, deltaTime);      
+            canvas.Render(spriteBatchUI, deltaTime);
             spriteBatchUI.End();
 
             base.Draw(gameTime);

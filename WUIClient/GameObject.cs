@@ -12,7 +12,7 @@ using WUIShared.Objects;
 
 namespace WUIClient {
     public class GameObject {
-        internal protected List<GameObject> children;
+        private List<GameObject> children;
         private Queue<GameObject> toBeRemoved;
         private Queue<GameObject> toBeAdded;
         private Queue<Action> invokationQueue;
