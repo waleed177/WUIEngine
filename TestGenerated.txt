@@ -1,0 +1,40 @@
+images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\SpaceInvaders\
+
+Camera:
+	camera-follow localPlayer
+
+PushableBlock:
+	position 0 400
+	size 32 32
+	texture alien.png
+
+Wall:
+	position 300 -100
+	size 32 512
+	texture alien.png
+
+Wall2:
+	position -100 -100
+	size 32 512
+	texture alien.png
+
+BouncyBall:
+	position -10 200
+	size 32 32
+	texture bullet.png
+
+Player:
+	boxCollider
+	topDownPlayer
+	texture player.png
+	size 64 64
+	position 0 0
+	player-speed 300 300
+	@type 0
+
+Object6:
+	position 46 -95
+	size 64 32
+	texture player.png
+
+

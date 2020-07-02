@@ -74,3 +74,6 @@ CameraSetFollow
 ByteArrayUserPacket
 	int UID
 	byte[p8388608] data
+
+SaveWorldPacket
+	string name

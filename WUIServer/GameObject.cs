@@ -3,6 +3,7 @@ using LowLevelNetworking.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using WUIServer.Components;
 using WUIShared.Objects;
@@ -236,6 +237,22 @@ namespace WUIServer {
             lock (childModification) {
                 invokationQueue.Enqueue(action);
             }
+        }
+
+        public virtual void StringSerialize(StringBuilder stringBuilder, int tabLevel, string nameIfNameIsNull) {
+            //if (ObjType != Objects.Empty) throw new Exception("SERIALIZATION NOT IMPLEMENTED FOR " + ObjType);
+            if (ObjType != Objects.Empty) return;
+            if (tabLevel > 0) throw new NotSupportedException("Non component nesting not implemented yet.");
+            //TODO: DONT DO THIS HERE.
+            if (name == null)
+                name = nameIfNameIsNull;
+            stringBuilder.Append(name);
+            stringBuilder.Append(":\n");
+            foreach (var item in children) {
+                //TODO: ADD SUPPORT FOR NON-COMPONENT CHILDREN.
+                item.StringSerialize(stringBuilder, tabLevel + 1, null);
+            }
+            stringBuilder.AppendLine();
         }
     }
 

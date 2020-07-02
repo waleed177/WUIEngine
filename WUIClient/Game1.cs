@@ -93,6 +93,16 @@ namespace WUIClient {
             btn2.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += (sender) => ToolSelect(scaleTool);
             canvas.AddChild(btn2);
 
+            GameObject btn3 = new GameObject();
+            btn3.transform.Position = new Vector2(640, 0);
+            btn3.transform.Size = new Vector2(100, 32);
+            btn3.AddChild(new MouseClickableComponent(true));
+            btn3.AddChild(new RawTextureRenderer() { texture = UIRect, color = Color.White });
+            btn3.AddChild(new TextRenderer("Save", Color.Black));
+            btn3.AddChild(new ButtonComponent());
+            btn3.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += SaveButton_Clicked;
+            canvas.AddChild(btn3);
+
             FilePanel filePanel = new FilePanel();
             filePanel.transform.Position = new Vector2(0, 0);
             canvas.AddChild(filePanel);
@@ -100,6 +110,12 @@ namespace WUIClient {
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
 
 
+        }
+
+        private void SaveButton_Clicked(GameObject sender) {
+            client.Send(new WUIShared.Packets.SaveWorldPacket() {
+                name = "TEST"
+            });
         }
 
         private void ToolSelect(Tools.Tool tool) {

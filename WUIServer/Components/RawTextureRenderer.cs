@@ -37,15 +37,20 @@ namespace WUIServer.Components {
         public override void SendTo(ClientBase client) {
             base.SendTo(client);
 
-            if (texture != null)
+            if (texture != null && texture.name != null)
                 Send(client, GetTexturePacket());
         }
 
         public override void OnAdded() {
             base.OnAdded();
-            if (texture != null) {
+            if (texture != null && texture.name != null) {
                 Send(GetTexturePacket());
             }
+        }
+
+        //TODO: This is not always correct, so it should be fixed.
+        public override void StringSerialize(StringBuilder stringBuilder, int tabLevel, string nameIfNameIsNull) {
+            stringBuilder.Append('\t', tabLevel); stringBuilder.AppendLine($"texture {texture.name}");
         }
     }
 }

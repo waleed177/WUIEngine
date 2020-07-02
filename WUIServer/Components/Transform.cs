@@ -1,6 +1,7 @@
 ﻿using BinaryConversions;
 using LowLevelNetworking.Shared;
 using System;
+using System.Text;
 using WUIServer.Math;
 using WUIShared.Objects;
 using WUIShared.Packets;
@@ -97,6 +98,11 @@ namespace WUIServer.Components {
             base.SendTo(client);
             Send(client, positionPacket);
             Send(client, sizePacket);
+        }
+
+        public override void StringSerialize(StringBuilder stringBuilder, int tabLevel, string nameIfNameIsNull) {
+            stringBuilder.Append('\t', tabLevel); stringBuilder.AppendLine($"position {Position.X} {Position.Y}");
+            stringBuilder.Append('\t', tabLevel); stringBuilder.AppendLine($"size {Size.X} {Size.Y}");
         }
     }
 }

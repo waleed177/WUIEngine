@@ -16,6 +16,7 @@ namespace WUIServer {
         public static GameObject world;
         internal static NetworkManager networkManager;
         public static WUIGGameLoader gameWorldFile;
+        public static WUIGGameSaver gameSaver;
         public static ServerAssetManager assetManager;
 
         private static Thread timerThread;
@@ -31,7 +32,10 @@ namespace WUIServer {
             assetManager = new ServerAssetManager();
 
             gameWorldFile = new WUIGGameLoader(world);
-            gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
+            gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\TestGenerated.txt"));
+
+            gameSaver = new WUIGGameSaver(world);
+
             Console.WriteLine("Server started!");
 
             timerThread = new Thread(Timer_Thread);

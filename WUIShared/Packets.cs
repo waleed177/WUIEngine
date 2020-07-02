@@ -24,6 +24,7 @@ namespace WUIShared.Packets {
         MovingObjectClientCollision,
         CameraSetFollow,
         ByteArrayUserPacket,
+        SaveWorldPacket,
     }
 
     public class PlayerJoined : Packet {
@@ -714,6 +715,47 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"int UID = {UID}\nbyte[p8388608] data = {data}\n";
+    }
+
+    public class SaveWorldPacket : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.SaveWorldPacket;
+        public override int Size { get => +4 + name.Length; }
+
+        public override int RawSerializeSize => Size + 5;
+        public string name;
+
+        public SaveWorldPacket() {
+        }
+        public SaveWorldPacket(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(Size >> 0);
+                arr[start++] = (byte)(Size >> 8);
+                arr[start++] = (byte)(Size >> 16);
+                arr[start++] = (byte)(Size >> 24);
+            }
+            unchecked {
+                arr[start++] = (byte)(name.Length >> 0);
+                arr[start++] = (byte)(name.Length >> 8);
+                arr[start++] = (byte)(name.Length >> 16);
+                arr[start++] = (byte)(name.Length >> 24);
+            }
+            Encoding.ASCII.GetBytes(name, 0, name.Length, arr, start);
+            start += name.Length;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                name = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
+            return start;
+        }
+        public override string ToString() => $"string name = {name}\n";
     }
 
 

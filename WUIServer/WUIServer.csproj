@@ -75,6 +75,7 @@
     <Compile Include="ServerAssetManager.cs" />
     <Compile Include="Texture2D.cs" />
     <Compile Include="WUIGGameLoader.cs" />
+    <Compile Include="WUIGGameSaver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
