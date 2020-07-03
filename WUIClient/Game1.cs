@@ -53,8 +53,8 @@ namespace WUIClient {
             camera = new Camera();
             WMouse.camera = camera;
 
-
-            client = new ClientBase("127.0.0.1", 3333, 8388608); //8MB Of buffer so images can be sent.
+            string[] config = File.ReadAllLines("Config.txt");
+            client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.
             assetManager = new ClientAssetManager(client);
             networkManager = new NetworkManager(world);
         }
@@ -106,7 +106,7 @@ namespace WUIClient {
             FilePanel filePanel = new FilePanel();
             filePanel.transform.Position = new Vector2(0, 0);
             canvas.AddChild(filePanel);
-            filePanel.OpenDirectory(@"C:\Users\waldohp\Desktop\Files\GameEngine WUI test folder");
+            filePanel.OpenDirectory(@"Images/");
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
 
 

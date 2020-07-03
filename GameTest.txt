@@ -1,41 +1,65 @@
-images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\Images\
+images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\SpaceInvaders\
 
 Camera:
 	camera-follow localPlayer
-
-FoodSpawner:
-	@timer 20
-	onUpdate
-		if this@timer < 0:
-			this@timer = random 10 100;
-			instantiate "Food" random 0-20 20; random 0-20 20;;
-		this@timer--;
 
 Player:
 	boxCollider
 	topDownPlayer
 	texture player.png
-	size 32 32
+	size 64 64
+	position 0 0
 	player-speed 300 300
 	@type 0
-	@size 32
-	onCollisionStay
-		if other@type == 0 if other@size < this@size:
-			inflate this@object other@size other@size;
-			this@size = this@size + other@size;
-			remove other@object;
-	
-Food:
+
+PushableBlock:
 	boxCollider
-	texture food.png
+	texture alien.png
 	size 32 32
-	position 50 50
+	position 0 400
 	@type 1
+	@diffX 0
+	@diffY 0
 	onCollisionStay
+		this@diffX = getX this@object; - getX other@object;;
+		this@diffY = getY this@object; - getY other@object;;
+		this@magX = this@diffX;
+		if this@magX < 0: this@magX = this@magX * 0-1;
+		this@magY = this@diffY;
+		if this@magY < 0: this@magY = this@magY * 0-1;
+		
+		if this@magX > 0: this@diffX = this@diffX / this@magX;
+		if this@magY > 0: this@diffY = this@diffY / this@magY;
+		
+		if this@magX > this@magY:
+			move this@object this@diffX*1 0;
+		if this@magX < this@magY:
+			move this@object 0 this@diffY*1;
+
+Wall:
+	boxCollider
+	texture alien.png
+	size 32 512
+	position 300 -100
+	@type 2
+
+Wall2:
+	boxCollider
+	texture alien.png
+	size 32 512
+	position -100 -100
+	@type 2
+	
+BouncyBall:
+	boxCollider
+	texture bullet.png
+	size 32 32
+	position 0 200
+	@type 3
+	@velX 5
+	onUpdate move this@object this@velX 0
+	onCollisionStay
+		this@velX = this@velX * 0-1
 		if other@type == 0:
-			inflate other@object 5 5;
-			other@size = other@size + 5;
-			remove this@object;
-
-
+			teleport other@object 0 0;
 

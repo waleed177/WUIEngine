@@ -22,7 +22,8 @@ namespace WUIServer {
         private static Thread timerThread;
 
         static void Main(string[] args) {
-            server = new Server<ClientHandler>("127.0.0.1", 3333, 8388608);
+            string[] hostingInfo = File.ReadAllLines("Config.txt");
+            server = new Server<ClientHandler>(hostingInfo[0], int.Parse(hostingInfo[1]), 8388608);
             broadcaster = new PacketBroadcaster(8388608);
             world = new GameObject(Objects.Empty, false) {
                 multiplayer = true
@@ -31,7 +32,7 @@ namespace WUIServer {
             assetManager = new ServerAssetManager();
 
             gameWorldFile = new WUIGGameLoader(world);
-            gameWorldFile.Evaluate(File.ReadAllText(@"C:\Users\waldohp\source\repos\WUILibrary\GameTest.txt"));
+            gameWorldFile.Evaluate(File.ReadAllText(@"GameFile.txt"));
 
             gameSaver = new WUIGGameSaver(world);
 
