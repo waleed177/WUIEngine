@@ -29,8 +29,12 @@ namespace WUIClient {
         }
 
         private void Client_DestroyGameObject(ClientBase sender, DestroyGameObject packet) {
-            GameObject gameObject = gameObjects[packet.UID];
-            gameObject.Parent.RemoveChild(gameObject, false);
+            Console.WriteLine("Attempting removal of " + packet.UID);
+            if (gameObjects.ContainsKey(packet.UID)) {
+                GameObject gameObject = gameObjects[packet.UID];
+                gameObject.Parent.RemoveChild(gameObject, false);
+                Console.WriteLine("Successfully removed " + packet.UID);
+            }
         }
 
         private void Client_ChangeGameObjectUID(ClientBase sender, ChangeGameObjectUID packet) {
@@ -38,7 +42,7 @@ namespace WUIClient {
             gameObject.SetPermanentNetworkUID(packet.newUID);
             gameObjects[packet.newUID] = gameObject;
             gameObjects[packet.oldUID] = null;
-            
+
             Game1.client.Send(new FreeTempUID() { UID = packet.oldUID });
         }
 
@@ -64,13 +68,13 @@ namespace WUIClient {
         }
 
         public void Add(GameObject gameObject) {
-            if(gameObject.UID == 0)
+            if (gameObject.UID == 0)
                 gameObject.UID = freeId--;
             gameObjects[gameObject.UID] = gameObject;
             Game1.client.Send(new WUIShared.Packets.SpawnGameObject() {
                 UID = gameObject.UID,
                 parentUID = gameObject.Parent.UID,
-                ObjType = (int) gameObject.ObjType
+                ObjType = (int)gameObject.ObjType
             });
         }
 

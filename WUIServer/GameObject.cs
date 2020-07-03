@@ -151,7 +151,7 @@ namespace WUIServer {
                 if (multiplayer && gameObject.Parent != null) {
                     Program.networkManager.Remove(gameObject, sendToOthers);
                     foreach (var item in gameObject.children)
-                        item.Remove();
+                        item.Remove(false);
                 }
                 gameObject.Parent = null;
             }
@@ -225,6 +225,7 @@ namespace WUIServer {
         //TODO: THREAD SAFETY.
         public virtual void SendTo(ClientBase client) {
             lock (childModification) {
+                Console.WriteLine("Sending Type: " + ObjType + ", UID: " + UID + ", Parent: " + Parent?.UID + " To client " + client.Id );
                 Packet packet = GetSpawnPacket();
                 if (packet != null)
                     client.Send(packet);

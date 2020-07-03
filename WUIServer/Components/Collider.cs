@@ -27,6 +27,8 @@ namespace WUIServer.Components {
                 foreach (GameObject child in Program.world.GetAllChildren()) {
                     Collider coll = child.GetFirst<Collider>();
                     if (coll == null || coll == this || coll.Parent.transform == null) continue;
+                    if (coll == null || coll.Parent == null || coll.Parent.Parent == null || Parent == null || Parent.Parent == null) continue;
+
                     if (CollidesWith(coll)) {
                         OnCollisionStay?.Invoke(this, coll);
                         if (Parent == null) return;
@@ -57,9 +59,11 @@ namespace WUIServer.Components {
         private void OnMovingObjectClientCollision(ClientBase sender, MovingObjectClientCollision packet) {
             for (int i = 0; i < packet.uidsLength; i++) {
                 Collider collider = ((Collider)Program.networkManager.Get(packet.uids[i]));
+                if (collider == null || collider.Parent == null || collider.Parent.Parent == null) continue;
                 //TODO CHECK IF ITS BETTER TO BATCH CALL INSTEAD OF INVOKE MANY TIMES.
                 Invoke(InvokeCollision);
                 void InvokeCollision() {
+                    if (collider == null || collider.Parent == null || collider.Parent.Parent == null || Parent == null || Parent.Parent == null) return;
                     collider.OnCollisionStay?.Invoke(collider, this);
                     OnCollisionStay?.Invoke(this, collider);
                 }

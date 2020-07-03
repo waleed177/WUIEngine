@@ -39,7 +39,7 @@ namespace WUIClient.Components {
             int amt = 0;
             foreach (GameObject child in Game1.instance.world.GetAllChildren()) {
                 Collider coll = child.GetFirst<Collider>();
-                if (coll == null || coll == this || coll.Parent.transform == null) continue;
+                if (coll == null || coll == this || coll.Parent == null || coll.Parent.transform == null) continue;
                 if (CollidesWith(coll)) collisions[amt++] = coll;
             }
             return amt;
@@ -48,7 +48,7 @@ namespace WUIClient.Components {
         public bool IsColliding() {
             foreach (GameObject child in Game1.instance.world.GetAllChildren()) {
                 Collider coll = child.GetFirst<Collider>();
-                if (coll == null || coll == this || coll.Parent.transform == null) continue;
+                if (coll == null || coll == this || coll.Parent == null || coll.Parent.transform == null) continue;
                 if (CollidesWith(coll)) return true;
             }
             return false;

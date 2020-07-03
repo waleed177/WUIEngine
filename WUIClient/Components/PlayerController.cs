@@ -29,7 +29,7 @@ namespace WUIClient.Components {
             //TODO: THERE IS A CHANGE EVERYTHING HERE WONT WORK, SO INVESTIGATE THE OWNERSHIP PACKET AND STUFF.
             //TODO: POSSIBLY MAKE A ONEXISTORFIND<Component> Function, or a WaitForChild function.
             collider = Parent.GetFirst<BoxCollider>();
-            collider.InitializeClientSidedCollision();
+            collider?.InitializeClientSidedCollision();
             if(Parent.ClientOwned)
                 Game1.localPlayer = this;
         }
@@ -38,15 +38,24 @@ namespace WUIClient.Components {
             base.OnUpdate(deltaTime);
             if (Parent.ClientOwned) {
                 Vector2 prevPosition = transform.Position;
-                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.D))
+                bool moved = false;
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.D)) {
                     transform.Position += new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
-                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.A))
+                    moved = true;
+                }
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.A)) {
                     transform.Position -= new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
-                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.W))
+                    moved = true;
+                }
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.W)) {
                     transform.Position -= new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
-                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S))
+                    moved = true;
+                }
+                if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.S)) {
                     transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
-                if(collider != null && collider.IsColliding()) {
+                    moved = true;
+                }
+                if(moved && collider != null && collider.IsColliding()) {
                     collider.SendCurrentCollisions();
                     transform.Position = prevPosition;
                 }

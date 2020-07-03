@@ -74,7 +74,9 @@ namespace WUIClient {
         }
 
         public void Update(float deltaTime) {
+            if (Parent == null && UID != 0) return;
             OnUpdate(deltaTime);
+
             if (childrenChanged) {
                 while (toBeRemoved.Count > 0) {
                     GameObject obj = toBeRemoved.Dequeue();
@@ -94,7 +96,7 @@ namespace WUIClient {
             }
 
             foreach (var child in children)
-                child.Update(deltaTime);
+                    child.Update(deltaTime);
         }
 
         public void Render(SpriteBatch batch, float deltaTime) {
@@ -145,7 +147,7 @@ namespace WUIClient {
             toBeRemoved.Enqueue(gameObject);
             if (multiplayer && gameObject.Parent != null) {
                 Game1.networkManager.Remove(gameObject, sendToOthers);
-                foreach (var item in gameObject.children)
+                foreach (var item in gameObject.GetAllChildren())
                     item.Remove();
             }
             gameObject.Parent = null;
@@ -166,7 +168,7 @@ namespace WUIClient {
         }
 
         public IEnumerable<GameObject> GetAllChildren() {
-           return children.Union(toBeAdded);
+           return children.Union(toBeAdded).Except(toBeRemoved);
         }
 
         public void Send(Packet packet) {

@@ -84,6 +84,7 @@ namespace WUIServer {
                 gameObject.UID = GenerateFreeId();
             gameObjects[gameObject.UID] = gameObject;
             Program.broadcaster.Broadcast(gameObject.GetSpawnPacket());
+            Console.WriteLine("Adding Type: " + gameObject.ObjType + ", UID: " + gameObject.UID + ", Parent: " + gameObject.Parent?.UID + " To everyone.");
         }
 
         private int GenerateFreeId() {
@@ -92,12 +93,19 @@ namespace WUIServer {
 
         public void Remove(GameObject gameObject, bool sendToOthers) {
             gameObjects.Remove(gameObject.UID);
-            if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0))
+            Console.WriteLine("Attempted Removing Type: " + gameObject.ObjType + ", UID: " + gameObject.UID + ", Parent: " + gameObject.Parent?.UID + " To everyone.");
+
+            if (sendToOthers && (gameObjects.ContainsKey(gameObject.Parent.UID) || gameObject.Parent.UID == 0)) {
                 Program.broadcaster.Broadcast(new DestroyGameObject() { UID = gameObject.UID });
+                Console.WriteLine("Removing Type: " + gameObject.ObjType + ", UID: " + gameObject.UID + ", Parent: " + gameObject.Parent?.UID + " To everyone.");
+
+            }
         }
 
         public GameObject Get(int uid) {
-            return gameObjects[uid];
+            if (gameObjects.ContainsKey(uid))
+                return gameObjects[uid];
+            else return null;
         }
     }
 }

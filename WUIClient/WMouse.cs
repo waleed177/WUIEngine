@@ -55,7 +55,7 @@ namespace WUIClient {
         public static GameObject GetGameObjectUnderneathMouse(GameObject root, bool screenPosition) {
             Vector2 mousePos = GetPosition(screenPosition);
             foreach (var item in root.GetAllChildren()) {
-                if (item.transform.Bounds.Contains(mousePos))
+                if (item.transform != null && item.transform.Bounds.Contains(mousePos))
                     return item;
             }
             return null;

@@ -1,7 +1,6 @@
-images C:\Users\waldohp\Desktop\Files\Projects\WUI Engine\SpaceInvaders\
-
 Camera:
-	camera-follow localPlayer
+	position -620.0006 185.0004
+	size 0 0
 
 PushableBlock:
 	position 0 400
@@ -9,32 +8,57 @@ PushableBlock:
 	texture alien.png
 
 Wall:
-	position 300 -100
+	position 300 -51
 	size 32 512
 	texture alien.png
 
 Wall2:
-	position -100 -100
-	size 32 512
+	position -837.5 235.5001
+	size 595 30.99988
 	texture alien.png
 
 BouncyBall:
-	position -10 200
-	size 32 32
+	position -719 27
+	size 32 40
 	texture bullet.png
 
-Player:
-	boxCollider
-	topDownPlayer
-	texture player.png
-	size 64 64
-	position 0 0
-	player-speed 300 300
-	@type 0
-
 Object6:
-	position 46 -95
+	position 197 101
 	size 64 32
 	texture player.png
 
+$$TEMP$$0:
+	position -620.0006 185.0004
+	size -151.3918 64
+	texture player.png
+
+Object_7:
+	position -253.0003 -23.99992
+	size 29 288
+	texture Happy.bmp
+
+Object_8:
+	position -976.0006 -54.99997
+	size 1277 32
+	texture Tomato.bmp
+
+Object_9:
+	position -976.9999 -23.99994
+	size 39 494.0005
+	texture Happy.bmp
+
+Object_10:
+	position -815.0007 441.0002
+	size 1115.305 27.00031
+	texture Tomato.bmp
+
+Object_11:
+	position -423.6965 284.0005
+	size 33 32
+	texture Tomato.bmp
+
+Object_12:
+	position -936.6965 441.0006
+	size 120 29
+	texture Tomato.bmp
 

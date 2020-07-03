@@ -55,8 +55,8 @@ namespace WUIClient {
 
 
             client = new ClientBase("127.0.0.1", 3333, 8388608); //8MB Of buffer so images can be sent.
-            networkManager = new NetworkManager(world);
             assetManager = new ClientAssetManager(client);
+            networkManager = new NetworkManager(world);
         }
 
         protected override void Initialize() {
