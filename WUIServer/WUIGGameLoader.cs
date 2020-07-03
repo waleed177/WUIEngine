@@ -31,6 +31,7 @@ namespace WUIServer {
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
             instantiateInstructions = new Dictionary<string, Action>();
+            Random random = new Random();
             this.world = world;
 
             ActionScript.Bind("print", args => {
@@ -53,6 +54,16 @@ namespace WUIServer {
                 return null;
             });
 
+            ActionScript.Bind("size", args => {
+                ((GameObject)args[0]).transform.Size = new Math.Vector2((int)args[1], (int)args[2]);
+                return null;
+            });
+
+            ActionScript.Bind("inflate", args => {
+                ((GameObject)args[0]).transform.Size += new Math.Vector2((int)args[1], (int)args[2]);
+                return null;
+            });
+
             ActionScript.Bind("getX", args => {
                 return (int)((GameObject)args[0]).transform.Position.X;
             });
@@ -66,6 +77,10 @@ namespace WUIServer {
                 if (args.Length == 3)
                     gameObject.transform.Position = new Math.Vector2(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()));
                 return gameObject;
+            });
+
+            ActionScript.Bind("random", args => {
+                return random.Next((int)args[0], (int)args[1]);
             });
         }
 
@@ -231,6 +246,7 @@ namespace WUIServer {
 
 
                             void Collider_OnCollisionStay(Collider sender, Collider other) {
+                                if (sender.Parent == null || other.Parent == null) return;
                                 ActionScript.SetVariable(new string[] { "other" }, ActionScript.GetVariable(new string[] { other.Parent.name }));
                                 ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { sender.Parent.name }));
                                 func();
