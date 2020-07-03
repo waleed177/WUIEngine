@@ -20,6 +20,8 @@ namespace WUIClient.Components {
             else
                 follow = null;
             followLocalPlayer = packet.followLocalPlayer;
+
+            Parent.multiplayer = !(packet.followEnabled || followLocalPlayer);
         }
 
         public override void OnUpdate(float deltaTime) {
