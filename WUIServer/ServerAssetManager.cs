@@ -14,14 +14,16 @@ namespace WUIServer {
         }
 
         public void AddAsset(string name, byte[] asset) {
-            if (assets.ContainsKey(name)) return;
-            Console.WriteLine("Broadcasting asset " + name + " to clients.");
-            assets[name] = asset;
-            Program.broadcaster.Broadcast(new WUIShared.Packets.AssetSend() { assetName = name, asset = asset });
+            lock (assets) {
+                if (assets.ContainsKey(name)) return;
+                Console.WriteLine("Broadcasting asset " + name + " to clients, the asset is of size: " + asset.Length + ".");
+                assets[name] = asset;
+                Program.broadcaster.Broadcast(new WUIShared.Packets.AssetSend() { assetName = name, asset = asset });
+            }
         }
 
         public void SendAllAssetsTo(ClientBase clientBase) {
-            foreach (var item in assets) {
+            lock (assets) foreach (var item in assets) {
                 Console.WriteLine("Sending asset " + item.Key + " to client id " + clientBase.Id + ".");
                 clientBase.Send(new AssetSend() { assetName = item.Key, asset = item.Value });
             }

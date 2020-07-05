@@ -21,7 +21,7 @@ namespace WUIClient {
         public SpriteFont arial;
 
         public GameObject world;
-        public static  GameObject gizmoWorld;
+        public static GameObject gizmoWorld;
         private GameObject canvas;
         public Camera camera;
 
@@ -135,13 +135,10 @@ namespace WUIClient {
 
         private void FilePanel_OnItemDrop(FilePanel sender, string fileName) {
             Texture2D spriteAtlas = assetManager.GetAsset<Texture2D>(Path.GetFileName(fileName));
-            FileStream fileStream = null;
             if (spriteAtlas == null) {
-                fileStream = new FileStream(fileName, FileMode.Open);
-                spriteAtlas = Texture2D.FromStream(GraphicsDevice, fileStream);
+                FileStream fileStream = new FileStream(fileName, FileMode.Open);
                 byte[] texture = new byte[fileStream.Length];
-                fileStream.Position = 0;
-                fileStream.Read(texture, 0, texture.Length);
+                fileStream.Read(texture, 0, (int)fileStream.Length);
                 fileStream.Dispose();
                 assetManager.SetAsset(Path.GetFileName(fileName), texture);
             }
@@ -151,7 +148,7 @@ namespace WUIClient {
             obj.transform.Size = new Vector2(64, 32);
             obj.AddChild(new MouseClickableComponent(false));
             obj.AddChild(new DragComponent());
-            obj.AddChild(new RawTextureRenderer() { texture = spriteAtlas, color = Color.White });
+            obj.AddChild(new RawTextureRenderer() { texture = null, color = Color.White });
             world.AddChild(obj);
             obj.GetFirst<RawTextureRenderer>().OnNetworkReady += Obj_OnNetworkReady;
             void Obj_OnNetworkReady(GameObject sender2) {
