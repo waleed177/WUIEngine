@@ -102,7 +102,7 @@ namespace WUIShared.Languages {
                     break;
                 case TokenTypes.Identifier:
                     Token peek = tokenizer.PeekToken();
-                    if (peek.type == TokenTypes.Operator && (string)peek.value == "@") {
+                    if (peek.type == TokenTypes.Operator && (string)peek.value == ".") {
                         tokenizer.NextToken();
                         string varName = (string)tokenizer.NextToken().value;
                         res = new Variable() { path = new string[] { (string)token.value, varName } };

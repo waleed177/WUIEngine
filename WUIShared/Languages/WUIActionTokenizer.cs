@@ -118,7 +118,7 @@ namespace WUIShared.Languages {
 
         private string ReadOperator() {
             string op = stream.Peek(2);
-            if (op[0] == op[1]) {
+            if (IsOperatorStart(op[1])) {
                 stream.Dump(2);
                 return op;
             }
@@ -129,7 +129,7 @@ namespace WUIShared.Languages {
         }
 
         private bool IsPunctuation(char c) => ",;(){}[]:\n".IndexOf(c) >= 0;
-        private bool IsOperatorStart(char c) => "+-/*=@<>".IndexOf(c) >= 0;
+        private bool IsOperatorStart(char c) => "+-/*=.<>".IndexOf(c) >= 0;
         private bool IsIdentifierStart(char c) => char.IsLetter(c) || c == '_';
         private bool IsIdentifier(char c) => char.IsLetterOrDigit(c) || c == '_';
         private bool IsKeyword(string c) => c == "if";

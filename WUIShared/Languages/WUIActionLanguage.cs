@@ -43,6 +43,12 @@ namespace WUIShared.Languages {
                             case "=":
                                 res += () => SetVariable(leftVariable.path, ComputeValue(binaryOperator.right));
                                 break;
+                            case "+=":
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) + (int) ComputeValue(binaryOperator.right));
+                                break;
+                            case "-=":
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) - (int) ComputeValue(binaryOperator.right));
+                                break;
                             default:
                                 break;
                         } else throw new NotSupportedException("Non variables are not supported for operators currently");

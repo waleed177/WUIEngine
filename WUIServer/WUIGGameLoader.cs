@@ -178,7 +178,7 @@ namespace WUIServer {
 
             GameObject gameObject = gameObjects[objectName];
 
-            if (propertyName.StartsWith("@")) {
+            if (propertyName.StartsWith(".")) {
                 string variableName = propertyName.Substring(1);
                 object val = propertyValue;
                 if (int.TryParse(propertyValue, out int intPropertyValue)) val = intPropertyValue;

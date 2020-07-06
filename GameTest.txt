@@ -63,3 +63,4 @@ BouncyBall:
 		if other@type == 0:
 			teleport other@object 0 0;
 
+
