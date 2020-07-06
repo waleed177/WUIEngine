@@ -32,7 +32,7 @@ namespace WUIServer {
                 num++;
             }
 
-            File.WriteAllText(@"C:\Users\waldohp\source\repos\WUILibrary\TestGenerated.txt", stringBuilder.ToString());
+            File.WriteAllText(@"Save.txt", stringBuilder.ToString());
         }
     }
 }
