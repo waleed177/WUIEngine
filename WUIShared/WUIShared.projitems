@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionTokenizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGLanguage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIGSyntaxParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ObjectInstantiator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringUtils.cs" />

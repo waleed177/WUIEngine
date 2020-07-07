@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
-using WUIShared.Objects;
+#if WUIServer
+using WUIServer.Components;
+#elif WUIClient
 using WUIClient.Components;
+#endif
 
-namespace WUIClient {
+namespace WUIShared.Objects {
     public static class ObjectInstantiator {
         public delegate GameObject ObjectFactory();
         private static Dictionary<Objects, ObjectFactory> factories;
