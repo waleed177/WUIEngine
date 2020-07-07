@@ -13,8 +13,10 @@ namespace WUIServer.Components {
         public Vector2 Position {
             get => backingField_Position;
             set {
-                foreach (var child in children)
-                    child.transform.Position = child.transform.LocalPosition + value;
+                if (Parent != null)
+                    foreach (var child in Parent.GetAllChildren())
+                        if (child.transform != null && child.transform != this)
+                            child.transform.Position += value - backingField_Position;
                 backingField_Position = value;
                 backingField_bounds.x = value.X;
                 backingField_bounds.y = value.Y;
