@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WUIClient.Gizmos;
+using WUIShared.Objects;
 
 namespace WUIClient.Tools {
     public class MoveTool : Tool {

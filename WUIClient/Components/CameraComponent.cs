@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using LowLevelNetworking.Shared;
+using WUIShared.Objects;
 using WUIShared.Packets;
 
 namespace WUIClient.Components {

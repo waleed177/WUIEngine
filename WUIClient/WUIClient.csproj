@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;LINUX</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LINUX,WUIClient</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -56,6 +56,7 @@
     <Compile Include="Components\FollowMouse.cs" />
     <Compile Include="Components\MouseClickableComponent.cs" />
     <Compile Include="Components\PlayerController.cs" />
+    <Compile Include="GameObject.cs" />
     <Compile Include="Gizmos\Gizmo.cs" />
     <Compile Include="Gizmos\MoveGizmo.cs" />
     <Compile Include="Gizmos\ScaleGizmo.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="Panels\FilePanel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="GameObject.cs" />
     <Compile Include="Components\RawTextureRenderer.cs" />
     <Compile Include="RectangleF.cs" />
     <Compile Include="Tools\MoveTool.cs" />

@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WUIClient.Components;
 using WUIClient.Components.UI;
+using WUIShared.Objects;
 
 namespace WUIClient.Panels {
     public class FilePanel : GameObject {

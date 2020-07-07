@@ -57,6 +57,7 @@ namespace WUIClient {
             client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.
             assetManager = new ClientAssetManager(client);
             networkManager = new NetworkManager(world);
+            GameObject.networkManager = networkManager;
         }
 
         protected override void Initialize() {

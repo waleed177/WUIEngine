@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WUIClient.Components;
+using WUIShared.Objects;
 using static WUIClient.Components.DragComponent;
 
 namespace WUIClient.Gizmos {

@@ -1,4 +1,5 @@
 ﻿using WUIClient.Gizmos;
+using WUIShared.Objects;
 
 namespace WUIClient.Tools {
     public class ScaleTool : Tool {

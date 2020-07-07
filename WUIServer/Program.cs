@@ -1,12 +1,7 @@
 ﻿using LowLevelNetworking.Server;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using WUIShared;
 using WUIShared.Objects;
 
 namespace WUIServer {
@@ -25,11 +20,16 @@ namespace WUIServer {
             string[] hostingInfo = File.ReadAllLines("Config.txt");
             server = new Server<ClientHandler>(hostingInfo[0], int.Parse(hostingInfo[1]), 8388608);
             broadcaster = new PacketBroadcaster(8388608);
+
             world = new GameObject(Objects.Empty, false) {
                 multiplayer = true
             };
+
             networkManager = new NetworkManager(world);
             assetManager = new ServerAssetManager();
+
+            GameObject.networkManager = networkManager;
+
 
             gameWorldFile = new WUIGGameLoader(world);
             gameWorldFile.Evaluate(File.ReadAllText(@"GameFile.txt"));
