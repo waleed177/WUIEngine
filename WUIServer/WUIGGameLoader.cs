@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using WUIServer.Components;
+using WUIShared;
 using WUIShared.Languages;
 using WUIShared.Objects;
 
@@ -16,10 +17,11 @@ namespace WUIServer {
         private readonly GameObject world;
         private int tempObjectId = 0;
         private string PlayerObject = "Player";
-        WUIActionLanguage ActionScript;
+        WUIWorldActionScript ActionScript;
 
         public WUIGGameLoader(GameObject world) {
-            ActionScript = new WUIActionLanguage();
+            ActionScript = new WUIWorldActionScript();
+            ActionScript.Instantiate = Instantiate;
             lang = new WUIGLanguage();
             lang.CreateObjectBinder += Lang_CreateObjectBinder;
             lang.ComponentAddBinder += Lang_ComponentAddBinder;
@@ -27,64 +29,15 @@ namespace WUIServer {
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
             instantiateInstructions = new Dictionary<string, Action>();
-            Random random = new Random();
             this.world = world;
 
-            ActionScript.Bind("print", args => {
-                Console.WriteLine(args[0].ToString());
-                return null;
-            });
-
-            ActionScript.Bind("remove", args => {
-                ((GameObject)args[0]).Remove();
-                return null;
-            });
-
-            ActionScript.Bind("teleport", args => {
-                ((GameObject)args[0]).transform.Position = new Math.Vector2((int)args[1], (int)args[2]);
-                return null;
-            });
-
-            ActionScript.Bind("move", args => {
-                ((GameObject)args[0]).transform.Position += new Math.Vector2((int)args[1], (int)args[2]);
-                return null;
-            });
-
-            ActionScript.Bind("size", args => {
-                ((GameObject)args[0]).transform.Size = new Math.Vector2((int)args[1], (int)args[2]);
-                return null;
-            });
-
-            ActionScript.Bind("inflate", args => {
-                ((GameObject)args[0]).transform.Size += new Math.Vector2((int)args[1], (int)args[2]);
-                return null;
-            });
-
-            ActionScript.Bind("getX", args => {
-                return (int)((GameObject)args[0]).transform.Position.X;
-            });
-
-            ActionScript.Bind("getY", args => {
-                return (int)((GameObject)args[0]).transform.Position.Y;
-            });
-
-            ActionScript.Bind("instantiate", args => {
-                GameObject gameObject = Instantiate(args[0].ToString());
-                if (args.Length == 3)
-                    gameObject.transform.Position = new Math.Vector2(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()));
-                return gameObject;
-            });
-
-            ActionScript.Bind("random", args => {
-                return random.Next((int)args[0], (int)args[1]);
-            });
         }
 
         public GameObject InstantiatePlayer() {
             return Instantiate(PlayerObject);
         }
 
-        public GameObject Instantiate(string name) {
+        private GameObject Instantiate(string name) {
             GameObject gameObject;
             lock (instantiateInstructions) {
                 instantiateInstructions[name]();
