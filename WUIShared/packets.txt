@@ -74,6 +74,9 @@ SendLocalScripts
 	int[] eventId
 	string[] code
 
+ScriptSendString
+	string message
+
 #serializeSize true
 
 ByteArrayUserPacket

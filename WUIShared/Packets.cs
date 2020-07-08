@@ -24,6 +24,7 @@ namespace WUIShared.Packets {
         MovingObjectClientCollision,
         CameraSetFollow,
         SendLocalScripts,
+        ScriptSendString,
         ByteArrayUserPacket,
         SaveWorldPacket,
     }
@@ -751,6 +752,41 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"int[] eventId = {eventId}\nstring[] code = {code}\n";
+    }
+
+    public class ScriptSendString : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.ScriptSendString;
+        public override int Size { get => +4 + message.Length; }
+
+        public override int RawSerializeSize => Size + 1;
+        public string message;
+
+        public ScriptSendString() {
+        }
+        public ScriptSendString(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(message.Length >> 0);
+                arr[start++] = (byte)(message.Length >> 8);
+                arr[start++] = (byte)(message.Length >> 16);
+                arr[start++] = (byte)(message.Length >> 24);
+            }
+            Encoding.ASCII.GetBytes(message, 0, message.Length, arr, start);
+            start += message.Length;
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                message = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
+            return start;
+        }
+        public override string ToString() => $"string message = {message}\n";
     }
 
     public class ByteArrayUserPacket : Packet {

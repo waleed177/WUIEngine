@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using LowLevelNetworking.Shared;
 using WUIServer.Components;
 using WUIShared;
 using WUIShared.Languages;
 using WUIShared.Objects;
+using WUIShared.Packets;
 
 namespace WUIServer {
     public class WUIGGameLoader {
@@ -224,6 +226,20 @@ namespace WUIServer {
                             }
                         }
                         break;
+                    case "onStringMessage": {
+                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                            Action func = ActionScript.Compile();
+                            gameObject.On<ScriptSendString>(OnMessageString);
+
+                            void OnMessageString(ClientBase sender, ScriptSendString packet) {
+                                string[] path = new string[] { "message" };
+                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
+                                func();
+                                ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                            }
+                        }
+                        break;
                     case "client-onLoad": {
                             LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
                             if (localscripts == null)
@@ -245,9 +261,18 @@ namespace WUIServer {
                             localscripts.SetScript(EventTypes.OnCollisionStay, propertyValue);
                         }
                         break;
+                    case "client-onStringMessage": {
+                            LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
+                            if (localscripts == null)
+                                gameObject.AddChild(localscripts = new LocalScriptsComponent());
+                            localscripts.SetScript(EventTypes.OnStringMessage, propertyValue);
+                        }
+                        break;
                     default:
                         break;
                 }
         }
+
+  
     }
 }

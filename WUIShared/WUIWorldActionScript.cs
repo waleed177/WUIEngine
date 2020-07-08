@@ -71,6 +71,13 @@ namespace WUIShared {
             Bind("random", args => {
                 return random.Next((int)args[0], (int)args[1]);
             });
+
+            Bind("sendStringMessage", args => {
+                ((GameObject)args[0]).Send(new Packets.ScriptSendString() {
+                    message = args[1].ToString()
+                });
+                return null;
+            });
         }
     }
 }

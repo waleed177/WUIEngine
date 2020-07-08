@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LowLevelNetworking.Shared;
 using WUIShared;
 using WUIShared.Objects;
@@ -41,6 +42,10 @@ namespace WUIClient.Components {
                         collider.OnCollisionStay += Collider_OnCollisionStay;
                         functions[eventId] = OnlyThis;
                         break;
+                    case EventTypes.OnStringMessage:
+                        //TODO: Have an UnOn function in the low level library.
+                        Parent.On<WUIShared.Packets.ScriptSendString>(OnHandleScriptSendString);
+                        break;
                     default:
                         break;
                 }
@@ -57,10 +62,19 @@ namespace WUIClient.Components {
                     func();
                 }
 
+                void OnHandleScriptSendString(ClientBase sender2, ScriptSendString packet2) {
+                    string[] path = new string[] { "message" };
+                    Game1.worldActionScript.SetVariable(new string[] { "this" }, Game1.worldActionScript.GetVariable(new string[] { Parent.name }));
+                    Game1.worldActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet2.message } });
+                    func();
+                    Game1.worldActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                }
 
             }
 
 
         }
+
+
     }
 }

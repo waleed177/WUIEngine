@@ -7,6 +7,7 @@ namespace WUIShared
     public enum EventTypes {
         OnLoad,
         OnUpdate,
-        OnCollisionStay
+        OnCollisionStay,
+        OnStringMessage
     }
 }

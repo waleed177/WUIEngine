@@ -60,6 +60,13 @@ namespace WUIClient {
                 Enum.TryParse((string)args[0], out Keys key);
                 return WKeyboard.currentKeyboardState.IsKeyDown(key) ? 1 : 0;
             });
+            worldActionScript.Bind("keyClick", (args) => {
+                Enum.TryParse((string)args[0], out Keys key);
+                return WKeyboard.KeyClick(key) ? 1 : 0;
+            });
+            worldActionScript.Bind("isClientOwned", (args) => {
+                return ((GameObject)args[0]).ClientOwned ? 1 : 0;
+            });
 
             string[] config = File.ReadAllLines("Config.txt");
             client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.

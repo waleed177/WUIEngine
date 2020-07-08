@@ -52,13 +52,13 @@ namespace WUIClient {
             if (gameObjects.ContainsKey(packet.UID)) return;
 
             GameObject gameObject = ObjectInstantiator.Instantiate((Objects)packet.ObjType);
+            gameObject.name = packet.name;
             gameObject.UID = packet.UID;
             if (packet.parentUID == 0)
                 world.AddChild(gameObject, false);
             else
                 gameObjects[packet.parentUID].AddChild(gameObject, false);
 
-            gameObject.name = packet.name;
 
             gameObjects[gameObject.UID] = gameObject;
 

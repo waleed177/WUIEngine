@@ -109,7 +109,7 @@ namespace WUIShared.Languages {
                         res = (int)ComputeValue(binaryOperator.left) % (int)ComputeValue(binaryOperator.right);
                         break;
                     case "==":
-                        res = ((int)ComputeValue(binaryOperator.left) == (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        res = ComputeValue(binaryOperator.left).Equals(ComputeValue(binaryOperator.right)) ? 1 : 0;
                         break;
                     case ">":
                         res = ((int)ComputeValue(binaryOperator.left) > (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
@@ -122,6 +122,12 @@ namespace WUIShared.Languages {
                         break;
                     case "<=":
                         res = ((int)ComputeValue(binaryOperator.left) <= (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
+                        break;
+                    case "&&":
+                        res = (((int)ComputeValue(binaryOperator.left)) == 1 && ((int)ComputeValue(binaryOperator.right)) == 1) ? 1 : 0;
+                        break;
+                    case "||":
+                        res = (((int)ComputeValue(binaryOperator.left)) == 1 || ((int)ComputeValue(binaryOperator.right)) == 1) ? 1 : 0;
                         break;
                     default: throw new NotImplementedException("Not implemented " + binaryOperator.operatorName);
                 }

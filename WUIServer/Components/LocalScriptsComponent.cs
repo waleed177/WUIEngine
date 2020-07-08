@@ -12,7 +12,7 @@ namespace WUIServer.Components {
         private string[] codes;
 
         public LocalScriptsComponent() : base(Objects.LocalScriptsComponent, false) {
-            codes = new string[3] { "", "", "" };
+            codes = new string[4] { "", "", "", "" };
         }
 
         public void SetScript(EventTypes eventType, string code) {
@@ -25,7 +25,7 @@ namespace WUIServer.Components {
 
         private WUIShared.Packets.SendLocalScripts GeneratePacket() {
             return new WUIShared.Packets.SendLocalScripts() {
-                eventId = new int[] { (int) EventTypes.OnLoad, (int) EventTypes.OnUpdate, (int) EventTypes.OnCollisionStay },
+                eventId = new int[] { (int) EventTypes.OnLoad, (int) EventTypes.OnUpdate, (int) EventTypes.OnCollisionStay, (int) EventTypes.OnStringMessage },
                 code = codes
             };
         }
