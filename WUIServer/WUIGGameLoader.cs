@@ -198,9 +198,11 @@ namespace WUIServer {
 
                             void Collider_OnCollisionStay(Collider sender, Collider other) {
                                 if (sender.Parent == null || other.Parent == null) return;
-                                ActionScript.SetVariable(new string[] { "other" }, ActionScript.GetVariable(new string[] { other.Parent.name }));
-                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { sender.Parent.name }));
-                                func();
+                                lock (ActionScript) {
+                                    ActionScript.SetVariable(new string[] { "other" }, ActionScript.GetVariable(new string[] { other.Parent.name }));
+                                    ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { sender.Parent.name }));
+                                    func();
+                                }
                             }
                         }
                         break;
@@ -210,8 +212,10 @@ namespace WUIServer {
                             gameObject.OnUpdateEvent += Update;
 
                             void Update(GameObject sender) {
-                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                func();
+                                lock (ActionScript) {
+                                    ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                    func();
+                                }
                             }
                         }
                         break;
@@ -221,22 +225,26 @@ namespace WUIServer {
                             gameObject.OnAddedEvent += OnAdded;
 
                             void OnAdded(GameObject sender) {
-                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                func();
+                                lock (ActionScript) {
+                                    ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                    func();
+                                }
                             }
                         }
                         break;
                     case "onStringMessage": {
                             ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
                             Action func = ActionScript.Compile();
+                            string[] path = new string[] { "message" };
                             gameObject.On<ScriptSendString>(OnMessageString);
 
                             void OnMessageString(ClientBase sender, ScriptSendString packet) {
-                                string[] path = new string[] { "message" };
-                                ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
-                                func();
-                                ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                                lock (ActionScript) {
+                                    ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                    ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
+                                    func();
+                                    ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                                }
                             }
                         }
                         break;
@@ -273,6 +281,6 @@ namespace WUIServer {
                 }
         }
 
-  
+
     }
 }

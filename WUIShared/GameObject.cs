@@ -174,17 +174,16 @@ namespace WUIShared.Objects {
         }
 
         public T GetFirst<T>() where T : GameObject {
-            foreach (var child in children)
-                if (child is T)
-                    return (T)child;
-            foreach (var child in toBeAdded)
-                if (child is T)
-                    return (T)child;
+            lock (childModification) {
+                foreach (var child in GetAllChildren())
+                    if (child is T)
+                        return (T)child;
+            }
             return default;
         }
 
         public IEnumerable<GameObject> GetAllChildren() {
-           return children.Union(toBeAdded).Except(toBeRemoved);
+            return children.Union(toBeAdded).Except(toBeRemoved);
         }
 
         public void On<PacketType>(PacketHandler<ClientBase>.HandlePacket<PacketType> handlePacket) where PacketType : Packet, new() {

@@ -80,7 +80,8 @@ namespace WUIClient {
             Game1.client.Send(new WUIShared.Packets.SpawnGameObject() {
                 UID = gameObject.UID,
                 parentUID = gameObject.Parent.UID,
-                ObjType = (int)gameObject.ObjType
+                ObjType = (int)gameObject.ObjType,
+                name = gameObject.name
             });
         }
 
