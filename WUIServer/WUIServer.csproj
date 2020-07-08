@@ -63,6 +63,7 @@
     <Compile Include="Components\MouseClickableComponent.cs" />
     <Compile Include="Components\PlayerController.cs" />
     <Compile Include="Components\RawTextureRenderer.cs" />
+    <Compile Include="Components\LocalScriptsComponent.cs" />
     <Compile Include="Components\TextRenderer.cs" />
     <Compile Include="Components\Transform.cs" />
     <Compile Include="GameObject.cs" />

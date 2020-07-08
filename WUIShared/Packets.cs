@@ -23,6 +23,7 @@ namespace WUIShared.Packets {
         PlayerSpeedSet,
         MovingObjectClientCollision,
         CameraSetFollow,
+        SendLocalScripts,
         ByteArrayUserPacket,
         SaveWorldPacket,
     }
@@ -121,12 +122,13 @@ namespace WUIShared.Packets {
 
     public class SpawnGameObject : Packet {
         public override int PacketType { get; } = (int)PacketTypes.SpawnGameObject;
-        public override int Size { get => +4 + 4 + 4; }
+        public override int Size { get => +4 + 4 + 4 + 4 + name.Length; }
 
         public override int RawSerializeSize => Size + 5;
         public int ObjType;
         public int UID;
         public int parentUID;
+        public string name;
 
         public SpawnGameObject() {
         }
@@ -159,15 +161,28 @@ namespace WUIShared.Packets {
                 arr[start++] = (byte)(parentUID >> 16);
                 arr[start++] = (byte)(parentUID >> 24);
             }
+            unchecked {
+                arr[start++] = (byte)(name.Length >> 0);
+                arr[start++] = (byte)(name.Length >> 8);
+                arr[start++] = (byte)(name.Length >> 16);
+                arr[start++] = (byte)(name.Length >> 24);
+            }
+            Encoding.ASCII.GetBytes(name, 0, name.Length, arr, start);
+            start += name.Length;
             return start;
         }
         public override int DeserializeFrom(byte[] arr, int start = 0) {
             ObjType = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
             UID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
             parentUID = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+            {
+                int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                name = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                start += strlen;
+            }
             return start;
         }
-        public override string ToString() => $"int ObjType = {ObjType}\nint UID = {UID}\nint parentUID = {parentUID}\n";
+        public override string ToString() => $"int ObjType = {ObjType}\nint UID = {UID}\nint parentUID = {parentUID}\nstring name = {name}\n";
     }
 
     public class ChangeGameObjectUID : Packet {
@@ -665,6 +680,77 @@ namespace WUIShared.Packets {
             return start;
         }
         public override string ToString() => $"bool followLocalPlayer = {followLocalPlayer}\nbool followEnabled = {followEnabled}\nint followUID = {followUID}\n";
+    }
+
+    public class SendLocalScripts : Packet {
+        public override int PacketType { get; } = (int)PacketTypes.SendLocalScripts;
+        public override int Size { get => +4 + eventId.Length * +4 + 4 + code.Sum((x) => x != null ? (4 + x.Length) : 0); }
+
+        public override int RawSerializeSize => Size + 1;
+        public int[] eventId;
+        public string[] code;
+
+        public SendLocalScripts() {
+        }
+        public SendLocalScripts(byte[] arr, int start = 0) {
+            DeserializeFrom(arr, start);
+        }
+        public override int SerializeTo(byte[] arr, int start = 0) {
+            arr[start++] = (byte)PacketType;
+            unchecked {
+                arr[start++] = (byte)(eventId.Length >> 0);
+                arr[start++] = (byte)(eventId.Length >> 8);
+                arr[start++] = (byte)(eventId.Length >> 16);
+                arr[start++] = (byte)(eventId.Length >> 24);
+            }
+            for (int i = 0; i < eventId.Length; i++) {
+                unchecked {
+                    arr[start++] = (byte)(eventId[i] >> 0);
+                    arr[start++] = (byte)(eventId[i] >> 8);
+                    arr[start++] = (byte)(eventId[i] >> 16);
+                    arr[start++] = (byte)(eventId[i] >> 24);
+                }
+            }
+            unchecked {
+                arr[start++] = (byte)(code.Length >> 0);
+                arr[start++] = (byte)(code.Length >> 8);
+                arr[start++] = (byte)(code.Length >> 16);
+                arr[start++] = (byte)(code.Length >> 24);
+            }
+            for (int i = 0; i < code.Length; i++) {
+                unchecked {
+                    arr[start++] = (byte)(code[i].Length >> 0);
+                    arr[start++] = (byte)(code[i].Length >> 8);
+                    arr[start++] = (byte)(code[i].Length >> 16);
+                    arr[start++] = (byte)(code[i].Length >> 24);
+                }
+                Encoding.ASCII.GetBytes(code[i], 0, code[i].Length, arr, start);
+                start += code[i].Length;
+            }
+            return start;
+        }
+        public override int DeserializeFrom(byte[] arr, int start = 0) {
+            {
+                int length = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                eventId = new int[length];
+                for (int i = 0; i < eventId.Length; i++) {
+                    eventId[i] = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                }
+            }
+            {
+                int length = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                code = new string[length];
+                for (int i = 0; i < code.Length; i++) {
+                    {
+                        int strlen = arr[start++] << 0 | arr[start++] << 8 | arr[start++] << 16 | arr[start++] << 24;
+                        code[i] = ASCIIEncoding.ASCII.GetString(arr, start, strlen);
+                        start += strlen;
+                    }
+                }
+            }
+            return start;
+        }
+        public override string ToString() => $"int[] eventId = {eventId}\nstring[] code = {code}\n";
     }
 
     public class ByteArrayUserPacket : Packet {

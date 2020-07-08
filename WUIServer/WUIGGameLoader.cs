@@ -224,6 +224,27 @@ namespace WUIServer {
                             }
                         }
                         break;
+                    case "client-onLoad": {
+                            LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
+                            if (localscripts == null)
+                                gameObject.AddChild(localscripts = new LocalScriptsComponent());
+                            localscripts.SetScript(EventTypes.OnLoad, propertyValue);
+                        }
+                        break;
+                    case "client-onUpdate": {
+                            LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
+                            if (localscripts == null)
+                                gameObject.AddChild(localscripts = new LocalScriptsComponent());
+                            localscripts.SetScript(EventTypes.OnUpdate, propertyValue);
+                        }
+                        break;
+                    case "client-onCollisionStay": {
+                            LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
+                            if (localscripts == null)
+                                gameObject.AddChild(localscripts = new LocalScriptsComponent());
+                            localscripts.SetScript(EventTypes.OnCollisionStay, propertyValue);
+                        }
+                        break;
                     default:
                         break;
                 }

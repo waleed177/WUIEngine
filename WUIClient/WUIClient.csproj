@@ -54,6 +54,7 @@
     <Compile Include="Components\Collider.cs" />
     <Compile Include="Components\DragComponent.cs" />
     <Compile Include="Components\FollowMouse.cs" />
+    <Compile Include="Components\LocalScriptsComponent.cs" />
     <Compile Include="Components\MouseClickableComponent.cs" />
     <Compile Include="Components\PlayerController.cs" />
     <Compile Include="GameObject.cs" />

@@ -33,6 +33,8 @@ namespace WUIClient {
         private Tools.MoveTool moveTool;
         private Tools.ScaleTool scaleTool;
 
+        public static WUIShared.WUIWorldActionScript worldActionScript;
+
         public Game1() {
             instance = this;
             graphics = new GraphicsDeviceManager(this);
@@ -53,11 +55,18 @@ namespace WUIClient {
             camera = new Camera();
             WMouse.camera = camera;
 
+            worldActionScript = new WUIShared.WUIWorldActionScript();
+            worldActionScript.Bind("keyDown", (args) => {
+                Enum.TryParse((string)args[0], out Keys key);
+                return WKeyboard.currentKeyboardState.IsKeyDown(key) ? 1 : 0;
+            });
+
             string[] config = File.ReadAllLines("Config.txt");
             client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.
             assetManager = new ClientAssetManager(client);
             networkManager = new NetworkManager(world);
             GameObject.networkManager = networkManager;
+
         }
 
         protected override void Initialize() {

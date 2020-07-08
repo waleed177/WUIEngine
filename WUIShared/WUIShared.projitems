@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)CharacterStream.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionLanguage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Languages\WUIActionParser.cs" />
@@ -20,6 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Packets.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WUIWorldActionScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)packets.txt" />

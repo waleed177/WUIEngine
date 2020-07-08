@@ -22,6 +22,7 @@ namespace WUIShared.Objects {
                 [Objects.PlayerController] = GeneralFactory<PlayerController>,
                 [Objects.BoxCollider] = GeneralFactory<BoxCollider>,
                 [Objects.Camera] = GeneralFactory<CameraComponent>,
+                [Objects.LocalScriptsComponent] = GeneralFactory<LocalScriptsComponent>,
             };
         }
 

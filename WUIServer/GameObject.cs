@@ -48,7 +48,8 @@ namespace WUIShared.Objects {
             return new WUIShared.Packets.SpawnGameObject() {
                 UID = UID,
                 parentUID = Parent.UID,
-                ObjType = (int)ObjType
+                ObjType = (int)ObjType,
+                name = name
             };
         }
 

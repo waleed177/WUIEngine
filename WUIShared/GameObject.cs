@@ -12,7 +12,7 @@ using WUIClient.Components;
 
 namespace WUIShared.Objects {
     public partial class GameObject {
-        public string name;
+        public string name = "";
 
         private List<GameObject> children;
         private Queue<GameObject> toBeRemoved;

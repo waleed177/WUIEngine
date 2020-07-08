@@ -16,6 +16,7 @@ namespace WUIShared.Objects
         ListBoxUIComponent,
         PlayerController,
         BoxCollider,
-        Camera
+        Camera,
+        LocalScriptsComponent
     }
 }

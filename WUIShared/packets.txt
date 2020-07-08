@@ -14,6 +14,7 @@ SpawnGameObject
 	int ObjType
 	int UID
 	int parentUID
+	string name
 
 ChangeGameObjectUID
 	int oldUID
@@ -68,6 +69,10 @@ CameraSetFollow
 	bool followLocalPlayer
 	bool followEnabled
 	int followUID
+
+SendLocalScripts
+	int[] eventId
+	string[] code
 
 #serializeSize true
 

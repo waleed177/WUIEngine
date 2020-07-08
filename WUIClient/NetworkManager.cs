@@ -58,7 +58,13 @@ namespace WUIClient {
             else
                 gameObjects[packet.parentUID].AddChild(gameObject, false);
 
+            gameObject.name = packet.name;
+
             gameObjects[gameObject.UID] = gameObject;
+
+            //TODO: MOVE THIS CODE ELSEWHERE
+            Game1.worldActionScript.SetVariable(new string[] { gameObject.name }, new Dictionary<string, object>());
+            Game1.worldActionScript.SetVariable(new string[] { gameObject.name, "object" }, gameObject);
         }
 
 
