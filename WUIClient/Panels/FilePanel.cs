@@ -60,8 +60,7 @@ namespace WUIClient.Panels {
             files = Directory.GetFiles(directory);
             listboxComponent.Clear();
             foreach (var item in files) {
-                var sp = item.Split('\\');
-                listboxComponent.AddItem(sp[sp.Length - 1]);
+                listboxComponent.AddItem(Path.GetFileName(item));
             }
         }
 
