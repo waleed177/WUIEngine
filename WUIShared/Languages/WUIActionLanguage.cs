@@ -159,7 +159,6 @@ namespace WUIShared.Languages {
         }
 
         private void SetVariable(Dictionary<string, object> variables, string[] path, object value) {
-            //Hardcoded 1,2 since these are the only ones supported as of right now.
             switch (path.Length) {
                 case 1:
                     variables[path[0]] = value;
@@ -167,17 +166,27 @@ namespace WUIShared.Languages {
                 case 2:
                     ((Dictionary<string, object>)variables[path[0]])[path[1]] = value;
                     break;
-                default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
+                default:
+                    Dictionary<string, object> cur = variables;
+                    for(int i = 0; i <path.Length-1; i++) {
+                        cur = (Dictionary<string, object>) cur[path[i]];
+                    }
+                    cur[path[path.Length - 1]] = value;
+                    break;
             }
         }
 
         //TODO: Investigate random errors here.
         public object GetVariable(string[] path) {
-            //Hardcoded 1,2 since these are the only ones supported as of right now.
             switch (path.Length) {
                 case 1: return variables[path[0]];
                 case 2: return ((Dictionary<string, object>)variables[path[0]])[path[1]];
-                default: throw new NotSupportedException("Nesting of variables is not supported for more than 2.");
+                default:
+                    Dictionary<string, object> cur = variables;
+                    for (int i = 0; i < path.Length - 1; i++) {
+                        cur = (Dictionary<string, object>)cur[path[i]];
+                    }
+                    return cur[path[path.Length - 1]];
             }
         }
     }

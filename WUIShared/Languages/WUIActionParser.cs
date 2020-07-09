@@ -49,7 +49,7 @@ namespace WUIShared.Languages {
                             if (multilineCheckToken.type == TokenTypes.Punctuation && (char)multilineCheckToken.value == '\n') {
                                 //Its a multiline if.
                                 tokenizer.NextToken(); //dump the new line.
-                                while(tokenizer.TabIndex > refTabIndex && (token = tokenizer.NextToken()).type != TokenTypes.EOF)
+                                while (tokenizer.TabIndex > refTabIndex && (token = tokenizer.NextToken()).type != TokenTypes.EOF)
                                     ParseStatement(token, ifStatement.TrueBody);
                             } else while (!((token = tokenizer.NextToken()).type == TokenTypes.Punctuation && (char)token.value == '\n') && token.type != TokenTypes.EOF)
                                     ParseStatement(token, ifStatement.TrueBody);
@@ -101,11 +101,20 @@ namespace WUIShared.Languages {
                     res = new String() { value = (string)token.value };
                     break;
                 case TokenTypes.Identifier:
+
                     Token peek = tokenizer.PeekToken();
                     if (peek.type == TokenTypes.Operator && (string)peek.value == ".") {
-                        tokenizer.NextToken();
-                        string varName = (string)tokenizer.NextToken().value;
-                        res = new Variable() { path = new string[] { (string)token.value, varName } };
+                        List<string> path = new List<string>();
+                        path.Add(token.value.ToString());
+                        do {
+                            tokenizer.NextToken(); //Dump the .
+                            string varName = (string)tokenizer.NextToken().value;
+                            path.Add(varName);
+                            peek = tokenizer.PeekToken();
+                        } while (peek.type == TokenTypes.Operator && (string)peek.value == ".");
+
+                        res = new Variable() { path = path.ToArray() };
+
                     } else res = ReadFunction(token); //token is the function name
                     break;
                 default:
