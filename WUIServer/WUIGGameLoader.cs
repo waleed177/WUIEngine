@@ -14,6 +14,7 @@ namespace WUIServer {
         private Dictionary<string, GameObject> gameObjects;
         private Dictionary<string, object> instanceVariables;
         private Dictionary<string, Action> instantiateInstructions;
+        private HashSet<string> dontSpawnList;
 
         private List<string> imagesDirectory = new List<string>();
         private readonly GameObject world;
@@ -32,8 +33,9 @@ namespace WUIServer {
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
             instantiateInstructions = new Dictionary<string, Action>();
-            this.world = world;
+            dontSpawnList = new HashSet<string>();
 
+            this.world = world;
         }
 
 
@@ -53,6 +55,7 @@ namespace WUIServer {
 
         public void Evaluate(string code) {
             lang.Evaluate(code);
+            dontSpawnList.Clear();
         }
 
         private void Lang_CreateObjectBinder(string objectName) {
@@ -82,20 +85,33 @@ namespace WUIServer {
         }
 
         private void Lang_EndOfObjectBinder(string objectName) {
-            if (objectName != "$$TEMP$$" + tempObjectId)
+            if (objectName != "$$TEMP$$" + tempObjectId) {
                 instantiateInstructions[objectName] += () => Lang_EndOfObjectBinder("$$TEMP$$" + tempObjectId);
+                if (dontSpawnList.Contains(objectName)) {
+                    ActionScript.RemoveVariable(new string[] { objectName });
+                    gameObjects.Remove(objectName);
+                }
+            }
+
             if (gameObjects.ContainsKey(objectName)) //Because not every object will be added to the world, some will be types (to be implemented).
                 world.AddChild(gameObjects[objectName]);
         }
 
         private void Lang_ComponentAddBinder(string objectName, string componentName) {
-            if (objectName != "$$TEMP$$" + tempObjectId)
+            if (objectName != "$$TEMP$$" + tempObjectId) {
                 instantiateInstructions[objectName] += () => Lang_ComponentAddBinder("$$TEMP$$" + tempObjectId, componentName);
-            if (objectName == PlayerObject) return;
+                if (dontSpawnList.Contains(objectName) || objectName == PlayerObject) return;
+            }
 
             GameObject gameObject = gameObjects[objectName];
 
             switch (componentName) {
+                case "dontSpawn": {
+                        //TODO: Add a check to make sure this is topmost.
+                        if (!objectName.StartsWith("$$TEMP$$"))
+                            dontSpawnList.Add(objectName);
+                    }
+                    break;
                 case "texture":
                     gameObject.AddChild(new RawTextureRenderer());
                     break;
@@ -134,11 +150,10 @@ namespace WUIServer {
                 return;
             }
 
-            if (objectName != "$$TEMP$$" + tempObjectId)
+            if (objectName != "$$TEMP$$" + tempObjectId) {
                 instantiateInstructions[objectName] += () => Lang_SetPropertyBinder("$$TEMP$$" + tempObjectId, propertyName, propertyValue);
-
-            if (objectName == PlayerObject) return;
-
+                if (dontSpawnList.Contains(objectName) || objectName == PlayerObject) return;
+            }
             GameObject gameObject = gameObjects[objectName];
 
             if (propertyName.StartsWith(".")) {
@@ -193,6 +208,57 @@ namespace WUIServer {
                             string[] sp = propertyValue.Split(' ');
                             if (sp[0] == "localPlayer")
                                 camera.FollowLocalPlayer = true;
+                        }
+                        break;
+                    case "gridSpawn": {
+                            world.Invoke(GridSpawn);
+
+                            void GridSpawn() {
+                                string[] lines = propertyValue.Split('\n');
+                                float sizeX = 0, sizeY = 0;
+                                float offsetX = 0, offsetY = 0;
+                                int curY = 0;
+                                int state = 0; //0 properties //1 tiles //2 map
+
+                                Dictionary<char, string> tileName = new Dictionary<char, string>();
+
+                                foreach (string line in lines) {
+                                    if (line.Trim() == "") continue;
+                                    string[] sp = line.Split(' ');
+                                    switch (state) {
+                                        case 0: //Reading properties
+                                            if (sp[0] == "size") {
+                                                sizeX = float.Parse(sp[1]);
+                                                sizeY = float.Parse(sp[2]);
+                                            } else if (sp[0] == "offset") {
+                                                offsetX = float.Parse(sp[1]);
+                                                offsetY = float.Parse(sp[2]);
+                                            } else if (sp[0] == "tiles") {
+                                                state = 1;
+                                            }
+                                            break;
+                                        case 1: //Reading tiles
+                                            if (sp[0] == "map") {
+                                                state = 2;
+                                            } else {
+                                                if (sp[0].Length > 1) throw new NotSupportedException("You cannot name your tile with more than one letter.");
+                                                tileName[sp[0][0]] = sp[1];
+                                            }
+                                            break;
+                                        case 2: //Reading map
+                                            for (int i = 0; i < line.Length; i++) {
+                                                char currentTileId = line[i];
+                                                if (currentTileId == '0') continue;
+                                                GameObject go = Instantiate(tileName[currentTileId]);
+                                                go.transform.Position = new Math.Vector2(offsetX + i * sizeX, offsetY + curY * sizeY);
+                                            }
+                                            curY++;
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
                         }
                         break;
                     case "onCollisionStay": {
