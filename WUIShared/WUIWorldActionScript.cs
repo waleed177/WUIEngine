@@ -46,6 +46,14 @@ namespace WUIShared {
                 return null;
             });
 
+            Bind("getSizeX", args => {
+                return (int)((GameObject)args[0]).transform.Size.X;
+            });
+
+            Bind("getSizeY", args => {
+                return (int)((GameObject)args[0]).transform.Size.Y;
+            });
+
             Bind("inflate", args => {
                 ((GameObject)args[0]).transform.Size += new Vector2((int)args[1], (int)args[2]);
                 return null;
