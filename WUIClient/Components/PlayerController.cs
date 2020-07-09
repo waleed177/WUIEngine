@@ -47,6 +47,12 @@ namespace WUIClient.Components {
                     transform.Position -= new Microsoft.Xna.Framework.Vector2(HorizontalSpeed * deltaTime, 0);
                     moved = true;
                 }
+                if (moved && collider != null && collider.IsColliding()) {
+                    collider.SendCurrentCollisions();
+                    transform.Position = prevPosition;
+                }
+                moved = false;
+                prevPosition = transform.Position;
                 if (WKeyboard.currentKeyboardState.IsKeyDown(Keys.W)) {
                     transform.Position -= new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
                     moved = true;
@@ -55,10 +61,11 @@ namespace WUIClient.Components {
                     transform.Position += new Microsoft.Xna.Framework.Vector2(0, VerticalSpeed * deltaTime);
                     moved = true;
                 }
-                if(moved && collider != null && collider.IsColliding()) {
+                if (moved && collider != null && collider.IsColliding()) {
                     collider.SendCurrentCollisions();
                     transform.Position = prevPosition;
                 }
+
             }
         }
 
