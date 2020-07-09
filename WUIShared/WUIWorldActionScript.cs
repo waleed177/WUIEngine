@@ -73,7 +73,7 @@ namespace WUIShared {
                 GameObject gameObject = Instantiate(args[0].ToString());
                 if (args.Length == 3)
                     gameObject.transform.Position = new Vector2(float.Parse(args[1].ToString()), float.Parse(args[2].ToString()));
-                return gameObject;
+                return GetVariable(new string[] { gameObject.name });
             });
 
             Bind("random", args => {
