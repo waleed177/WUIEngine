@@ -85,7 +85,7 @@ namespace WUIShared.Languages {
                     return ReadString(1);
                 }
             } else if (tabLevel == 1) {
-                if (words.Length == 1 && PeekTabLevel() == 1)
+                if (words.Length == 1 && PeekTabLevel() <= 1)
                     tokenType = TokenTypes.InstantiateComponent;
                 else if (currentWord == 0) {
                     tokenType = TokenTypes.PropertyName;
