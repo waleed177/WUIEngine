@@ -10,11 +10,14 @@ namespace WUIShared.Languages
         public delegate void PropertySetDelegate(string objectName, string propertyName, string propertyValue);
         public delegate void ComponentAddDelegate(string objectName, string componentName);
         public delegate void CreateObjectDelegate(string objectName);
+        public delegate void EndOfObject(string objectName);
 
         private WUIGSyntaxParser parser;
         public event CreateObjectDelegate CreateObjectBinder;
         public event PropertySetDelegate SetPropertyBinder;
         public event ComponentAddDelegate ComponentAddBinder;
+        public event EndOfObject EndOfObjectBinder;
+
 
         public WUIGLanguage() {
             parser = new WUIGSyntaxParser();
@@ -25,9 +28,13 @@ namespace WUIShared.Languages
 
             string token = "";
             TokenTypes tokenType = TokenTypes.Unknown;
+            string prevObjectName = null;
             while((token = parser.NextToken(out tokenType)) != null) {
                 switch (tokenType) {
                     case TokenTypes.ObjectName:
+                        if(prevObjectName != null)
+                            EndOfObjectBinder(prevObjectName);
+                        prevObjectName = token;
                         CreateObjectBinder(token);
                         break;
                     case TokenTypes.PropertyName:
@@ -43,6 +50,9 @@ namespace WUIShared.Languages
                         break;
                 }
             }
+
+            EndOfObjectBinder(parser.CurrentObjectName);
+
         }
     }
 }

@@ -22,12 +22,13 @@ namespace WUIServer.Components {
 
         public override void OnUpdate(float deltaTime) {
             base.OnUpdate(deltaTime);
+            if (Parent == null || Parent.Parent == null) return;
+
             if (ContinouslyCheckCollisions) {
                 //TODO add a way to change Program.world to world
-                foreach (GameObject child in Program.world.GetAllChildren()) {
+                foreach (GameObject child in Program.world.GetCurrentChildren()) {
                     Collider coll = child.GetFirst<Collider>();
-                    if (coll == null || coll == this || coll.Parent.transform == null) continue;
-                    if (coll == null || coll.Parent == null || coll.Parent.Parent == null || Parent == null || Parent.Parent == null) continue;
+                    if (coll == null || coll.Parent == null || coll == this) return;
 
                     if (CollidesWith(coll)) {
                         OnCollisionStay?.Invoke(this, coll);
@@ -42,6 +43,7 @@ namespace WUIServer.Components {
             foreach (GameObject child in Program.world.GetAllChildren()) {
                 Collider coll = child.GetFirst<Collider>();
                 if (coll == null || coll == this || coll.Parent.transform == null) continue;
+                if (amt >= collisions.Length) return amt;
                 if (CollidesWith(coll)) collisions[amt++] = coll;
             }
             return amt;

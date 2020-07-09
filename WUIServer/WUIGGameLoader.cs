@@ -28,12 +28,14 @@ namespace WUIServer {
             lang.CreateObjectBinder += Lang_CreateObjectBinder;
             lang.ComponentAddBinder += Lang_ComponentAddBinder;
             lang.SetPropertyBinder += Lang_SetPropertyBinder;
+            lang.EndOfObjectBinder += Lang_EndOfObjectBinder;
             gameObjects = new Dictionary<string, GameObject>();
             instanceVariables = new Dictionary<string, object>();
             instantiateInstructions = new Dictionary<string, Action>();
             this.world = world;
 
         }
+
 
         public GameObject InstantiatePlayer() {
             return Instantiate(PlayerObject);
@@ -63,9 +65,12 @@ namespace WUIServer {
             GameObject obj = new GameObject();
             gameObjects[objectName] = obj;
             obj.name = objectName;
-            ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
-            ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
-            world.AddChild(obj);
+
+            lock (ActionScript) {
+                ActionScript.SetVariable(new string[] { objectName }, new Dictionary<string, object>());
+                ActionScript.SetVariable(new string[] { objectName, "object" }, obj);
+            }
+
 
             string _objectName = objectName;
             obj.OnDestroyedEvent += obj_OnDestroyedEvent;
@@ -74,6 +79,13 @@ namespace WUIServer {
                 ActionScript.RemoveVariable(new string[] { _objectName });
                 gameObjects.Remove(_objectName);
             }
+        }
+
+        private void Lang_EndOfObjectBinder(string objectName) {
+            if (objectName != "$$TEMP$$" + tempObjectId)
+                instantiateInstructions[objectName] += () => Lang_EndOfObjectBinder("$$TEMP$$" + tempObjectId);
+            if (gameObjects.ContainsKey(objectName)) //Because not every object will be added to the world, some will be types (to be implemented).
+                world.AddChild(gameObjects[objectName]);
         }
 
         private void Lang_ComponentAddBinder(string objectName, string componentName) {
@@ -133,7 +145,7 @@ namespace WUIServer {
                 string variableName = propertyName.Substring(1);
                 object val = propertyValue;
                 if (int.TryParse(propertyValue, out int intPropertyValue)) val = intPropertyValue;
-                ActionScript.SetVariable(new string[] { objectName, variableName }, val);
+                lock (ActionScript) ActionScript.SetVariable(new string[] { objectName, variableName }, val);
             } else switch (propertyName) {
                     case "texture": {
                             RawTextureRenderer tex = gameObject.GetFirst<RawTextureRenderer>();
@@ -189,9 +201,11 @@ namespace WUIServer {
                                 gameObject.AddChild(collider = new BoxCollider());
 
                             string objName = objectName;
-                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
-                            Action func = ActionScript.Compile();
-
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
                             collider.ContinouslyCheckCollisions = true;
                             collider.OnCollisionStay += Collider_OnCollisionStay;
 
@@ -207,8 +221,11 @@ namespace WUIServer {
                         }
                         break;
                     case "onUpdate": {
-                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
-                            Action func = ActionScript.Compile();
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
                             gameObject.OnUpdateEvent += Update;
 
                             void Update(GameObject sender) {
@@ -220,8 +237,11 @@ namespace WUIServer {
                         }
                         break;
                     case "onLoad": {
-                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
-                            Action func = ActionScript.Compile();
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
                             gameObject.OnAddedEvent += OnAdded;
 
                             void OnAdded(GameObject sender) {
@@ -233,19 +253,27 @@ namespace WUIServer {
                         }
                         break;
                     case "onStringMessage": {
-                            ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
-                            Action func = ActionScript.Compile();
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
                             string[] path = new string[] { "message" };
                             gameObject.On<ScriptSendString>(OnMessageString);
 
+                            //This runs on a different thread than the world.
                             void OnMessageString(ClientBase sender, ScriptSendString packet) {
-                                lock (ActionScript) {
-                                    ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                    ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
-                                    func();
-                                    ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                                world.Invoke(OnMessageStringInvoked); //For thread safety!
+                                void OnMessageStringInvoked() {
+                                    lock (ActionScript) {
+                                        ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                        ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
+                                        func();
+                                        ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
+                                    }
                                 }
                             }
+
                         }
                         break;
                     case "client-onLoad": {

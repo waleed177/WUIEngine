@@ -186,6 +186,10 @@ namespace WUIShared.Objects {
             return children.Union(toBeAdded).Except(toBeRemoved);
         }
 
+        public IEnumerable<GameObject> GetCurrentChildren() {
+            return children;
+        }
+
         public void On<PacketType>(PacketHandler<ClientBase>.HandlePacket<PacketType> handlePacket) where PacketType : Packet, new() {
             packetHandler.On(handlePacket);
         }
