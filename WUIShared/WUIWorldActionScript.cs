@@ -101,6 +101,98 @@ namespace WUIShared {
             Bind("ComponentGet", args => {
                 return ((GameObject)args[0]).GetFirst(args[1].ToString());
             });
+
+            #region ArrayInt
+            //TODO: Create syntax sugar for these.
+
+            Bind("ArrayIntNew", args => {
+                return new List<int>();
+            });
+
+            Bind("ArrayIntAddRepeat", args => {
+                List<int> list = ((List<int>)args[0]);
+                for(int i = 0; i < (int) args[1]; i++)
+                    list.Add((int)args[2]);
+                return null;
+            });
+
+            Bind("ArrayIntAdd", args => {
+                ((List<int>)args[0]).Add((int)args[1]);
+                return null;
+            });
+
+            Bind("ArrayIntSet", args => {
+                return ((List<int>)args[0])[(int)args[1]] = (int)args[2];
+            });
+
+            Bind("ArrayIntGet", args => {
+                return ((List<int>)args[0])[(int)args[1]];
+            });
+
+            Bind("ArrayIntClear", args => {
+                ((List<int>)args[0]).Clear();
+                return null;
+            });
+
+            Bind("ArrayIntRemove", args => {
+                ((List<int>)args[0]).Remove((int)args[1]);
+                return null;
+            });
+
+            Bind("ArrayIntRemoveAt", args => {
+                ((List<int>)args[0]).RemoveAt((int)args[1]);
+                return null;
+            });
+
+            Bind("ArrayIntCount", args => ((List<int>)args[0]).Count);
+            Bind("ArrayIntIndexOf", args => ((List<int>)args[0]).IndexOf((int)args[1]));
+
+            #endregion
+            #region ArrayObj
+            //TODO: Create syntax sugar for these.
+
+            Bind("ArrayObjNew", args => {
+                return new List<object>();
+            });
+
+            Bind("ArrayObjAdd", args => {
+                ((List<object>)args[0]).Add(args[1]);
+                return null;
+            });
+
+            Bind("ArrayObjAddRepeat", args => {
+                List<object> list = ((List<object>)args[0]);
+                for (int i = 0; i < (int)args[1]; i++)
+                    list.Add(args[2]);
+                return null;
+            });
+
+            Bind("ArrayObjSet", args => {
+                return ((List<object>)args[0])[(int)args[1]] = args[2];
+            });
+
+            Bind("ArrayObjGet", args => {
+                return ((List<object>)args[0])[(int)args[1]];
+            });
+
+            Bind("ArrayObjClear", args => {
+                ((List<object>)args[0]).Clear();
+                return null;
+            });
+
+            Bind("ArrayObjRemove", args => {
+                ((List<object>)args[0]).Remove(args[1]);
+                return null;
+            });
+
+            Bind("ArrayObjRemoveAt", args => {
+                ((List<object>)args[0]).RemoveAt((int)args[1]);
+                return null;
+            });
+
+            Bind("ArrayObjCount", args => ((List<object>)args[0]).Count);
+            Bind("ArrayObjIndexOf", args => ((List<object>)args[0]).IndexOf(args[1]));
+            #endregion
         }
     }
 }
