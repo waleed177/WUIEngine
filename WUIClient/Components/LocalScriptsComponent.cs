@@ -41,7 +41,6 @@ namespace WUIClient.Components {
                         collider.ContinouslyCheckCollisions = true;
                         collider.OnCollisionStay -= onCollisionStay;
                         collider.OnCollisionStay += Collider_OnCollisionStay;
-                        functions[eventId] = OnlyThis;
                         break;
                     case EventTypes.OnStringMessage:
                         //TODO: Have an UnOn function in the low level library.

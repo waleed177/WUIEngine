@@ -28,7 +28,7 @@ namespace WUIServer.Components {
                 //TODO add a way to change Program.world to world
                 foreach (GameObject child in Program.world.GetCurrentChildren()) {
                     Collider coll = child.GetFirst<Collider>();
-                    if (coll == null || coll.Parent == null || coll == this) return;
+                    if (coll == null || coll.Parent == null || coll == this || coll.Parent.transform == null) continue;
 
                     if (CollidesWith(coll)) {
                         OnCollisionStay?.Invoke(this, coll);

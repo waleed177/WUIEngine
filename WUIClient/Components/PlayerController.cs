@@ -49,6 +49,7 @@ namespace WUIClient.Components {
                 }
                 if (moved && collider != null && collider.IsColliding()) {
                     collider.SendCurrentCollisions();
+                    collider.ExecuteEventsWithCurrentCollisions(tellOtherColliderAboutCollision: true);
                     transform.Position = prevPosition;
                 }
                 moved = false;
@@ -63,6 +64,7 @@ namespace WUIClient.Components {
                 }
                 if (moved && collider != null && collider.IsColliding()) {
                     collider.SendCurrentCollisions();
+                    collider.ExecuteEventsWithCurrentCollisions(tellOtherColliderAboutCollision: true);
                     transform.Position = prevPosition;
                 }
 

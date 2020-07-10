@@ -26,16 +26,10 @@ namespace WUIClient.Components {
 
             if (ContinouslyCheckCollisions) {
                 //TODO add a way to change Program.world to world
-                foreach (GameObject child in Game1.instance.world.GetCurrentChildren()) {
-                    Collider coll = child.GetFirst<Collider>();
-                    if (coll == null || coll.Parent == null || coll == this) return;
-                    if (CollidesWith(coll)) {
-                        OnCollisionStay?.Invoke(this, coll);
-                        if (Parent == null) return;
-                    }
-                }
+                ExecuteEventsWithCurrentCollisions();
             }
         }
+
 
         public int GetCollisions(Collider[] collisions) {
             int amt = 0;
@@ -69,6 +63,18 @@ namespace WUIClient.Components {
                 objectClientCollision.uids[i] = collisions[i].UID;
             objectClientCollision.uidsLength = amt;
             Send(objectClientCollision);
+        }
+
+        public void ExecuteEventsWithCurrentCollisions(bool tellOtherColliderAboutCollision = false) {
+            foreach (GameObject child in Game1.instance.world.GetCurrentChildren()) {
+                Collider coll = child.GetFirst<Collider>();
+                if (coll == null || coll.Parent == null || coll == this || coll.Parent.transform == null) continue;
+                if (CollidesWith(coll)) {
+                    OnCollisionStay?.Invoke(this, coll);
+                    if (tellOtherColliderAboutCollision) coll.OnCollisionStay?.Invoke(coll, this);
+                    if (Parent == null) return;
+                }
+            }
         }
     }
 }
