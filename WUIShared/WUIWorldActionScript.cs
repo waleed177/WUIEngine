@@ -6,8 +6,10 @@ using WUIShared.Objects;
 
 #if WUIServer
 using WUIServer.Math;
+using WUIServer.Components;
 #elif WUIClient
 using Microsoft.Xna.Framework;
+using WUIClient.Components;
 #endif
 
 namespace WUIShared {
@@ -85,6 +87,19 @@ namespace WUIShared {
                     message = args[1].ToString()
                 });
                 return null;
+            });
+
+            Bind("UITextSet", args => {
+                ((UIText)args[0]).Text = args[1].ToString();
+                return null;
+            });
+
+            Bind("UITextGet", args => {
+                return ((UIText)args[0]).Text;
+            });
+
+            Bind("ComponentGet", args => {
+                return ((GameObject)args[0]).GetFirst(args[1].ToString());
             });
         }
     }

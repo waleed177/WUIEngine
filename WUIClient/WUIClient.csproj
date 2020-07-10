@@ -58,6 +58,7 @@
     <Compile Include="Components\LocalScriptsComponent.cs" />
     <Compile Include="Components\MouseClickableComponent.cs" />
     <Compile Include="Components\PlayerController.cs" />
+    <Compile Include="Components\UIText.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Gizmos\Gizmo.cs" />
     <Compile Include="Gizmos\MoveGizmo.cs" />

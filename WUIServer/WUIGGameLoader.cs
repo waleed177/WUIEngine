@@ -139,6 +139,9 @@ namespace WUIServer {
                 case "camera":
                     gameObject.AddChild(new CameraComponent());
                     break;
+                case "UIText":
+                    gameObject.AddChild(new UIText());
+                    break;
                 default:
                     break;
             }
@@ -263,6 +266,13 @@ namespace WUIServer {
                                     }
                                 }
                             }
+                        }
+                        break;
+                    case "UIText": {
+                            UIText obj = gameObject.GetFirst<UIText>();
+                            if (obj == null)
+                                gameObject.AddChild(obj = new UIText());
+                            obj.Text = propertyValue;
                         }
                         break;
                     case "onCollisionStay": {

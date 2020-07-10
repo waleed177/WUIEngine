@@ -67,6 +67,7 @@
     <Compile Include="Components\LocalScriptsComponent.cs" />
     <Compile Include="Components\TextRenderer.cs" />
     <Compile Include="Components\Transform.cs" />
+    <Compile Include="Components\UIText.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Math\RectangleF.cs" />
     <Compile Include="Math\Vector2.cs" />

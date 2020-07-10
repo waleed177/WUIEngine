@@ -182,6 +182,19 @@ namespace WUIShared.Objects {
             return default;
         }
 
+        public GameObject GetFirst(string objectType) {
+            return GetFirst((Objects) Enum.Parse(typeof(Objects), objectType));
+        }
+
+        public GameObject GetFirst(Objects objectType) {
+            lock (childModification) {
+                foreach (var child in GetAllChildren())
+                    if (child.ObjType == objectType)
+                        return child;
+            }
+            return null;
+        }
+
         public IEnumerable<GameObject> GetAllChildren() {
             return children.Union(toBeAdded).Except(toBeRemoved);
         }

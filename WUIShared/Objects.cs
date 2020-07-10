@@ -18,6 +18,7 @@ namespace WUIShared.Objects
         BoxCollider,
         Camera,
         LocalScriptsComponent,
-        ClientDontReplicate
+        ClientDontReplicate,
+        UIText
     }
 }

@@ -24,6 +24,7 @@ namespace WUIShared.Objects {
                 [Objects.Camera] = GeneralFactory<CameraComponent>,
                 [Objects.LocalScriptsComponent] = GeneralFactory<LocalScriptsComponent>,
                 [Objects.ClientDontReplicate] = GeneralFactory<ClientDontReplicate>,
+                [Objects.UIText] = GeneralFactory<UIText>,
             };
         }
 
