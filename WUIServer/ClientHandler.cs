@@ -13,6 +13,7 @@ namespace WUIServer {
             Program.assetManager.Handle(this);
             Program.networkManager.HandleClient(this);
             Program.gameSaver.HandleClient(this);
+            Program.gameWorldFile.HandleClient(this);
             On<WUIShared.Packets.SpawnGameObject>(Client_SpawnGameObjectRequest);
             On<WUIShared.Packets.ByteArrayUserPacket>(Client_ByteArrayUserPacket);
         }

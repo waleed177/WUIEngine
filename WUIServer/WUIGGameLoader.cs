@@ -14,6 +14,7 @@ namespace WUIServer {
         private Dictionary<string, GameObject> gameObjects;
         private Dictionary<string, object> instanceVariables;
         private Dictionary<string, Action> instantiateInstructions;
+
         private HashSet<string> dontSpawnList;
 
         private List<string> imagesDirectory = new List<string>();
@@ -21,6 +22,8 @@ namespace WUIServer {
         private int tempObjectId = 0;
         private string PlayerObject = "Player";
         WUIWorldActionScript ActionScript;
+        private ClientBase.NoParametersDelegate ClientHandler_OnDisconnect;
+        private ClientBase.NoParametersDelegate ClientHandler_OnStart;
 
         public WUIGGameLoader(GameObject world) {
             ActionScript = new WUIWorldActionScript();
@@ -37,7 +40,7 @@ namespace WUIServer {
 
             //Server specific bindings
             ActionScript.Bind("MessageStringSendTo", args => {
-                ((GameObject)args[0]).Send((ClientBase) args[1], new ScriptSendString() {
+                ((GameObject)args[0]).Send((ClientBase)args[1], new ScriptSendString() {
                     message = args[2].ToString()
                 });
                 return null;
@@ -283,6 +286,50 @@ namespace WUIServer {
                             obj.Text = propertyValue;
                         }
                         break;
+                    case "onClientJoin": {
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
+                            ClientHandler_OnStart += OnStart;
+
+                            void OnStart(ClientBase client) {
+                                world.Invoke(OnStartInvoked);
+
+                                void OnStartInvoked() {
+                                    lock (ActionScript) {
+                                        ActionScript.SetVariable(new string[] { "args" }, new Dictionary<string, object>() { { "client", client } });
+                                        ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                        func();
+                                    }
+                                    ClientHandler_OnStart -= OnStart;
+                                }
+                            }
+                        }
+                        break;
+                    case "onClientLeave": {
+                            Action func;
+                            lock (ActionScript) {
+                                ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
+                                func = ActionScript.Compile();
+                            }
+                            ClientHandler_OnDisconnect += OnDisconnect;
+
+                            void OnDisconnect(ClientBase client) {
+                                world.Invoke(OnDisconnectInvoked);
+
+                                void OnDisconnectInvoked() {
+                                    lock (ActionScript) {
+                                        ActionScript.SetVariable(new string[] { "args" }, new Dictionary<string, object>() { { "client", client } });
+                                        ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
+                                        func();
+                                    }
+                                    ClientHandler_OnDisconnect -= OnDisconnect;
+                                }
+                            }
+                        }
+                        break;
                     case "onCollisionStay": {
                             Collider collider = gameObject.GetFirst<Collider>();
                             if (collider == null)
@@ -346,7 +393,7 @@ namespace WUIServer {
                                 ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
                                 func = ActionScript.Compile();
                             }
-                            string[] path = new string[] { "message" };
+                            string[] path = new string[] { "args" };
                             gameObject.On<ScriptSendString>(OnMessageString);
 
                             //This runs on a different thread than the world.
@@ -355,7 +402,7 @@ namespace WUIServer {
                                 void OnMessageStringInvoked() {
                                     lock (ActionScript) {
                                         ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                        ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message }, { "sender", sender } });
+                                        ActionScript.SetVariable(path, new Dictionary<string, object>() { { "message", packet.message }, { "sender", sender } });
                                         func();
                                         ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
                                     }
@@ -398,5 +445,9 @@ namespace WUIServer {
         }
 
 
+        public void HandleClient(ClientHandler clientHandler) {
+            clientHandler.OnDisconnect += client => ClientHandler_OnDisconnect?.Invoke(client);
+            clientHandler.OnStart += client => ClientHandler_OnStart?.Invoke(client); ;
+        }
     }
 }
