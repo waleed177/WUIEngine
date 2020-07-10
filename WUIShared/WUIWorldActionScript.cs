@@ -23,53 +23,53 @@ namespace WUIShared {
         }
 
         private void GenerateBindings() {
-            Bind("print", args => {
+            Bind("Print", args => {
                 Console.WriteLine(args[0].ToString());
                 return null;
             });
 
-            Bind("remove", args => {
+            Bind("Remove", args => {
                 ((GameObject)args[0]).Remove();
                 return null;
             });
 
-            Bind("teleport", args => {
+            Bind("PositionSet", args => {
                 ((GameObject)args[0]).transform.Position = new Vector2((int)args[1], (int)args[2]);
                 return null;
             });
 
-            Bind("move", args => {
+            Bind("PositionRelativeSet", args => {
                 ((GameObject)args[0]).transform.Position += new Vector2((int)args[1], (int)args[2]);
                 return null;
             });
 
-            Bind("size", args => {
+            Bind("SizeSet", args => {
                 ((GameObject)args[0]).transform.Size = new Vector2((int)args[1], (int)args[2]);
                 return null;
             });
 
-            Bind("getSizeX", args => {
+            Bind("SizeGetX", args => {
                 return (int)((GameObject)args[0]).transform.Size.X;
             });
 
-            Bind("getSizeY", args => {
+            Bind("SizeGetY", args => {
                 return (int)((GameObject)args[0]).transform.Size.Y;
             });
 
-            Bind("inflate", args => {
+            Bind("Inflate", args => {
                 ((GameObject)args[0]).transform.Size += new Vector2((int)args[1], (int)args[2]);
                 return null;
             });
 
-            Bind("getX", args => {
+            Bind("GetX", args => {
                 return (int)((GameObject)args[0]).transform.Position.X;
             });
 
-            Bind("getY", args => {
+            Bind("GetY", args => {
                 return (int)((GameObject)args[0]).transform.Position.Y;
             });
 
-            Bind("instantiate", args => {
+            Bind("Instantiate", args => {
                 if (Instantiate == null)
                     throw new NotImplementedException("Instantiation is not implemented");
                 GameObject gameObject = Instantiate(args[0].ToString());
@@ -78,11 +78,11 @@ namespace WUIShared {
                 return GetVariable(new string[] { gameObject.name });
             });
 
-            Bind("random", args => {
+            Bind("Random", args => {
                 return random.Next((int)args[0], (int)args[1]);
             });
 
-            Bind("sendStringMessage", args => {
+            Bind("MessageStringSend", args => {
                 ((GameObject)args[0]).Send(new Packets.ScriptSendString() {
                     message = args[1].ToString()
                 });

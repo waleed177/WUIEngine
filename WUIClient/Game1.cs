@@ -56,15 +56,15 @@ namespace WUIClient {
             WMouse.camera = camera;
 
             worldActionScript = new WUIShared.WUIWorldActionScript();
-            worldActionScript.Bind("keyDown", (args) => {
+            worldActionScript.Bind("KeyDown", (args) => {
                 Enum.TryParse((string)args[0], out Keys key);
                 return WKeyboard.currentKeyboardState.IsKeyDown(key) ? 1 : 0;
             });
-            worldActionScript.Bind("keyClick", (args) => {
+            worldActionScript.Bind("KeyClick", (args) => {
                 Enum.TryParse((string)args[0], out Keys key);
                 return WKeyboard.KeyClick(key) ? 1 : 0;
             });
-            worldActionScript.Bind("isClientOwned", (args) => {
+            worldActionScript.Bind("IsClientOwned", (args) => {
                 return ((GameObject)args[0]).ClientOwned ? 1 : 0;
             });
 

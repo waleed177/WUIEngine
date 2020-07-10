@@ -332,7 +332,7 @@ namespace WUIServer {
                             }
                         }
                         break;
-                    case "onStringMessage": {
+                    case "onMessageStringRecieved": {
                             Action func;
                             lock (ActionScript) {
                                 ActionScript.LoadCode(";\n" + propertyValue); //the extra semicolon is to fix a bug where an if statement  doesnt work if it was the first statement, TODO: this should be fixed properly.....
@@ -377,7 +377,7 @@ namespace WUIServer {
                             localscripts.SetScript(EventTypes.OnCollisionStay, propertyValue);
                         }
                         break;
-                    case "client-onStringMessage": {
+                    case "client-onMessageStringRecieved": {
                             LocalScriptsComponent localscripts = gameObject.GetFirst<LocalScriptsComponent>();
                             if (localscripts == null)
                                 gameObject.AddChild(localscripts = new LocalScriptsComponent());
