@@ -20,6 +20,7 @@ namespace WUIClient.Components {
             for (int i = 0; i < packet.eventId.Length; i++) {
                 int eventId = packet.eventId[i];
                 string code = packet.code[i];
+                if (code.Trim() == "") continue;
 
                 Game1.worldActionScript.LoadCode(code);
                 Action func = Game1.worldActionScript.Compile();
