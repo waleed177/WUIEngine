@@ -209,6 +209,13 @@ namespace WUIShared.Objects {
             OnRecieveNetworkUID?.Invoke(this, UID);
             OnNetworkReady?.Invoke(this);
         }
+
+        public void SetMultiplayerRecursively(bool multiplayer) {
+            this.multiplayer = multiplayer;
+            lock (childModification)
+                foreach (var child in GetAllChildren())
+                    child.SetMultiplayerRecursively(multiplayer);
+        }
     }
 
 }

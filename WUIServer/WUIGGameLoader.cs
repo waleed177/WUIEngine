@@ -112,6 +112,10 @@ namespace WUIServer {
                             dontSpawnList.Add(objectName);
                     }
                     break;
+                case "clientDontReplicate": {
+                        gameObject.AddChild(new ClientDontReplicate());
+                    }
+                    break;
                 case "texture":
                     gameObject.AddChild(new RawTextureRenderer());
                     break;

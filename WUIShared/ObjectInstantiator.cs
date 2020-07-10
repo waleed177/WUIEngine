@@ -23,6 +23,7 @@ namespace WUIShared.Objects {
                 [Objects.BoxCollider] = GeneralFactory<BoxCollider>,
                 [Objects.Camera] = GeneralFactory<CameraComponent>,
                 [Objects.LocalScriptsComponent] = GeneralFactory<LocalScriptsComponent>,
+                [Objects.ClientDontReplicate] = GeneralFactory<ClientDontReplicate>,
             };
         }
 
