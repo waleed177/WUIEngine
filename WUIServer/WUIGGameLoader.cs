@@ -35,6 +35,14 @@ namespace WUIServer {
             instantiateInstructions = new Dictionary<string, Action>();
             dontSpawnList = new HashSet<string>();
 
+            //Server specific bindings
+            ActionScript.Bind("MessageStringSendTo", args => {
+                ((GameObject)args[0]).Send((ClientBase) args[1], new ScriptSendString() {
+                    message = args[2].ToString()
+                });
+                return null;
+            });
+
             this.world = world;
         }
 
@@ -347,7 +355,7 @@ namespace WUIServer {
                                 void OnMessageStringInvoked() {
                                     lock (ActionScript) {
                                         ActionScript.SetVariable(new string[] { "this" }, ActionScript.GetVariable(new string[] { gameObject.name }));
-                                        ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message } });
+                                        ActionScript.SetVariable(path, new Dictionary<string, object>() { { "value", packet.message }, { "sender", sender } });
                                         func();
                                         ActionScript.SetVariable(path, null); //To force it to be shortlived. (Fast GC).
                                     }
