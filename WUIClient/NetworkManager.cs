@@ -57,7 +57,7 @@ namespace WUIClient {
             if (packet.parentUID == 0)
                 world.AddChild(gameObject, false);
             else
-                gameObjects[packet.parentUID].AddChild(gameObject, false);
+                gameObjects[packet.parentUID].AddChild(gameObject, false); //TODO: It errors here with gameObjects[packet.parentUID] not existing, but it happens randomly
 
 
             gameObjects[gameObject.UID] = gameObject;
