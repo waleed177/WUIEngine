@@ -22,7 +22,8 @@ namespace WUIClient {
 
         public GameObject world;
         public static GameObject gizmoWorld;
-        private GameObject canvas;
+        private bool editorGUIEnabled = false;
+        private GameObject editorGUI;
         public Camera camera;
 
         public static NetworkManager networkManager;
@@ -43,7 +44,7 @@ namespace WUIClient {
                 multiplayer = true
             };
 
-            canvas = new GameObject(Objects.Empty, false) {
+            editorGUI = new GameObject(Objects.Empty, false) {
                 multiplayer = false
             };
 
@@ -98,7 +99,7 @@ namespace WUIClient {
             btn.AddChild(new TextRenderer("MoveTool", Color.Black));
             btn.AddChild(new ButtonComponent());
             btn.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += (sender) => ToolSelect(moveTool);
-            canvas.AddChild(btn);
+            editorGUI.AddChild(btn);
 
             GameObject btn2 = new GameObject();
             btn2.transform.Position = new Vector2(240, 0);
@@ -108,7 +109,7 @@ namespace WUIClient {
             btn2.AddChild(new TextRenderer("ScaleTool", Color.Black));
             btn2.AddChild(new ButtonComponent());
             btn2.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += (sender) => ToolSelect(scaleTool);
-            canvas.AddChild(btn2);
+            editorGUI.AddChild(btn2);
 
             GameObject btn3 = new GameObject();
             btn3.transform.Position = new Vector2(640, 0);
@@ -118,11 +119,11 @@ namespace WUIClient {
             btn3.AddChild(new TextRenderer("Save", Color.Black));
             btn3.AddChild(new ButtonComponent());
             btn3.GetFirst<MouseClickableComponent>().mouseClickable.OnMouseLeftClickUp += SaveButton_Clicked;
-            canvas.AddChild(btn3);
+            editorGUI.AddChild(btn3);
 
             FilePanel filePanel = new FilePanel();
             filePanel.transform.Position = new Vector2(0, 0);
-            canvas.AddChild(filePanel);
+            editorGUI.AddChild(filePanel);
             filePanel.OpenDirectory(@"Images/");
             filePanel.OnItemDrop += FilePanel_OnItemDrop;
 
@@ -182,6 +183,7 @@ namespace WUIClient {
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            if (WKeyboard.KeyClick(Keys.Tab)) editorGUIEnabled = !editorGUIEnabled;
 
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -193,7 +195,7 @@ namespace WUIClient {
             WKeyboard.Update();
             gizmoWorld.Update(deltaTime);
             world.Update(deltaTime);
-            canvas.Update(deltaTime);
+            if(editorGUIEnabled) editorGUI.Update(deltaTime);
 
             base.Update(gameTime);
         }
@@ -209,7 +211,7 @@ namespace WUIClient {
             spriteBatch.End();
 
             spriteBatchUI.Begin();
-            canvas.Render(spriteBatchUI, deltaTime);
+            if (editorGUIEnabled) editorGUI.Render(spriteBatchUI, deltaTime);
             spriteBatchUI.End();
 
             base.Draw(gameTime);
