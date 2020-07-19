@@ -123,37 +123,13 @@ namespace WUIServer {
                             dontSpawnList.Add(objectName);
                     }
                     break;
-                case "clientDontReplicate": {
-                        gameObject.AddChild(new ClientDontReplicate());
-                    }
-                    break;
-                case "texture":
-                    gameObject.AddChild(new RawTextureRenderer());
-                    break;
-                case "clickable":
-                    gameObject.AddChild(new MouseClickableComponent());
-                    break;
-                case "boxCollider":
-                    gameObject.AddChild(new BoxCollider());
-                    break;
                 case "draggable":
                     if (gameObject.GetFirst<MouseClickableComponent>() == null)
                         gameObject.AddChild(new MouseClickableComponent());
                     gameObject.AddChild(new DragComponent());
                     break;
-                case "followMouse":
-                    gameObject.AddChild(new FollowMouse());
-                    break;
-                case "topDownPlayer":
-                    gameObject.AddChild(new PlayerController());
-                    break;
-                case "camera":
-                    gameObject.AddChild(new CameraComponent());
-                    break;
-                case "UIText":
-                    gameObject.AddChild(new UIText());
-                    break;
                 default:
+                    ObjectInstantiator.Instantiate(componentName);
                     break;
             }
         }
