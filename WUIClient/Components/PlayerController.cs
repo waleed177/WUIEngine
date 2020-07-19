@@ -31,7 +31,7 @@ namespace WUIClient.Components {
             collider = Parent.GetFirst<BoxCollider>();
             collider?.InitializeClientSidedCollision();
             if(Parent.ClientOwned)
-                Game1.localPlayer = this;
+                Game1.localPlayer = Parent;
         }
 
         public override void OnUpdate(float deltaTime) {

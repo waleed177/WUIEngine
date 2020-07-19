@@ -24,11 +24,13 @@ namespace WUIClient {
         public static GameObject gizmoWorld;
         private bool editorGUIEnabled = false;
         private GameObject editorGUI;
+        private GameObject userGUI;
+
         public Camera camera;
 
         public static NetworkManager networkManager;
         public static ClientAssetManager assetManager;
-        public static PlayerController localPlayer;
+        public static GameObject localPlayer;
 
         private Tools.Tool currentTool = null;
         private Tools.MoveTool moveTool;
@@ -52,6 +54,10 @@ namespace WUIClient {
                 multiplayer = false
             };
 
+            userGUI = new GameObject(Objects.Empty, false) {
+                multiplayer = false
+            };
+
             IsMouseVisible = true;
             camera = new Camera();
             WMouse.camera = camera;
@@ -65,9 +71,35 @@ namespace WUIClient {
                 Enum.TryParse((string)args[0], out Keys key);
                 return WKeyboard.KeyClick(key) ? 1 : 0;
             });
-            worldActionScript.Bind("IsClientOwned", (args) => {
+            worldActionScript.Bind("ClientOwnedIs", (args) => {
                 return ((GameObject)args[0]).ClientOwned ? 1 : 0;
             });
+            worldActionScript.Bind("LocalPlayerIs", (args) => {
+                return localPlayer == ((GameObject)args[0]);
+            });
+            worldActionScript.Bind("LocalPlayerGet", (args) => {
+                if (localPlayer == null) return 0;
+                return worldActionScript.GetVariable(new string[] { localPlayer.name });
+            });
+            worldActionScript.Bind("LocalPlayerSet", (args) => {
+                localPlayer = ((GameObject)args[0]);
+                return null;
+            });
+            worldActionScript.Bind("LocalPlayerExists", (args) => localPlayer != null ? 1 : 0);
+            worldActionScript.Bind("ParentSetToUI", (args) => {
+                GameObject gameObject = ((GameObject)args[0]);
+                gameObject.Remove(false);
+                userGUI.AddChild(gameObject);
+                return null;
+            });
+            //MouseStuff
+            worldActionScript.Bind("MouseGetWorldX", (args) => (int)  WMouse.WorldPosition.X);
+            worldActionScript.Bind("MouseGetWorldY", (args) => (int)  WMouse.WorldPosition.Y);
+            worldActionScript.Bind("MouseGetScreenX", (args) => (int) WMouse.Position.X);
+            worldActionScript.Bind("MouseGetScreenY", (args) => (int) WMouse.Position.Y);
+            worldActionScript.Bind("MouseButton0Down", (args) => (int)WMouse.mouseState.LeftButton);
+            worldActionScript.Bind("MouseButton1Down", (args) => (int)WMouse.mouseState.RightButton);
+
 
             string[] config = File.ReadAllLines("Config.txt");
             client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.
@@ -195,7 +227,8 @@ namespace WUIClient {
             WKeyboard.Update();
             gizmoWorld.Update(deltaTime);
             world.Update(deltaTime);
-            if(editorGUIEnabled) editorGUI.Update(deltaTime);
+            userGUI.Update(deltaTime);
+            if (editorGUIEnabled) editorGUI.Update(deltaTime);
 
             base.Update(gameTime);
         }
@@ -211,6 +244,7 @@ namespace WUIClient {
             spriteBatch.End();
 
             spriteBatchUI.Begin();
+            userGUI.Render(spriteBatchUI, deltaTime);
             if (editorGUIEnabled) editorGUI.Render(spriteBatchUI, deltaTime);
             spriteBatchUI.End();
 
