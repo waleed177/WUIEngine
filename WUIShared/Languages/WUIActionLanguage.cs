@@ -13,11 +13,18 @@ namespace WUIShared.Languages {
 
         Program parsedProgram;
 
+        private object returnValueOfFunction;
+
         public WUIActionLanguage() {
             parser = new WUIActionParser();
             bindingDictionary = new Dictionary<string, FunctionDelegate>();
             variables = new Dictionary<string, object>();
             localVariables = new Stack<Dictionary<string, object>>();
+
+            Bind("Return", (args) => {
+                returnValueOfFunction = args[0];
+                return null;
+            });
         }
 
         public void LoadCode(string code) {
@@ -35,8 +42,15 @@ namespace WUIShared.Languages {
 
             foreach (var item in prog.body) {
                 if (item is FunctionCall functionCall) {
-                    FunctionDelegate func = bindingDictionary[functionCall.functionName];
-                    res += () => func(ComputeArguments(functionCall.arguments));
+                    //TODO: Dont allow functions to not be explicitly declared before assigning?
+                    if (bindingDictionary.ContainsKey(functionCall.functionName)) {
+                        FunctionDelegate func = bindingDictionary[functionCall.functionName];
+                        res += () => func(ComputeArguments(functionCall.arguments));
+                    } else {
+                        res += () => {
+                            bindingDictionary[functionCall.functionName](ComputeArguments(functionCall.arguments));
+                        };
+                    }
                 } else if (item is BinaryOperator binaryOperator) {
                     if (binaryOperator.left is Variable leftVariable)
                         switch (binaryOperator.operatorName) {
@@ -44,10 +58,10 @@ namespace WUIShared.Languages {
                                 res += () => SetVariable(leftVariable.path, ComputeValue(binaryOperator.right));
                                 break;
                             case "+=":
-                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) + (int) ComputeValue(binaryOperator.right));
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) + (int)ComputeValue(binaryOperator.right));
                                 break;
                             case "-=":
-                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) - (int) ComputeValue(binaryOperator.right));
+                                res += () => SetVariable(leftVariable.path, (int)GetVariable(leftVariable.path) - (int)ComputeValue(binaryOperator.right));
                                 break;
                             default:
                                 break;
@@ -66,7 +80,7 @@ namespace WUIShared.Languages {
                         } else throw new NotImplementedException("Non variables are not implemented for operators currently");
                 } else if (item is IfStatement ifStatement) {
                     Action trueBody = Compile(ifStatement.TrueBody);
-                    if(ifStatement.FalseBody == null) {
+                    if (ifStatement.FalseBody == null) {
                         res += () => {
                             if ((int)ComputeValue(ifStatement.condition) != 0)
                                 trueBody();
@@ -80,7 +94,7 @@ namespace WUIShared.Languages {
                                 falseBody();
                         };
                     }
-                } else if(item is ForLoop forLoop) {
+                } else if (item is ForLoop forLoop) {
                     Action initialize = Compile(forLoop.initialization);
                     Action incrementation = Compile(forLoop.incrementation);
                     Action body = Compile(forLoop.body);
@@ -151,7 +165,9 @@ namespace WUIShared.Languages {
                 }
             } else if (item is WUIActionParser.String str)
                 res = str.value;
-            else
+            else if (item is Program program) {
+                res = Compile(program);
+            } else
                 throw new NotImplementedException("This item is not implemented!");
             return res;
         }
@@ -161,6 +177,13 @@ namespace WUIShared.Languages {
         }
 
         public void SetVariable(string[] path, object value) {
+            //TODO: Better way to implement user defined functions.
+            if (path.Length == 1 && value is Action action) {
+                Bind(path[0], (args) => {
+                    action();
+                    return returnValueOfFunction;
+                });
+            }
             SetVariable(variables, path, value);
         }
 
@@ -186,8 +209,8 @@ namespace WUIShared.Languages {
                     break;
                 default:
                     Dictionary<string, object> cur = variables;
-                    for(int i = 0; i <path.Length-1; i++) {
-                        cur = (Dictionary<string, object>) cur[path[i]];
+                    for (int i = 0; i < path.Length - 1; i++) {
+                        cur = (Dictionary<string, object>)cur[path[i]];
                     }
                     cur[path[path.Length - 1]] = value;
                     break;

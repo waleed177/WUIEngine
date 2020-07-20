@@ -145,7 +145,20 @@ namespace WUIShared.Languages {
 
                         res = new Variable() { path = path.ToArray() };
 
-                    } else res = ReadFunction(token); //token is the function name
+                    } else if (peek.type == TokenTypes.Operator) {
+                        res = new Variable() { path = new string[] { token.value.ToString() } };
+                    } else
+                        res = ReadFunction(token); //token is the function name
+                    break;
+                case TokenTypes.Punctuation:
+                    if ((char)token.value == '{') {
+                        Program func = new Program();
+
+                        Token funcToken;
+                        while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
+                            ParseStatement(func);
+                        return func;
+                    }
                     break;
                 default:
                     break;
