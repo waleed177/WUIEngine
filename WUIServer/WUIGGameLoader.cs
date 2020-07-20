@@ -129,7 +129,7 @@ namespace WUIServer {
                     gameObject.AddChild(new DragComponent());
                     break;
                 default:
-                    ObjectInstantiator.Instantiate(componentName);
+                    gameObject.AddChild(ObjectInstantiator.Instantiate(componentName));
                     break;
             }
         }
