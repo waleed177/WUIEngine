@@ -19,15 +19,23 @@ namespace WUIShared.Languages {
             Program res = new Program();
 
             Token token;
-            while ((token = tokenizer.NextToken()).type != TokenTypes.EOF) {
-                ParseStatement(token, res);
+            while ((token = tokenizer.PeekToken()).type != TokenTypes.EOF) {
+                ParseStatement(res);
             }
 
             return res;
         }
 
-        private void ParseStatement(Token token, Program res) {
+        private void ParseStatement(Program res) {
+            ParseObject parseObject = ParseStatement();
+            if (parseObject != null)
+                res.body.Add(parseObject);
+        }
+
+
+        private ParseObject ParseStatement() {
             //Console.WriteLine(token.type + " : " + token.value + " : " + tokenizer.TabIndex);
+            Token token = tokenizer.NextToken();
 
             switch (token.type) {
                 case TokenTypes.Punctuation:
@@ -40,44 +48,66 @@ namespace WUIShared.Languages {
                     if ((string)token.value == "if") {
                         IfStatement ifStatement = new IfStatement();
                         ifStatement.condition = ReadValue(tokenizer.NextToken());
-                        ifStatement.TrueBody = new Program();
-                        Token possiblyColon = tokenizer.PeekToken();
-                        if (possiblyColon.type == TokenTypes.Punctuation && (char)possiblyColon.value == ':') {
-                            int refTabIndex = tokenizer.TabIndex;
-                            tokenizer.NextToken(); //Dump the colon.
-                            Token multilineCheckToken = tokenizer.PeekToken();
-                            if (multilineCheckToken.type == TokenTypes.Punctuation && (char)multilineCheckToken.value == '\n') {
-                                //Its a multiline if.
-                                tokenizer.NextToken(); //dump the new line.
-                                while (tokenizer.TabIndex > refTabIndex && (token = tokenizer.NextToken()).type != TokenTypes.EOF)
-                                    ParseStatement(token, ifStatement.TrueBody);
-                            } else while (!((token = tokenizer.NextToken()).type == TokenTypes.Punctuation && (char)token.value == '\n') && token.type != TokenTypes.EOF)
-                                    ParseStatement(token, ifStatement.TrueBody);
-                        } else {
-                            token = tokenizer.NextToken();
-                            ParseStatement(token, ifStatement.TrueBody);
+                        ParseStatementBody(ifStatement.TrueBody = new Program());
+                        Token possibleElseToken = tokenizer.PeekToken();
+                        if (possibleElseToken.type == TokenTypes.Keyword && (string)possibleElseToken.value == "else") {
+                            tokenizer.NextToken(); //dump the else token.
+                            ParseStatementBody(ifStatement.FalseBody = new Program());
                         }
 
-                        res.body.Add(ifStatement);
+                        return ifStatement;
+                    } else if ((string)token.value == "for") {
+                        ForLoop forLoop = new ForLoop();
+                        ParseStatement(forLoop.initialization = new Program());
+                        forLoop.condition = ReadValue(tokenizer.NextToken());
+                        ParseStatement(forLoop.incrementation = new Program());
+                        ParseStatementBody(forLoop.body = new Program());
+                        return forLoop;
                     }
                     break;
                 case TokenTypes.Identifier: {
                         Token peek = tokenizer.PeekToken();
                         if (peek.type == TokenTypes.Operator) {
-                            res.body.Add(ReadValue(token));
+                            return ReadValue(token);
                         } else {
                             //Function
                             FunctionCall functionCall = ReadFunction(token);
-                            res.body.Add(functionCall);
+                            return functionCall;
                         }
                     }
-                    break;
                 case TokenTypes.Operator:
                     break;
                 case TokenTypes.EOF:
                     break;
                 default:
                     break;
+            }
+            return null;
+        }
+        /*
+         * This is for statements that need single or multistatement bodies or even multiline bodies.
+         * works like this:
+         * If there is a colon then its either multiline or multistatement.
+         * If there is no colon, then its single statement.
+         * The multistatement one ends at the end of the line.
+         * The multiline ends when the tab level decreases by atleast one from the tab level of the colon.
+         */
+        private void ParseStatementBody(Program body) {
+            Token token;
+            Token possiblyColon = tokenizer.PeekToken();
+            if (possiblyColon.type == TokenTypes.Punctuation && (char)possiblyColon.value == ':') {
+                int refTabIndex = tokenizer.TabIndex;
+                tokenizer.NextToken(); //Dump the colon.
+                Token multilineCheckToken = tokenizer.PeekToken();
+                if (multilineCheckToken.type == TokenTypes.Punctuation && (char)multilineCheckToken.value == '\n') {
+                    //Its a multiline if.
+                    tokenizer.NextToken(); //dump the new line.
+                    while (tokenizer.TabIndex > refTabIndex && (token = tokenizer.PeekToken()).type != TokenTypes.EOF)
+                        ParseStatement(body);
+                } else while (!((token = tokenizer.PeekToken()).type == TokenTypes.Punctuation && (char)token.value == '\n') && token.type != TokenTypes.EOF)
+                        ParseStatement(body);
+            } else {
+                ParseStatement(body);
             }
         }
 
@@ -184,5 +214,14 @@ namespace WUIShared.Languages {
             public ParseObject condition;
             public Program TrueBody, FalseBody;
         }
+
+        public class ForLoop : ParseObject {
+            public Program initialization;
+            public ParseObject condition;
+            public Program incrementation;
+            public Program body;
+        }
     }
 }
+
+//for v.i = 0; v.i < 10; v.i++:

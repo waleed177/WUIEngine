@@ -66,9 +66,27 @@ namespace WUIShared.Languages {
                         } else throw new NotImplementedException("Non variables are not implemented for operators currently");
                 } else if (item is IfStatement ifStatement) {
                     Action trueBody = Compile(ifStatement.TrueBody);
+                    if(ifStatement.FalseBody == null) {
+                        res += () => {
+                            if ((int)ComputeValue(ifStatement.condition) != 0)
+                                trueBody();
+                        };
+                    } else {
+                        Action falseBody = Compile(ifStatement.FalseBody);
+                        res += () => {
+                            if ((int)ComputeValue(ifStatement.condition) != 0)
+                                trueBody();
+                            else
+                                falseBody();
+                        };
+                    }
+                } else if(item is ForLoop forLoop) {
+                    Action initialize = Compile(forLoop.initialization);
+                    Action incrementation = Compile(forLoop.incrementation);
+                    Action body = Compile(forLoop.body);
                     res += () => {
-                        if ((int)ComputeValue(ifStatement.condition) != 0)
-                            trueBody();
+                        for (initialize(); (int)ComputeValue(forLoop.condition) != 0; incrementation())
+                            body();
                     };
                 }
             }
