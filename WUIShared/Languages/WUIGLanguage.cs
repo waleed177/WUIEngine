@@ -24,7 +24,7 @@ namespace WUIShared.Languages
         }
 
         public void Evaluate(string code) {
-            parser.LoadCode(code);
+            parser.LoadCode(code + "\n");
 
             string token = "";
             TokenTypes tokenType = TokenTypes.Unknown;
