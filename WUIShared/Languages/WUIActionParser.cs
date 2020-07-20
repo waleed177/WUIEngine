@@ -143,7 +143,21 @@ namespace WUIShared.Languages {
                             peek = tokenizer.PeekToken();
                         } while (peek.type == TokenTypes.Operator && (string)peek.value == ".");
 
-                        res = new Variable() { path = path.ToArray() };
+
+                        if(peek.type == TokenTypes.Punctuation && (char) peek.value == '[') {
+                            tokenizer.NextToken(); //dump the [
+
+                            res = new ArrayIndexedObject() {
+                                arrayName = new Variable() { path = path.ToArray() },
+                                arrayIndice = ReadValue(tokenizer.NextToken())
+                            };
+
+                            Token potentialClosingBracket = tokenizer.NextToken(); //]
+                            if (!(potentialClosingBracket.type == TokenTypes.Punctuation && (char)potentialClosingBracket.value == ']'))
+                                throw new Exception("Expecting ]");
+                        } else {
+                            res = new Variable() { path = path.ToArray() };
+                        }
 
                     } else if (peek.type == TokenTypes.Operator) {
                         res = new Variable() { path = new string[] { token.value.ToString() } };
@@ -151,13 +165,23 @@ namespace WUIShared.Languages {
                         res = ReadFunction(token); //token is the function name
                     break;
                 case TokenTypes.Punctuation:
-                    if ((char)token.value == '{') {
-                        Program func = new Program();
+                    switch ((char)token.value) {
+                        case '{':
+                            Program func = new Program();
 
-                        Token funcToken;
-                        while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
-                            ParseStatement(func);
-                        return func;
+                            Token funcToken;
+                            while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
+                                ParseStatement(func);
+                            return func;
+                        case '[': {
+                                Token closingBrackets = tokenizer.NextToken();
+                                if (closingBrackets.type == TokenTypes.Punctuation && (char) closingBrackets.value == ']')
+                                    return new ArrayConstructor();
+                                else
+                                    throw new Exception("Expecting ]");
+                            }
+                        default:
+                            break;
                     }
                     break;
                 default:
@@ -233,6 +257,14 @@ namespace WUIShared.Languages {
             public ParseObject condition;
             public Program incrementation;
             public Program body;
+        }
+
+        public class ArrayConstructor : ParseObject {
+        }
+
+        public class ArrayIndexedObject : ParseObject {
+            public Variable arrayName;
+            public ParseObject arrayIndice;
         }
     }
 }

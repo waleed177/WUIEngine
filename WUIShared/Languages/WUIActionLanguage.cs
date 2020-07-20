@@ -52,7 +52,7 @@ namespace WUIShared.Languages {
                         };
                     }
                 } else if (item is BinaryOperator binaryOperator) {
-                    if (binaryOperator.left is Variable leftVariable)
+                    if (binaryOperator.left is Variable leftVariable) {
                         switch (binaryOperator.operatorName) {
                             case "=":
                                 res += () => SetVariable(leftVariable.path, ComputeValue(binaryOperator.right));
@@ -65,7 +65,30 @@ namespace WUIShared.Languages {
                                 break;
                             default:
                                 break;
-                        } else throw new NotSupportedException("Non variables are not supported for operators currently");
+                        }
+                    } else if (binaryOperator.left is ArrayIndexedObject arrayIndexedObject) {
+                        switch (binaryOperator.operatorName) {
+                            case "=":
+                                res += () => ((List<object>)GetVariable(arrayIndexedObject.arrayName.path))[(int) ComputeValue(arrayIndexedObject.arrayIndice)] = ComputeValue(binaryOperator.right);
+                                break;
+                            case "+=":
+                                res += () => {
+                                    List<object> array = (List<object>)GetVariable(arrayIndexedObject.arrayName.path);
+                                    int index = (int)ComputeValue(arrayIndexedObject.arrayIndice);
+                                    array[index] = (int)array[index] + (int)ComputeValue(binaryOperator.right);
+                                };
+                                break;
+                            case "-=":
+                                res += () => {
+                                    List<object> array = (List<object>)GetVariable(arrayIndexedObject.arrayName.path);
+                                    int index = (int)ComputeValue(arrayIndexedObject.arrayIndice);
+                                    array[index] = (int)array[index] - (int)ComputeValue(binaryOperator.right);
+                                };
+                                break;
+                            default:
+                                break;
+                        }
+                    } else throw new NotSupportedException("Non variables are not supported for operators currently");
                 } else if (item is RightUnaryOperator rightUnaryOperator) {
                     if (rightUnaryOperator.left is Variable leftVariable)
                         switch (rightUnaryOperator.operatorName) {
@@ -121,6 +144,8 @@ namespace WUIShared.Languages {
                 res = integer.value;
             else if (item is Variable variable)
                 res = GetVariable(variable.path);
+            else if (item is ArrayIndexedObject arrayIndexedObject)
+                res = ((List<object>)GetVariable(arrayIndexedObject.arrayName.path))[(int) ComputeValue(arrayIndexedObject.arrayIndice)];
             else if (item is FunctionCall functionCall) {
                 res = bindingDictionary[functionCall.functionName](ComputeArguments(functionCall.arguments));
             } else if (item is BinaryOperator binaryOperator) {
@@ -167,6 +192,8 @@ namespace WUIShared.Languages {
                 res = str.value;
             else if (item is Program program) {
                 res = Compile(program);
+            } else if (item is ArrayConstructor arrayConstructor) {
+                return new List<object>();
             } else
                 throw new NotImplementedException("This item is not implemented!");
             return res;
