@@ -23,6 +23,8 @@ namespace WUIShared {
         }
 
         private void GenerateBindings() {
+            Bind("This", args => GetVariable(new string[] { "this" }));
+
             Bind("Print", args => {
                 Console.WriteLine(args[0].ToString());
                 return null;
@@ -192,6 +194,14 @@ namespace WUIShared {
 
             Bind("ArrayObjCount", args => ((List<object>)args[0]).Count);
             Bind("ArrayObjIndexOf", args => ((List<object>)args[0]).IndexOf(args[1]));
+            #endregion
+            #region "String"
+            Bind("StringConcat", args => {
+                string res = "";
+                for (int i = 0; i < args.Length; i++)
+                    res += args[i].ToString();
+                return res;
+            });
             #endregion
         }
     }
