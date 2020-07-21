@@ -129,7 +129,7 @@ namespace WUIShared.Languages {
         }
 
         private bool IsPunctuation(char c) => ",;(){}[]:\n".IndexOf(c) >= 0;
-        private bool IsOperatorStart(char c) => "+-/*=.<>&".IndexOf(c) >= 0;
+        private bool IsOperatorStart(char c) => "+-/*=.<>&!".IndexOf(c) >= 0;
         private bool IsIdentifierStart(char c) => char.IsLetter(c) || c == '_';
         private bool IsIdentifier(char c) => char.IsLetterOrDigit(c) || c == '_';
         private bool IsKeyword(string c) => c == "if" || c == "else" || c == "for" || c == "while" || c == "break" || c == "end" || c == "func" || c == "function" || c == "def" || c == "define" || c == "include" || c == "struct" || c == "class" || c == "netstruct" || c == "netclass";

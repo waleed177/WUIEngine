@@ -28,7 +28,7 @@ namespace WUIShared.Languages {
         }
 
         public void LoadCode(string code) {
-            parser.LoadCode(code);
+            parser.LoadCode(";\n" + code); //TODO: FIGURE OUT WHY I NEED THE SEMICOLON.
             parsedProgram = parser.ParseCode();
 
         }
@@ -168,6 +168,9 @@ namespace WUIShared.Languages {
                     case "==":
                         res = ComputeValue(binaryOperator.left).Equals(ComputeValue(binaryOperator.right)) ? 1 : 0;
                         break;
+                    case "!=":
+                        res = ComputeValue(binaryOperator.left).Equals(ComputeValue(binaryOperator.right)) ? 0 : 1;
+                        break;
                     case ">":
                         res = ((int)ComputeValue(binaryOperator.left) > (int)ComputeValue(binaryOperator.right)) ? 1 : 0;
                         break;
@@ -207,6 +210,7 @@ namespace WUIShared.Languages {
             //TODO: Better way to implement user defined functions.
             if (path.Length == 1 && value is Action action) {
                 Bind(path[0], (args) => {
+                    SetVariable(new string[] { "args" }, new Dictionary<string, object>() { { "array", new List<object>(args) } });
                     action();
                     return returnValueOfFunction;
                 });
