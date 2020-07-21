@@ -5,6 +5,7 @@ using static WUIShared.Languages.WUIActionTokenizer;
 
 namespace WUIShared.Languages {
     public class WUIActionParser {
+        private readonly string[] argsArrayPath = new string[] { "args", "array" };
         WUIActionTokenizer tokenizer;
 
         public WUIActionParser() {
@@ -166,13 +167,56 @@ namespace WUIShared.Languages {
                     break;
                 case TokenTypes.Punctuation:
                     switch ((char)token.value) {
-                        case '{':
-                            Program func = new Program();
+                        case '{': {
+                                Program func = new Program();
 
-                            Token funcToken;
-                            while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
-                                ParseStatement(func);
-                            return func;
+                                Token funcToken;
+                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
+                                    ParseStatement(func);
+                                return func;
+                            }
+                        case '(': {
+                                //Named parameters function.
+                                Program func = new Program();
+
+                                //TODO: Check if the other method is more optimum (making a new parse object for named parameters and doing the rest of the work in wuiactionlanguage).
+                                int argNum = 0;
+                                Token funcToken;
+                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == ')')) {
+                                    tokenizer.NextToken();
+                                    if (funcToken.type == TokenTypes.Identifier) {
+                                        //f.[ParamName] = args.array[argNum];
+                                        func.body.Add(new BinaryOperator() {
+                                            left = new Variable() {
+                                                path = new string[] { "f", (string)funcToken.value }
+                                            },
+                                            operatorName = "=",
+                                            right = new ArrayIndexedObject() {
+                                                arrayName = new Variable() {
+                                                    path = argsArrayPath
+                                                },
+                                                arrayIndice = new Integer() {
+                                                    value = argNum++
+                                                }
+                                            },
+                                        });
+                                    } else {
+                                        throw new Exception("Expected identifier got " + funcToken.type);
+                                    }
+                                }
+
+                                funcToken = tokenizer.PeekToken();
+                                
+                                if (funcToken.type != TokenTypes.Punctuation && (char) funcToken.value != '{') {
+                                    throw new Exception("Expected { got " + funcToken.value);
+                                }
+                                tokenizer.NextToken(); //dump the {.
+
+                                //Read the function.
+                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
+                                    ParseStatement(func);
+                                return func;
+                            }
                         case '[': {
                                 Token closingBrackets = tokenizer.NextToken();
                                 if (closingBrackets.type == TokenTypes.Punctuation && (char) closingBrackets.value == ']')
