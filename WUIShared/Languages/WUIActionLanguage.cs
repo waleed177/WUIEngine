@@ -15,11 +15,20 @@ namespace WUIShared.Languages {
 
         private object returnValueOfFunction;
 
+        //readonly's
+        readonly string[] argsPath = new string[] { "args" };
+        readonly string[] thisPath = new string[] { "this" };
+        readonly string[] funcPath = new string[] { "f" };
+
         public WUIActionLanguage() {
             parser = new WUIActionParser();
             bindingDictionary = new Dictionary<string, FunctionDelegate>();
             variables = new Dictionary<string, object>();
             localVariables = new Stack<Dictionary<string, object>>();
+
+            SetVariable(argsPath, null);
+            SetVariable(thisPath, null);
+            SetVariable(funcPath, null);
 
             Bind("Return", (args) => {
                 returnValueOfFunction = args[0];
@@ -209,10 +218,24 @@ namespace WUIShared.Languages {
         public void SetVariable(string[] path, object value) {
             //TODO: Better way to implement user defined functions.
             if (path.Length == 1 && value is Action action) {
+                 
                 Bind(path[0], (args) => {
-                    SetVariable(new string[] { "args" }, new Dictionary<string, object>() { { "array", new List<object>(args) } });
+                    object _returnValueOfFunction = returnValueOfFunction;
+                    object _args = GetVariable(argsPath);
+                    object _this = GetVariable(thisPath);
+                    object _func = GetVariable(funcPath);
+
+                    SetVariable(argsPath, new Dictionary<string, object>() { { "array", new List<object>(args) } });
+                    SetVariable(thisPath, null);
+                    SetVariable(funcPath, new Dictionary<string, object>());
                     action();
-                    return returnValueOfFunction;
+
+                    object res = returnValueOfFunction;
+                    returnValueOfFunction = _returnValueOfFunction;
+                    SetVariable(argsPath, _args);
+                    SetVariable(thisPath, _this);
+                    SetVariable(funcPath, _func);
+                    return res;
                 });
             }
             SetVariable(variables, path, value);
