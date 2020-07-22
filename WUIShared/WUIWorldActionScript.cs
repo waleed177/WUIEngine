@@ -202,6 +202,11 @@ namespace WUIShared {
                     res += args[i].ToString();
                 return res;
             });
+            Bind("StringSub", args => ((string) args[0]).Substring((int) args[0], (int) args[1]));
+            Bind("StringSplit", args => ((string)args[0]).Split((char)args[1]));
+            #endregion
+            #region "Casting"
+            Bind("Int", args => int.Parse((string)args[0]));
             #endregion
         }
     }
