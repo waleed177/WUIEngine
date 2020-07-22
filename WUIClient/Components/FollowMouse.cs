@@ -9,9 +9,9 @@ namespace WUIClient.Components {
     class FollowMouse : GameObject {
         public bool screenPosition;
 
-        public FollowMouse() : base(Objects.FollowMouse, false) { }
+        public FollowMouse() : base(Objects.followMouse, false) { }
 
-        public FollowMouse(bool screenPosition) : base(Objects.FollowMouse, false) {
+        public FollowMouse(bool screenPosition) : base(Objects.followMouse, false) {
             this.screenPosition = screenPosition;
         }
 

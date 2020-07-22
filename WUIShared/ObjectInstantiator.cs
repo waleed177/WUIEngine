@@ -9,38 +9,35 @@ namespace WUIShared.Objects {
     public static class ObjectInstantiator {
         public delegate GameObject ObjectFactory();
         private static Dictionary<Objects, ObjectFactory> factories;
-        private static Dictionary<string, ObjectFactory> factories_string;
 
         static ObjectInstantiator() {
             factories = new Dictionary<Objects, ObjectFactory>();
-            factories_string = new Dictionary<string, ObjectFactory>();
 
-            AddFactory(Objects.Empty, "__EMPTY", EmptyFactory);
+            AddFactory(Objects.Empty, EmptyFactory);
 
-            AddGeneralFactory<ButtonComponent>(Objects.ButtonComponent, "UIButton");
-            AddGeneralFactory<UIText>(Objects.UIText, "UIText");
-            AddGeneralFactory<MouseClickableComponent>(Objects.MouseClickableComponent, "clickable");
+            AddGeneralFactory<ButtonComponent>(Objects.UIButton);
+            AddGeneralFactory<UIText>(Objects.UIText);
+            AddGeneralFactory<MouseClickableComponent>(Objects.clickable);
 
-            AddGeneralFactory<DragComponent>(Objects.DragComponent, "draggable");
-            AddGeneralFactory<FollowMouse>(Objects.FollowMouse, "followMouse");
-            AddGeneralFactory<RawTextureRenderer>(Objects.RawTextureRenderer, "texture");
-            AddGeneralFactory<Transform>(Objects.Transform, "transform");
-            AddGeneralFactory<CameraComponent>(Objects.Camera, "camera");
-            AddGeneralFactory<LocalScriptsComponent>(Objects.LocalScriptsComponent, "__LOCALSCRIPTSCOMPONENT");
-            AddGeneralFactory<ClientDontReplicate>(Objects.ClientDontReplicate, "clientDontReplicate");
+            AddGeneralFactory<DragComponent>(Objects.draggable);
+            AddGeneralFactory<FollowMouse>(Objects.followMouse);
+            AddGeneralFactory<RawTextureRenderer>(Objects.texture);
+            AddGeneralFactory<Transform>(Objects.transform);
+            AddGeneralFactory<CameraComponent>(Objects.camera);
+            AddGeneralFactory<LocalScriptsComponent>(Objects.LocalScriptsComponent);
+            AddGeneralFactory<ClientDontReplicate>(Objects.clientDontReplicate);
 
-            AddGeneralFactory<PlayerController>(Objects.PlayerController, "topDownPlayer");
+            AddGeneralFactory<PlayerController>(Objects.player);
 
-            AddGeneralFactory<BoxCollider>(Objects.BoxCollider, "boxCollider");
+            AddGeneralFactory<BoxCollider>(Objects.boxCollider);
         }
 
-        private static void AddFactory(Objects objType, string scriptName, ObjectFactory factory) {
+        private static void AddFactory(Objects objType, ObjectFactory factory) {
             factories.Add(objType, factory);
-            factories_string.Add(scriptName, factory);
         }
 
-        private static void AddGeneralFactory<T>(Objects objType, string scriptName) where T : GameObject, new() {
-            AddFactory(objType, scriptName, GeneralFactory<T>);
+        private static void AddGeneralFactory<T>(Objects objType) where T : GameObject, new() {
+            AddFactory(objType, GeneralFactory<T>);
         }
 
         internal static GameObject Instantiate(Objects objType) {
@@ -48,7 +45,8 @@ namespace WUIShared.Objects {
         }
 
         internal static GameObject Instantiate(string objName) {
-            return factories_string[objName].Invoke();
+            System.Enum.TryParse<Objects>(objName, out Objects objType);
+            return factories[objType].Invoke();
         }
 
         private static GameObject GeneralFactory<T>() where T : GameObject, new() {

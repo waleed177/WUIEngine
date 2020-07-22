@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace WUIClient.Components {
     public class BoxCollider : Collider {
 
-        public BoxCollider() : base (WUIShared.Objects.Objects.BoxCollider) {
+        public BoxCollider() : base (WUIShared.Objects.Objects.boxCollider) {
 
         }
 

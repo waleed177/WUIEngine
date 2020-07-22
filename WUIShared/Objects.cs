@@ -6,19 +6,19 @@ namespace WUIShared.Objects
 {
     public enum Objects {
         Empty,
-        Transform,
-        RawTextureRenderer,
-        MouseClickableComponent,
-        FollowMouse,
-        DragComponent,
-        ButtonComponent,
+        transform,
+        texture,
+        clickable,
+        followMouse,
+        draggable,
+        UIButton,
         TextRenderer,
         ListBoxUIComponent,
-        PlayerController,
-        BoxCollider,
-        Camera,
+        player,
+        boxCollider,
+        camera,
         LocalScriptsComponent,
-        ClientDontReplicate,
+        clientDontReplicate,
         UIText
     }
 }

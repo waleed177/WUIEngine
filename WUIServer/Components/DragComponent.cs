@@ -9,7 +9,7 @@ namespace WUIServer.Components {
     class DragComponent : GameObject {
         public bool screenPosition = false;
 
-        public DragComponent() : base(Objects.DragComponent, false ) {}
+        public DragComponent() : base(Objects.draggable, false ) {}
 
         public override void OnAdded() {
             base.OnAdded();

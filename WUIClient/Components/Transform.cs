@@ -60,7 +60,7 @@ namespace WUIClient.Components {
         private TransformSizeSet sizePacket;
 
 
-        public Transform() : base(Objects.Transform, false) {
+        public Transform() : base(Objects.transform, false) {
             positionPacket = new TransformPositionSet();
             sizePacket = new TransformSizeSet();
             On<TransformPositionSet>(TransformPositionSet);

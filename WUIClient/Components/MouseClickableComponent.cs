@@ -13,7 +13,7 @@ namespace WUIClient.Components {
 
         public MouseClickableComponent() : this(false) { }
 
-        public MouseClickableComponent(bool screenPosition) : base(Objects.MouseClickableComponent, false) {
+        public MouseClickableComponent(bool screenPosition) : base(Objects.clickable, false) {
             mouseClickable = new MouseClickable<GameObject>();
             this.screenPosition = screenPosition;
         }

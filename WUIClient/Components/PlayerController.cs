@@ -15,7 +15,7 @@ namespace WUIClient.Components {
         public float VerticalSpeed { get; private set; } = 32;
         private Collider collider;
 
-        public PlayerController() : base(Objects.PlayerController, false) {
+        public PlayerController() : base(Objects.player, false) {
             On<PlayerSpeedSet>(PlayerSpeedSet);
         }
         

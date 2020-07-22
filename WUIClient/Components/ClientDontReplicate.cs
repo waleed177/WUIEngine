@@ -8,7 +8,7 @@ using WUIShared.Objects;
 namespace WUIClient.Components {
     public class ClientDontReplicate : GameObject {
 
-        public ClientDontReplicate() : base(Objects.ClientDontReplicate, false) {
+        public ClientDontReplicate() : base(Objects.clientDontReplicate, false) {
             
         }
 

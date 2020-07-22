@@ -22,7 +22,7 @@ namespace WUIClient.Components {
 
         private MouseClickable<GameObject> mouseClickable;
 
-        public DragComponent() : base(Objects.DragComponent, false) {
+        public DragComponent() : base(Objects.draggable, false) {
             
         }
 

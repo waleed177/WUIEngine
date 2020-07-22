@@ -8,7 +8,7 @@ using WUIShared.Objects;
 namespace WUIServer.Components {
     public class BoxCollider : Collider {
 
-        public BoxCollider() : base(Objects.BoxCollider) {
+        public BoxCollider() : base(Objects.boxCollider) {
 
         }
 

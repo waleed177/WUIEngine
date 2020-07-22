@@ -15,7 +15,7 @@ namespace WUIClient.Components {
         private RawTextureRenderer renderer;
         private MouseClickableComponent mouseClickable;
 
-        public ButtonComponent() : base(Objects.ButtonComponent, false) {}
+        public ButtonComponent() : base(Objects.UIButton, false) {}
 
         public override void OnAdded() {
             base.OnAdded();

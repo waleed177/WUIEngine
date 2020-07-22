@@ -10,7 +10,7 @@ namespace WUIClient.Components {
     public class CameraComponent : GameObject {
         private Transform follow;
         private bool followLocalPlayer = false;
-        public CameraComponent() : base(WUIShared.Objects.Objects.Camera, false) {
+        public CameraComponent() : base(WUIShared.Objects.Objects.camera, false) {
             On<CameraSetFollow>(OnCameraSetFollow);
         }
 

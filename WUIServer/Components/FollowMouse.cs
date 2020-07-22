@@ -11,7 +11,7 @@ namespace WUIServer.Components {
 
         public FollowMouse() : this(false) { }
 
-        public FollowMouse(bool screenPosition) : base(Objects.FollowMouse, false) {
+        public FollowMouse(bool screenPosition) : base(Objects.followMouse, false) {
             this.screenPosition = screenPosition;
         }
 

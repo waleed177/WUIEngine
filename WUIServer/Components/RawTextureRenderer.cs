@@ -15,7 +15,7 @@ namespace WUIServer.Components {
         public float rotation;
         public Vector2 pivot;
 
-        public RawTextureRenderer() : base(Objects.RawTextureRenderer, false) {
+        public RawTextureRenderer() : base(Objects.texture, false) {
             texture = new Texture2D(null);
             On<RawTextureRendererTextureSet>(RecievedTexture);
         }

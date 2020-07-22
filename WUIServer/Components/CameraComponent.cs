@@ -23,7 +23,7 @@ namespace WUIServer.Components {
             }
         }
 
-        public CameraComponent() : base(WUIShared.Objects.Objects.Camera, false) {
+        public CameraComponent() : base(WUIShared.Objects.Objects.camera, false) {
 
         }
 

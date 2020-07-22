@@ -10,7 +10,7 @@ namespace WUIServer.Components {
         public float HorizontalSpeed { set; get; }
         public float VerticalSpeed { set; get; }
 
-        public PlayerController() : base(Objects.PlayerController, false) {
+        public PlayerController() : base(Objects.player, false) {
             
         }
 
