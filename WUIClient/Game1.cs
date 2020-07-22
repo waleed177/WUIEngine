@@ -93,13 +93,19 @@ namespace WUIClient {
                 return null;
             });
             //MouseStuff
-            worldActionScript.Bind("MouseGetWorldX", (args) => (int)  WMouse.WorldPosition.X);
-            worldActionScript.Bind("MouseGetWorldY", (args) => (int)  WMouse.WorldPosition.Y);
-            worldActionScript.Bind("MouseGetScreenX", (args) => (int) WMouse.Position.X);
-            worldActionScript.Bind("MouseGetScreenY", (args) => (int) WMouse.Position.Y);
-            worldActionScript.Bind("MouseButton0Down", (args) => (int)WMouse.mouseState.LeftButton);
-            worldActionScript.Bind("MouseButton1Down", (args) => (int)WMouse.mouseState.RightButton);
-
+            worldActionScript.Bind("MouseGetWorldX", (args) => (int)WMouse.WorldPosition.X);
+            worldActionScript.Bind("MouseGetWorldY", (args) => (int)WMouse.WorldPosition.Y);
+            worldActionScript.Bind("MouseGetScreenX", (args) => (int)WMouse.Position.X);
+            worldActionScript.Bind("MouseGetScreenY", (args) => (int)WMouse.Position.Y);
+            worldActionScript.Bind("MouseLeftDown", (args) => (int)WMouse.mouseState.LeftButton);
+            worldActionScript.Bind("MouseRightDown", (args) => (int)WMouse.mouseState.RightButton);
+            worldActionScript.Bind("MouseLeftClick", (args) => WMouse.RightMouseClick() ? 1 : 0);
+            worldActionScript.Bind("MouseRightClick", (args) => WMouse.LeftMouseClick() ? 1 : 0);
+            worldActionScript.Bind("MouseOverObject", (args) => ((MouseClickableComponent)args[0]).mouseClickable.MouseOver ? 1: 0);
+            worldActionScript.Bind("MouseLeftClickDownObject", (args) => ((MouseClickableComponent)args[0]).mouseClickable.MouseLeftClickDown ? 1 : 0);
+            worldActionScript.Bind("MouseRightClickUpObject", (args) => ((MouseClickableComponent)args[0]).mouseClickable.MouseLeftClickUp ? 1 : 0);
+            worldActionScript.Bind("MouseLeftDownObject", (args) => (((MouseClickableComponent)args[0]).mouseClickable.MouseOver && WMouse.mouseState.LeftButton == ButtonState.Pressed) ? 1 : 0);
+            worldActionScript.Bind("MouseRightDownObject", (args) => (((MouseClickableComponent)args[0]).mouseClickable.MouseOver && WMouse.mouseState.RightButton == ButtonState.Pressed) ? 1 : 0);
 
             string[] config = File.ReadAllLines("Config.txt");
             client = new ClientBase(config[0], int.Parse(config[1]), 8388608); //8MB Of buffer so images can be sent.

@@ -37,6 +37,10 @@ namespace WUIClient {
                     OnMouseEnter?.Invoke(sender);
                 } else {
                     MouseLeave = true;
+                    MouseLeftClickDown = false;
+                    MouseRightClickDown = false;
+                    MouseLeftClickUp = false;
+                    MouseRightClickUp = false;
                     OnMouseLeave?.Invoke(sender);
                 }
             } else {
