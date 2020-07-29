@@ -65,12 +65,6 @@ namespace WUIShared.Objects {
 
             ObjType = type;
             packetHandler = new PacketHandler<ClientBase>();
-            OnChildAdded += GameObject_OnChildAdded;
-        }
-
-        private void GameObject_OnChildAdded(GameObject sender, GameObject gameObject) {
-            if (gameObject is Transform)
-                transform = (Transform)gameObject;
         }
 
         private void Added() {
@@ -134,6 +128,8 @@ namespace WUIShared.Objects {
 
         public void AddChild(GameObject child, bool sendToOthers = true) {
             lock (childModification) {
+                if (child is Transform)
+                    transform = (Transform)child;
                 childrenChanged = true;
                 child.Parent = this;
                 bool usedToBeMultiplayer = child.multiplayer;
@@ -155,11 +151,11 @@ namespace WUIShared.Objects {
             }
         }
 
-        public void RemoveChild(GameObject gameObject, bool sendToOthers = true) {
+        public void RemoveChild(GameObject gameObject, bool sendToOthers = true, bool alertNetworkManager = true) {
             lock (childModification) {
                 childrenChanged = true;
                 toBeRemoved.Enqueue(gameObject);
-                if (multiplayer && gameObject.Parent != null) {
+                if (alertNetworkManager && multiplayer && gameObject.Parent != null) {
                     networkManager.Remove(gameObject, sendToOthers);
                     foreach (var item in gameObject.children)
                         item.Remove(false);
@@ -169,8 +165,8 @@ namespace WUIShared.Objects {
         }
 
         //Parent is null at random? TODO: FIX
-        public void Remove(bool sendToOthers = true) {
-            Parent?.RemoveChild(this, sendToOthers);
+        public void Remove(bool sendToOthers = true, bool alertNetworkManager = true) {
+            Parent?.RemoveChild(this, sendToOthers, alertNetworkManager);
         }
 
         public T GetFirst<T>() where T : GameObject {

@@ -88,9 +88,10 @@ namespace WUIClient {
             worldActionScript.Bind("LocalPlayerExists", (args) => localPlayer != null ? 1 : 0);
             worldActionScript.Bind("ParentSetToUI", (args) => {
                 GameObject gameObject = ((GameObject)args[0]);
-                gameObject.Remove(false);
+                if (gameObject.Parent != userGUI) return 1; // You are in UI!
+                gameObject.Remove(false, false);
                 userGUI.AddChild(gameObject);
-                return null;
+                return 0;
             });
             //MouseStuff
             worldActionScript.Bind("MouseGetWorldX", (args) => (int)WMouse.WorldPosition.X);
@@ -112,7 +113,7 @@ namespace WUIClient {
             assetManager = new ClientAssetManager(client);
             networkManager = new NetworkManager(world);
             GameObject.networkManager = networkManager;
-
+            
         }
 
         protected override void Initialize() {

@@ -17,6 +17,7 @@ namespace WUIClient.Components {
         }
 
         private void OnRecieveLocalScripts(ClientBase sender, SendLocalScripts packet) {
+            Console.WriteLine("Recieved packet " + packet.code[1]);
             for (int i = 0; i < packet.eventId.Length; i++) {
                 int eventId = packet.eventId[i];
                 string code = packet.code[i];
@@ -27,9 +28,10 @@ namespace WUIClient.Components {
 
                 switch ((EventTypes)eventId) {
                     case EventTypes.OnLoad:
-                        Parent.OnAddedEvent -= functions[eventId];
-                        Parent.OnAddedEvent += OnlyThis;
-                        functions[eventId] = OnlyThis;
+                        //Parent.OnAddedEvent -= functions[eventId];
+                        //Parent.OnAddedEvent += OnlyThis;
+                        //TODO: this may not work if this object was instantiated in the client.
+                        OnlyThis(Parent);
                         break;
                     case EventTypes.OnUpdate:
                         Parent.OnUpdateEvent -= functions[eventId];

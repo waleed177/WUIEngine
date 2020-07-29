@@ -113,7 +113,7 @@ namespace WUIShared {
 
             Bind("ArrayIntAddRepeat", args => {
                 List<int> list = ((List<int>)args[0]);
-                for(int i = 0; i < (int) args[1]; i++)
+                for (int i = 0; i < (int)args[1]; i++)
                     list.Add((int)args[2]);
                 return null;
             });
@@ -202,11 +202,17 @@ namespace WUIShared {
                     res += args[i].ToString();
                 return res;
             });
-            Bind("StringSub", args => ((string) args[0]).Substring((int) args[0], (int) args[1]));
-            Bind("StringSplit", args => ((string)args[0]).Split((char)args[1]));
+            Bind("StringSub", args => ((string)args[0]).Substring((int)args[0], (int)args[1]));
+            Bind("StringSplit", args => new List<object>(((string)args[0]).Split(new string[] { (string)args[1] }, StringSplitOptions.None)));
             #endregion
             #region "Casting"
             Bind("Int", args => int.Parse((string)args[0]));
+            #endregion
+            #region "Instance Functions"
+            Bind("InstanceFunctionBind", args => {
+                SetVariable(new string[] { (string)args[0] }, (Action) args[1]);
+                return null;
+            });
             #endregion
         }
     }
