@@ -25,12 +25,6 @@ namespace WUIShared.Languages {
         readonly string[] thisPath = new string[] { "this" };
         readonly string[] funcPath = new string[] { "f" };
 
-        public event VariableSetDelegate OnVariableSet;
-        public event UserDefinedFunctionCall OnUserDefinedFunctionCall;
-        public event UserDefinedFunctionCall OnUserDefinedFunctionCallEnd;
-        public event ArraySetDelegate OnArraySet;
-        public event PositionChangedDelegate OnPositionChanged;
-
         private Dictionary<object, string[]> variableReferenceToPath;
 
         public WUIActionLanguage() {
@@ -64,7 +58,6 @@ namespace WUIShared.Languages {
             Action res = () => { };
 
             foreach (var item in prog.body) {
-                res += () => OnPositionChanged?.Invoke(item.row, item.column);
                 if (item is FunctionCall functionCall) {
                     //TODO: Dont allow functions to not be explicitly declared before assigning?
                     if (bindingDictionary.ContainsKey(functionCall.functionName)) {
@@ -100,7 +93,6 @@ namespace WUIShared.Languages {
                                     int index = (int)ComputeValue(arrayIndexedObject.arrayIndice);
                                     object oldVal = array[index];
                                     array[index] = ComputeValue(binaryOperator.right);
-                                    OnArraySet?.Invoke(arrayIndexedObject.arrayName.path, index, oldVal, array[index]);
                                 };
                                 break;
                             case TokenTypes.Operator_AddEqual:
@@ -110,7 +102,6 @@ namespace WUIShared.Languages {
 
                                     object oldVal = array[index];
                                     array[index] = (int)array[index] + (int)ComputeValue(binaryOperator.right);
-                                    OnArraySet?.Invoke(arrayIndexedObject.arrayName.path, index, oldVal, array[index]);
                                 };
                                 break;
                             case TokenTypes.Operator_SubtractEqual:
@@ -119,7 +110,6 @@ namespace WUIShared.Languages {
                                     int index = (int)ComputeValue(arrayIndexedObject.arrayIndice);
                                     object oldVal = array[index];
                                     array[index] = (int)array[index] - (int)ComputeValue(binaryOperator.right);
-                                    OnArraySet?.Invoke(arrayIndexedObject.arrayName.path, index, oldVal, array[index]);
                                 };
                                 break;
                             default:
@@ -253,14 +243,10 @@ namespace WUIShared.Languages {
                     object _this = GetVariable(thisPath);
                     object _func = GetVariable(funcPath);
 
-                    OnUserDefinedFunctionCall?.Invoke(path[0], args);
-
                     SetVariable(argsPath, new Dictionary<string, object>() { { "array", args.Clone() } });
                     SetVariable(thisPath, null);
                     SetVariable(funcPath, new Dictionary<string, object>());
                     action();
-
-                    OnUserDefinedFunctionCallEnd?.Invoke(path[0], args);
 
                     object res = returnValueOfFunction;
                     returnValueOfFunction = _returnValueOfFunction;
@@ -273,7 +259,7 @@ namespace WUIShared.Languages {
 
             if (value != null && !variableReferenceToPath.ContainsKey(value))
                 variableReferenceToPath[value] = path;
-            OnVariableSet?.Invoke(path, VariableExists(path) ? GetVariable(path) : null, value);
+
             switch (path.Length) {
                 case 1:
                     variables[path[0]] = value;
