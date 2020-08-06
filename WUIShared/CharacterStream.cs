@@ -7,6 +7,10 @@ namespace WUIShared {
         private string str;
         private int position;
 
+        public int Row { get; private set; } = 1;
+        public int Column { get; private set; } = 1;
+
+
         public CharacterStream(string str) {
             this.str = str;
             position = 0;
@@ -34,13 +38,13 @@ namespace WUIShared {
 
         public string NextWord(char chr = ' ') {
             int start = position;
-            while (position < str.Length && str[position] != chr) position++;
+            while (position < str.Length && str[position] != chr) IncrementPosition();
             return str.Substring(start, position - start);
         }
 
         public void DumpUntil(char chr) {
             int start = position;
-            while (position < str.Length && str[position] != chr) position++;
+            while (position < str.Length && str[position] != chr) IncrementPosition();
         }
 
         public string PeekOnly(Func<char, bool> filter) {
@@ -55,13 +59,13 @@ namespace WUIShared {
 
         public string NextOnly(Func<char, bool> filter) {
             int start = position;
-            while (position < str.Length && filter(str[position])) position++;
+            while (position < str.Length && filter(str[position])) IncrementPosition();
             return str.Substring(start, position - start);
         }
 
         public char Next() {
             if (position < str.Length)
-                return str[position++];
+                return str[IncrementPosition()];
             else
                 return (char)0;
         }
@@ -80,12 +84,23 @@ namespace WUIShared {
 
         public string Next(int amount) {
             string res = Peek(amount);
-            position += res.Length;
+            Dump(res.Length);
             return res;
         }
 
         public void Dump(int amt) {
-            position += amt;
+            for (int i = 0; i < amt; i++)
+                IncrementPosition();
+        }
+
+        private int IncrementPosition() {
+            if (str[position] == '\n') {
+                Column = 1;
+                Row++;
+            } else {
+                Column++;
+            }
+            return position++;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace WUIShared.Languages {
             tokenizer = new WUIActionTokenizer();
         }
 
+
         public void LoadCode(string code) {
             tokenizer.LoadCode(code);
         }
@@ -39,8 +40,6 @@ namespace WUIShared.Languages {
             Token token = tokenizer.NextToken();
 
             switch (token.type) {
-                case TokenTypes.Punctuation:
-                    break;
                 case TokenTypes.Number:
                     break;
                 case TokenTypes.String:
@@ -48,6 +47,8 @@ namespace WUIShared.Languages {
                 case TokenTypes.Keyword:
                     if ((string)token.value == "if") {
                         IfStatement ifStatement = new IfStatement();
+                        ifStatement.column = token.column;
+                        ifStatement.row = token.row;
                         ifStatement.condition = ReadValue(tokenizer.NextToken());
                         ParseStatementBody(ifStatement.TrueBody = new Program());
                         Token possibleElseToken = tokenizer.PeekToken();
@@ -59,6 +60,8 @@ namespace WUIShared.Languages {
                         return ifStatement;
                     } else if ((string)token.value == "for") {
                         ForLoop forLoop = new ForLoop();
+                        forLoop.column = token.column;
+                        forLoop.row = token.row;
                         ParseStatement(forLoop.initialization = new Program());
                         forLoop.condition = ReadValue(tokenizer.NextToken());
                         ParseStatement(forLoop.incrementation = new Program());
@@ -68,16 +71,12 @@ namespace WUIShared.Languages {
                     break;
                 case TokenTypes.Identifier: {
                         Token peek = tokenizer.PeekToken();
-                        if (peek.type == TokenTypes.Operator) {
-                            return ReadValue(token);
+                        if (peek.type == TokenTypes.Punctuation_Open_Parenthesis) {
+                            return ReadFunction(token);
                         } else {
-                            //Function
-                            FunctionCall functionCall = ReadFunction(token);
-                            return functionCall;
+                            return ReadValue(token);
                         }
                     }
-                case TokenTypes.Operator:
-                    break;
                 case TokenTypes.EOF:
                     break;
                 default:
@@ -96,16 +95,16 @@ namespace WUIShared.Languages {
         private void ParseStatementBody(Program body) {
             Token token;
             Token possiblyColon = tokenizer.PeekToken();
-            if (possiblyColon.type == TokenTypes.Punctuation && (char)possiblyColon.value == ':') {
+            if (possiblyColon.type == TokenTypes.Punctuation_Colon) {
                 int refTabIndex = tokenizer.TabIndex;
                 tokenizer.NextToken(); //Dump the colon.
                 Token multilineCheckToken = tokenizer.PeekToken();
-                if (multilineCheckToken.type == TokenTypes.Punctuation && (char)multilineCheckToken.value == '\n') {
+                if (multilineCheckToken.type == TokenTypes.Punctuation_NewLine) {
                     //Its a multiline if.
                     tokenizer.NextToken(); //dump the new line.
                     while (tokenizer.TabIndex > refTabIndex && (token = tokenizer.PeekToken()).type != TokenTypes.EOF)
                         ParseStatement(body);
-                } else while (!((token = tokenizer.PeekToken()).type == TokenTypes.Punctuation && (char)token.value == '\n') && token.type != TokenTypes.EOF)
+                } else while (!((token = tokenizer.PeekToken()).type == TokenTypes.Punctuation_NewLine) && token.type != TokenTypes.EOF)
                         ParseStatement(body);
             } else {
                 ParseStatement(body);
@@ -114,11 +113,21 @@ namespace WUIShared.Languages {
 
         private FunctionCall ReadFunction(Token token) {
             FunctionCall functionCall = new FunctionCall() {
-                functionName = (string)token.value
+                functionName = (string)token.value,
+                column = token.column,
+                row = token.row
             };
 
-            while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation && token.type != TokenTypes.EOF)
+            tokenizer.NextToken(); //Dump the (;
+
+            while ((token = tokenizer.NextToken()).type != TokenTypes.Punctuation_Close_Parenthesis && token.type != TokenTypes.EOF) {
                 functionCall.arguments.Add(ReadValue(token));
+                token = tokenizer.PeekToken();
+                if (token.type == TokenTypes.Punctuation_Comma) {
+                    tokenizer.NextToken();
+                    continue; //TODO: Possibly make commas non-optional
+                }
+            }
             return functionCall;
         }
 
@@ -134,7 +143,7 @@ namespace WUIShared.Languages {
                 case TokenTypes.Identifier:
 
                     Token peek = tokenizer.PeekToken();
-                    if (peek.type == TokenTypes.Operator && (string)peek.value == ".") {
+                    if (peek.type == TokenTypes.Operator_Access) {
                         List<string> path = new List<string>();
                         path.Add(token.value.ToString());
                         do {
@@ -142,111 +151,117 @@ namespace WUIShared.Languages {
                             string varName = (string)tokenizer.NextToken().value;
                             path.Add(varName);
                             peek = tokenizer.PeekToken();
-                        } while (peek.type == TokenTypes.Operator && (string)peek.value == ".");
+                        } while (peek.type == TokenTypes.Operator_Access);
 
 
-                        if(peek.type == TokenTypes.Punctuation && (char) peek.value == '[') {
+                        if (peek.type == TokenTypes.Punctuation_Open_Square) {
                             tokenizer.NextToken(); //dump the [
 
                             res = new ArrayIndexedObject() {
-                                arrayName = new Variable() { path = path.ToArray() },
+                                arrayName = new Variable() { path = path.ToArray(), row = token.row, column = token.column },
                                 arrayIndice = ReadValue(tokenizer.NextToken())
                             };
 
                             Token potentialClosingBracket = tokenizer.NextToken(); //]
-                            if (!(potentialClosingBracket.type == TokenTypes.Punctuation && (char)potentialClosingBracket.value == ']'))
-                                throw new Exception("Expecting ]");
+                            if (potentialClosingBracket.type != TokenTypes.Punctuation_Close_Square)
+                                throw new Exception("Expecting ] at " + token.Position() + " instead got " + token.type);
                         } else {
                             res = new Variable() { path = path.ToArray() };
                         }
 
-                    } else if (peek.type == TokenTypes.Operator) {
-                        res = new Variable() { path = new string[] { token.value.ToString() } };
-                    } else
+                    } else if (peek.type == TokenTypes.Punctuation_Open_Parenthesis) {
                         res = ReadFunction(token); //token is the function name
+                    } else
+                        res = new Variable() { path = new string[] { token.value.ToString() } };
                     break;
-                case TokenTypes.Punctuation:
-                    switch ((char)token.value) {
-                        case '{': {
-                                Program func = new Program();
+                case TokenTypes.Punctuation_Open_Squiggly: {
+                        Program func = new Program();
 
-                                Token funcToken;
-                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
-                                    ParseStatement(func);
-                                return func;
-                            }
-                        case '(': {
-                                //Named parameters function.
-                                Program func = new Program();
+                        Token funcToken;
+                        while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && funcToken.type != TokenTypes.Punctuation_Close_Squiggly)
+                            ParseStatement(func);
+                        res = func;
+                    }
+                    break;
+                case TokenTypes.Punctuation_Open_Parenthesis: {
+                        //Named parameters function.
+                        Program func = new Program();
 
-                                //TODO: Check if the other method is more optimum (making a new parse object for named parameters and doing the rest of the work in wuiactionlanguage).
-                                int argNum = 0;
-                                Token funcToken;
-                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == ')')) {
-                                    tokenizer.NextToken();
-                                    if (funcToken.type == TokenTypes.Identifier) {
-                                        //f.[ParamName] = args.array[argNum];
-                                        func.body.Add(new BinaryOperator() {
-                                            left = new Variable() {
-                                                path = new string[] { "f", (string)funcToken.value }
-                                            },
-                                            operatorName = "=",
-                                            right = new ArrayIndexedObject() {
-                                                arrayName = new Variable() {
-                                                    path = argsArrayPath
-                                                },
-                                                arrayIndice = new Integer() {
-                                                    value = argNum++
-                                                }
-                                            },
-                                        });
-                                    } else {
-                                        throw new Exception("Expected identifier got " + funcToken.type);
+                        //TODO: Check if the other method is more optimum (making a new parse object for named parameters and doing the rest of the work in wuiactionlanguage).
+                        int argNum = 0;
+                        Token funcToken;
+                        while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && funcToken.type != TokenTypes.Punctuation_Close_Parenthesis) {
+                            tokenizer.NextToken();
+                            if (funcToken.type == TokenTypes.Identifier) {
+                                //Generate code for the parameter list.
+                                //f.[ParamName] = args.array[argNum];
+                                func.body.Add(new BinaryOperator() {
+                                    left = new Variable() {
+                                        path = new string[] { "f", (string)funcToken.value }
+                                    },
+                                    operatorName = TokenTypes.Operator_Assign,
+                                    right = new ArrayIndexedObject() {
+                                        arrayName = new Variable() {
+                                            path = argsArrayPath
+                                        },
+                                        arrayIndice = new Integer() {
+                                            value = argNum++
+                                        }
                                     }
-                                }
-
-                                funcToken = tokenizer.PeekToken();
-                                
-                                if (funcToken.type != TokenTypes.Punctuation && (char) funcToken.value != '{') {
-                                    throw new Exception("Expected { got " + funcToken.value);
-                                }
-                                tokenizer.NextToken(); //dump the {.
-
-                                //Read the function.
-                                while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation && (char)funcToken.value == '}'))
-                                    ParseStatement(func);
-                                return func;
+                                });
+                            } else {
+                                throw new Exception("Expected identifier at " + funcToken.Position() + " instead got " + funcToken.type);
                             }
-                        case '[': {
-                                Token closingBrackets = tokenizer.NextToken();
-                                if (closingBrackets.type == TokenTypes.Punctuation && (char) closingBrackets.value == ']')
-                                    return new ArrayConstructor();
-                                else
-                                    throw new Exception("Expecting ]");
-                            }
-                        default:
-                            break;
+                        }
+
+                        tokenizer.NextToken(); //Dump the )
+
+                        funcToken = tokenizer.NextToken();
+
+                        if (funcToken.type != TokenTypes.Punctuation_Open_Squiggly) {
+                            throw new Exception("Expected { at " + funcToken.Position() + " got " + funcToken.type);
+                        }
+                        tokenizer.NextToken(); //dump the {.
+
+                        //Read the function.
+                        while ((funcToken = tokenizer.PeekToken()).type != TokenTypes.EOF && !(funcToken.type == TokenTypes.Punctuation_Close_Squiggly))
+                            ParseStatement(func);
+                        res = func;
+                    }
+                    break;
+                case TokenTypes.Punctuation_Open_Square: {
+                        Token length = tokenizer.NextToken();
+                        if (length.type != TokenTypes.Number)
+                            throw new Exception("Expected a number got " + length.type);
+                        Token closingBrackets = tokenizer.NextToken();
+                        if (closingBrackets.type == TokenTypes.Punctuation_Close_Square)
+                            res = new ArrayConstructor { arrayLength = (int)length.value };
+                        else
+                            throw new Exception("Expecting ] at " + closingBrackets.Position() + " instead got " + closingBrackets.type);
                     }
                     break;
                 default:
                     break;
             }
 
-            if (tokenizer.PeekToken().type == TokenTypes.Operator) {
+            if (tokenizer.IsOperator(tokenizer.PeekToken())) {
                 Token op = tokenizer.NextToken();
-                string oper = (string)op.value;
-                if (oper == "++" || oper == "--") {
-                    res = new RightUnaryOperator() { operatorName = oper, left = res };
+                if (op.type == TokenTypes.Operator_Increment || op.type == TokenTypes.Operator_Decrement) {
+                    res = new RightUnaryOperator() { operatorName = op.type, left = res };
                 } else {
-                    res = new BinaryOperator() { operatorName = (string)op.value, left = res, right = ReadValue(tokenizer.NextToken()) };
+                    res = new BinaryOperator() { operatorName = op.type, left = res, right = ReadValue(tokenizer.NextToken()) };
                 }
             }
+
+            res.column = token.column;
+            res.row = token.row;
+
             return res;
         }
 
         ////////////////////////////////Classes////////////////////////
         public class ParseObject {
-
+            public int row, column;
         }
 
         public class Program : ParseObject {
@@ -269,17 +284,17 @@ namespace WUIShared.Languages {
         }
 
         public class BinaryOperator : ParseObject {
-            public string operatorName;
+            public TokenTypes operatorName;
             public ParseObject left, right;
         }
 
         public class RightUnaryOperator : ParseObject {
-            public string operatorName;
+            public TokenTypes operatorName;
             public ParseObject left;
         }
 
         public class LeftUnaryOperator : ParseObject {
-            public string operatorName;
+            public TokenTypes operatorName;
             public ParseObject right;
         }
 
@@ -304,6 +319,7 @@ namespace WUIShared.Languages {
         }
 
         public class ArrayConstructor : ParseObject {
+            public int arrayLength;
         }
 
         public class ArrayIndexedObject : ParseObject {
